@@ -2,294 +2,746 @@ import Link from "next/link";
 import { HeroHeadline } from "@/components/HeroHeadline";
 import { SectionReveal } from "@/components/SectionReveal";
 import { CountUpNumber } from "@/components/CountUpNumber";
+import { PortfolioGrid } from "@/components/PortfolioGrid";
 
-// Portfolio images from WP media library
-const PORTFOLIO = [
-  { src: "https://triolla.io/wp-content/uploads/2025/11/Frame-2147224611.png",       label: "Product Design",   cols: "col-span-12 md:col-span-8" },
-  { src: "https://triolla.io/wp-content/uploads/2025/10/Screenshot-2025-10-15-at-9.43.09.png", label: "UX Research",     cols: "col-span-6 md:col-span-4" },
-  { src: "https://triolla.io/wp-content/uploads/2025/09/Screenshot-2025-09-01-at-17.14.33-min-scaled.png", label: "SaaS Platform",   cols: "col-span-6 md:col-span-6" },
-  { src: "https://triolla.io/wp-content/uploads/2025/10/Screenshot-2025-10-21-at-11.15.11-scaled.png",     label: "Mobile App",      cols: "col-span-12 md:col-span-6" },
-  { src: "https://triolla.io/wp-content/uploads/2025/11/Frame-2147224612.png",       label: "Motion Design",   cols: "col-span-4 md:col-span-3" },
-  { src: "https://triolla.io/wp-content/uploads/2025/09/Screenshot-2025-09-16-at-11.02.54-scaled.png",     label: "Cybersecurity UI", cols: "col-span-8 md:col-span-9" },
+
+const SERVICE_CARDS = [
+  { num: "01", title: "Design a new product",        body: "Design and develop an industry-leading product" },
+  { num: "02", title: "Improve an existing product", body: "Upgrade and redesign your product to become a category leader" },
+  { num: "03", title: "First Steps for Start-ups",   body: "Take your vision from concept to launch" },
+  { num: "04", title: "Product consulting",          body: "Accelerate your strategic planning process" },
+];
+
+const TIMELINE_STEPS = [
+  { step: "01", title: "Kickoff meeting",          text: "Understanding your vision, goals, and target audience." },
+  { step: "02", title: "Research & Discovery",     text: "Market analysis, competitor review, and user needs." },
+  { step: "03", title: "User Interviews",          text: "Gathering qualitative data directly from your users." },
+  { step: "04", title: "Information Architecture", text: "Structuring the product logic and navigation flow." },
+  { step: "05", title: "Wireframing",              text: "Creating low-fidelity layouts for core screens." },
+  { step: "06", title: "Design Concept",           text: "Establishing the visual language and moodboard." },
+  { step: "07", title: "UI Design",               text: "Applying the visual concept to the wireframes." },
+  { step: "08", title: "Prototyping",             text: "Building interactive models for user testing." },
+  { step: "09", title: "Detailed Design",         text: "Finalizing all screens and creating the Design System." },
 ];
 
 export default function Home() {
   return (
-    <main className="bg-[#1a1a1a] text-white overflow-hidden pb-32">
+    <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
 
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col items-center pt-32 pb-16 px-4 overflow-hidden">
+      {/* ── Grain noise overlay ── */}
+      <div
+        aria-hidden="true"
+        className="grain-overlay"
+      />
 
-        {/* CSS background glow — no external assets needed */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          {/* Radial yellow glow from bottom center */}
-          <div
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full opacity-[0.07]"
-            style={{ background: "radial-gradient(ellipse at center, #facc15 0%, transparent 70%)" }}
-          />
-          {/* Subtle dot grid */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
-          {/* Top right corner accent */}
-          <div
-            className="absolute top-0 right-0 w-[600px] h-[600px] opacity-[0.03]"
-            style={{ background: "radial-gradient(circle at top right, #facc15 0%, transparent 60%)" }}
-          />
+      {/* ══════════════════════════════════════════════
+          HERO
+      ══════════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex flex-col items-center pt-32 pb-20 px-4 overflow-hidden">
+
+        {/* Ambient orb cluster */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="hero-orb hero-orb--gold" />
+          <div className="hero-orb hero-orb--amber" />
+          <div className="hero-orb hero-orb--dim" />
+          <div className="hero-grid" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center">
-          <div className="text-yellow-400 font-medium tracking-widest uppercase mb-6 text-sm">Product UX/UI design for</div>
+        <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center w-full">
+
+          {/* Eyebrow */}
+          <div className="eyebrow">
+            <span className="eyebrow__dot" />
+            Product UX/UI design for
+            <span className="eyebrow__dot" />
+          </div>
 
           <HeroHeadline
             headline="Creative Design Attracts People. Smart UX Makes Them Stay"
             subtext="Product Design for Tech, Gaming, Medical, Cyber, IoT, Agritech, Mobile, SaaS Platforms & Startups"
-            headlineClassName="text-6xl md:text-[80px] lg:text-[110px] leading-[0.9] font-bold tracking-tighter mb-8 max-w-[1200px]"
-            subtextClassName="text-xl md:text-3xl font-light text-gray-300 max-w-4xl mx-auto leading-relaxed"
+            headlineClassName="text-6xl md:text-[80px] lg:text-[110px] leading-[0.9] font-bold tracking-tighter mb-8 max-w-[1200px] hero-headline"
+            subtextClassName="text-xl md:text-2xl font-light text-gray-400 max-w-3xl mx-auto leading-relaxed"
           />
 
-          {/* Floating badge — top left */}
-          <div
-            className="absolute top-12 -left-4 lg:-left-16 hidden md:flex items-center gap-3 bg-black/80 border border-white/10 rounded-2xl px-4 py-3 shadow-2xl backdrop-blur-sm"
-            style={{ animation: "floatA 6s ease-in-out infinite" }}
-          >
-            <div className="w-9 h-9 bg-yellow-400 rounded-xl flex items-center justify-center shrink-0">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 1L10.06 5.17L14.66 5.85L11.33 9.1L12.12 13.69L8 11.52L3.88 13.69L4.67 9.1L1.34 5.85L5.94 5.17L8 1Z" fill="black" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div>
-              <div className="text-[11px] text-gray-400 uppercase tracking-widest leading-none mb-0.5">Global Award</div>
-              <div className="text-[15px] font-bold text-white leading-none">#1 Product Design 2025</div>
-            </div>
-          </div>
+  
+        </div>
 
-          {/* Floating badge — top right */}
-          <div
-            className="absolute top-36 -right-4 lg:-right-16 hidden md:flex items-center gap-3 bg-black/80 border border-white/10 rounded-2xl px-4 py-3 shadow-2xl backdrop-blur-sm"
-            style={{ animation: "floatB 7s ease-in-out infinite" }}
-          >
-            <div className="w-9 h-9 bg-[#111] rounded-xl border border-white/10 flex items-center justify-center shrink-0">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="9" width="2.5" height="6" rx="1" fill="#facc15"/>
-                <rect x="5" y="6" width="2.5" height="9" rx="1" fill="#facc15"/>
-                <rect x="9" y="3" width="2.5" height="12" rx="1" fill="#facc15"/>
-                <rect x="13" y="1" width="2.5" height="14" rx="1" fill="#facc15"/>
-              </svg>
-            </div>
-            <div>
-              <div className="text-[11px] text-gray-400 uppercase tracking-widest leading-none mb-0.5">Delivered</div>
-              <div className="text-[15px] font-bold text-white leading-none">150+ Products Shipped</div>
-            </div>
-          </div>
-
-          {/* Floating badge — bottom left */}
-          <div
-            className="absolute bottom-16 -left-4 lg:-left-8 hidden md:flex items-center gap-3 bg-yellow-400 rounded-2xl px-4 py-3 shadow-2xl"
-            style={{ animation: "floatC 8s ease-in-out infinite" }}
-          >
-            <div className="w-7 h-7 bg-black/20 rounded-lg flex items-center justify-center shrink-0">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="6" stroke="black" strokeWidth="1.5"/>
-                <path d="M7 4V7.5L9 9" stroke="black" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <div>
-              <div className="text-[11px] text-black/60 uppercase tracking-widest leading-none mb-0.5">Experience</div>
-              <div className="text-[15px] font-black text-black leading-none">10+ Years</div>
-            </div>
-          </div>
+        {/* Scroll cue */}
+        <div className="scroll-cue" aria-hidden="true">
+          <div className="scroll-cue__line" />
+          <span className="scroll-cue__label">Scroll</span>
         </div>
       </section>
 
-      {/* CSS keyframe animations injected via style tag */}
-      <style>{`
-        @keyframes floatA {
-          0%, 100% { transform: translateY(0px) rotate(-1deg); }
-          50% { transform: translateY(-12px) rotate(0deg); }
-        }
-        @keyframes floatB {
-          0%, 100% { transform: translateY(0px) rotate(1deg); }
-          50% { transform: translateY(-16px) rotate(-0.5deg); }
-        }
-        @keyframes floatC {
-          0%, 100% { transform: translateY(0px) rotate(0.5deg); }
-          50% { transform: translateY(-10px) rotate(-1deg); }
-        }
-      `}</style>
-
-      {/* Portfolio Grid — WP images */}
+      {/* ══════════════════════════════════════════════
+          PORTFOLIO GRID
+      ══════════════════════════════════════════════ */}
       <section className="relative z-20 max-w-[1600px] mx-auto px-4 -mt-10 mb-32">
-        <SectionReveal className="grid grid-cols-12 gap-4 md:gap-6">
-          {PORTFOLIO.map((item) => (
-            <div className={`${item.cols} group`} key={item.src}>
-              <div className="overflow-hidden rounded-3xl h-full shadow-2xl min-h-[220px] relative bg-[#111]">
-                <img
-                  src={item.src}
-                  alt={item.label}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  style={{ minHeight: "220px" }}
-                />
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500 flex items-end p-6 opacity-0 group-hover:opacity-100">
-                  <span className="bg-yellow-400 text-black text-sm font-bold px-3 py-1.5 rounded-full">{item.label}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </SectionReveal>
+        <PortfolioGrid />
       </section>
 
-      {/* About Section */}
-      <section className="py-24 bg-black rounded-[4rem] mx-4 md:mx-10 px-8 lg:px-24 mb-32 shadow-2xl border border-white/5 relative overflow-hidden">
+      {/* ══════════════════════════════════════════════
+          WHY US SECTION
+      ══════════════════════════════════════════════ */}
+      <section className="why-section py-24 mx-4 md:mx-10 px-8 lg:px-24 mb-32 relative overflow-hidden">
+        <div className="why-section__orb" aria-hidden="true" />
+
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col lg:flex-row justify-between mb-20 gap-10">
-            <h3 className="text-5xl md:text-6xl font-bold max-w-2xl leading-tight">
-              Why startups<br /> and global high-tech partner with us...
-            </h3>
-            <p className="text-xl text-gray-400 max-w-xl leading-relaxed mt-4 lg:mt-0">
+            <div>
+              <h3 className="text-5xl md:text-6xl font-bold max-w-2xl leading-tight">
+                Why startups<br />and global high-tech<br />partner with us...
+              </h3>
+            </div>
+            <p className="text-xl text-gray-400 max-w-xl leading-relaxed mt-4 lg:mt-10 lg:self-end">
               Thanks to our exceptionally talented & experienced product designers, we provide customized UX/UI and product design services to most industries: Fintech, Cyber, Medical, Agro & Gaming.
             </p>
           </div>
 
-          <SectionReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { title: "Design a new product",          body: "Design and develop an industry-leading product",          icon: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" },
-              { title: "Improve an existing product",   body: "Upgrade and redesign your product to become a category leader", icon: "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" },
-              { title: "First Steps for Start-ups",     body: "Take your vision from concept to launch",                  icon: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" },
-              { title: "Product consulting",            body: "Accelerate your strategic planning process",               icon: "M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z" },
-            ].map((card, i) => (
-              <div key={i} className="bg-[#111] p-8 rounded-3xl border border-white/10 hover:border-yellow-400/50 transition-colors group relative overflow-hidden">
-                <div className="mb-10 flex justify-center h-[160px] items-center">
-                  <div className="w-20 h-20 rounded-2xl bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-yellow-400/20 transition-all duration-500">
-                    <svg className="w-8 h-8 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
-                    </svg>
-                  </div>
+          <SectionReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {SERVICE_CARDS.map((card, i) => (
+              <div key={i} className="service-card group">
+                <div className="service-card__num">{card.num}</div>
+                <div className="service-card__icon-wrap">
+                  <svg className="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                  </svg>
                 </div>
-                <h5 className="text-2xl font-bold mb-4">{card.title}</h5>
-                <p className="text-gray-400 text-lg leading-relaxed">{card.body}</p>
+                <h5 className="text-lg font-bold mb-3 mt-6 leading-snug">{card.title}</h5>
+                <p className="text-gray-400 leading-relaxed text-sm">{card.body}</p>
+                <div className="service-card__border-anim" aria-hidden="true" />
               </div>
             ))}
           </SectionReveal>
 
           <div className="mt-20 flex justify-center">
-            <Link href="/contact-us" className="inline-block border border-yellow-400 text-yellow-400 rounded-full px-10 py-4 text-xl font-medium hover:bg-yellow-400 hover:text-black transition-all">
+            <Link href="/contact-us" className="btn-outline-gold">
               Partner with us
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Awards Section */}
-      <section id="winners-section" className="py-24 bg-[#111] max-w-[1400px] mx-auto rounded-[3rem] px-8 border border-white/10 mb-32">
-        <div className="max-w-6xl mx-auto text-center">
-          <h3 className="text-4xl md:text-5xl font-bold mb-16">Global winners in Product UX/UI Design 2025</h3>
+      {/* ══════════════════════════════════════════════
+          AWARDS SECTION
+      ══════════════════════════════════════════════ */}
+      <section id="winners-section" className="py-24 max-w-[1400px] mx-auto px-4 mb-32">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h3 className="text-4xl md:text-5xl font-bold">Global winners in Product UX/UI Design 2025</h3>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#1a1a1a] p-10 rounded-3xl text-center border border-white/5 hover:-translate-y-2 transition-transform">
-              <div className="text-yellow-400 text-6xl font-black mb-4">#<CountUpNumber target={1} duration={800} /></div>
-              <div className="text-2xl font-bold">Health & Medical</div>
-              <div className="text-gray-500 mt-2">Design Awards</div>
-            </div>
-            <div className="bg-[#1a1a1a] p-10 rounded-3xl text-center border border-white/5 hover:-translate-y-2 transition-transform">
-              <div className="text-yellow-400 text-6xl font-black mb-4">#<CountUpNumber target={1} duration={800} /></div>
-              <div className="text-2xl font-bold">Cybersecurity</div>
-              <div className="text-gray-500 mt-2">UX Excellence</div>
-            </div>
-            <div className="bg-[#1a1a1a] p-10 rounded-3xl text-center border border-white/5 hover:-translate-y-2 transition-transform">
-              <div className="text-yellow-400 text-6xl font-black mb-4">#<CountUpNumber target={2} duration={1000} /></div>
-              <div className="text-2xl font-bold">Fintech & Finance</div>
-              <div className="text-gray-500 mt-2">Global UI Awards</div>
-            </div>
+            {[
+              { target: 1, duration: 800,  label: "Health & Medical", sub: "Design Awards",    delay: "0s" },
+              { target: 1, duration: 800,  label: "Cybersecurity",    sub: "UX Excellence",    delay: "0.15s" },
+              { target: 2, duration: 1000, label: "Fintech & Finance", sub: "Global UI Awards", delay: "0.3s" },
+            ].map((award, i) => (
+              <div key={i} className="award-card group" style={{ animationDelay: award.delay }}>
+                {/* SVG progress ring */}
+                <div className="award-ring-wrap" aria-hidden="true">
+                  <svg className="award-ring" viewBox="0 0 120 120">
+                    <circle className="award-ring__track" cx="60" cy="60" r="52" />
+                    <circle className="award-ring__fill" cx="60" cy="60" r="52" style={{ animationDelay: award.delay }} />
+                  </svg>
+                  <div className="award-ring__number">
+                    #<CountUpNumber target={award.target} duration={award.duration} />
+                  </div>
+                </div>
+                <div className="text-xl font-bold mt-8">{award.label}</div>
+                <div className="text-gray-500 mt-1 text-sm">{award.sub}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Design Process Timeline */}
+      {/* ══════════════════════════════════════════════
+          DESIGN PROCESS TIMELINE
+      ══════════════════════════════════════════════ */}
       <section className="py-24 max-w-[1600px] mx-auto overflow-hidden px-4">
         <div className="text-center mb-24">
           <h3 className="text-5xl md:text-7xl font-bold tracking-tighter">Our unique Design Process</h3>
-          <p className="text-xl text-gray-400 mt-6">A proven methodology for creating outstanding digital products.</p>
+          <p className="text-xl text-gray-400 mt-6 max-w-xl mx-auto">A proven methodology for creating outstanding digital products.</p>
         </div>
 
-        <SectionReveal className="flex overflow-x-auto pb-16 hide-scrollbar gap-10 px-10 snap-x">
-          {[
-            { step: "01", title: "Kickoff meeting",           text: "Understanding your vision, goals, and target audience." },
-            { step: "02", title: "Research & Discovery",      text: "Market analysis, competitor review, and user needs." },
-            { step: "03", title: "User Interviews",           text: "Gathering qualitative data directly from your users." },
-            { step: "04", title: "Information Architecture",  text: "Structuring the product logic and navigation flow." },
-            { step: "05", title: "Wireframing",               text: "Creating low-fidelity layouts for core screens." },
-            { step: "06", title: "Design Concept",            text: "Establishing the visual language and moodboard." },
-            { step: "07", title: "UI Design",                 text: "Applying the visual concept to the wireframes." },
-            { step: "08", title: "Prototyping",               text: "Building interactive models for user testing." },
-            { step: "09", title: "Detailed Design",           text: "Finalizing all screens and creating the Design System." },
-          ].map((item, i) => (
-            <div key={i} className="min-w-[300px] shrink-0 snap-center relative pt-10">
-              <div className="absolute top-0 left-0 text-[120px] font-black text-white/5 leading-none z-0 -mt-10 -ml-4">{item.step}</div>
+        <SectionReveal className="flex overflow-x-auto pb-16 hide-scrollbar gap-8 px-10 snap-x">
+          {TIMELINE_STEPS.map((item, i) => (
+            <div key={i} className="timeline-item min-w-[260px] shrink-0 snap-center">
+              <div className="timeline-item__bg-num" aria-hidden="true">{item.step}</div>
               <div className="relative z-10">
-                <div className="w-4 h-4 bg-yellow-400 rounded-full mb-6" />
-                <div className="h-1 w-full bg-white/10 absolute top-2 left-4 -z-10" />
-                <h4 className="text-2xl font-bold mb-4">{item.title}</h4>
-                <p className="text-gray-400 text-lg leading-relaxed">{item.text}</p>
+                <div className="timeline-item__dot" />
+                <div className="timeline-item__line" />
+                <h4 className="text-xl font-bold mb-3 mt-8">{item.title}</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.text}</p>
               </div>
             </div>
           ))}
         </SectionReveal>
       </section>
 
-      {/* Contact Section */}
+      {/* ══════════════════════════════════════════════
+          CONTACT SECTION
+      ══════════════════════════════════════════════ */}
       <section className="mt-24 max-w-[1400px] mx-auto px-4 lg:px-8">
-        <div className="bg-[#111] rounded-[3rem] border border-white/10 p-10 lg:p-20 overflow-hidden relative shadow-2xl">
-          {/* CSS background instead of broken SVG */}
-          <div
-            className="absolute inset-0 z-0 opacity-20 pointer-events-none"
-            style={{
-              backgroundImage: "linear-gradient(135deg, #facc15 0%, transparent 50%)",
-            }}
-          />
+        <div className="contact-section relative overflow-hidden">
+          <div className="contact-section__orb contact-section__orb--1" aria-hidden="true" />
+          <div className="contact-section__orb contact-section__orb--2" aria-hidden="true" />
+          <div className="contact-section__grid" aria-hidden="true" />
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-12 p-10 lg:p-20">
             <div className="md:w-1/2">
               <h3 className="text-5xl md:text-7xl font-bold mb-6 tracking-tighter">Wanna Chat?</h3>
-              <p className="text-xl text-gray-300 mb-10 max-w-md">Leave your details and we will get back to you as soon as possible.</p>
+              <p className="text-xl text-gray-400 mb-10 max-w-md">Leave your details and we will get back to you as soon as possible.</p>
 
-              <form className="space-y-6">
-                <SectionReveal className="space-y-6">
-                  {[
-                    <div key="name"><input type="text" placeholder="Name*" className="w-full bg-transparent border-b border-white/20 pb-4 text-xl focus:outline-none focus:border-yellow-400 transition-colors" /></div>,
-                    <div key="email"><input type="email" placeholder="Email*" className="w-full bg-transparent border-b border-white/20 pb-4 text-xl focus:outline-none focus:border-yellow-400 transition-colors" /></div>,
-                    <div key="phone"><input type="text" placeholder="Phone" className="w-full bg-transparent border-b border-white/20 pb-4 text-xl focus:outline-none focus:border-yellow-400 transition-colors" /></div>,
-                    <div key="msg"><textarea placeholder="Message" rows={3} className="w-full bg-transparent border-b border-white/20 pb-4 text-xl focus:outline-none focus:border-yellow-400 transition-colors resize-none" /></div>,
-                  ]}
-                </SectionReveal>
-                <button type="button" className="bg-yellow-400 text-black font-bold text-xl px-12 py-4 rounded-full hover:bg-white transition-colors w-full md:w-auto">
+              <form className="space-y-8">
+                {[
+                  { key: "name",  type: "text",  label: "Name*" },
+                  { key: "email", type: "email", label: "Email*" },
+                  { key: "phone", type: "text",  label: "Phone" },
+                ].map((f) => (
+                  <div key={f.key} className="form-field">
+                    <input type={f.type} placeholder={f.label} className="form-input" />
+                  </div>
+                ))}
+                <div className="form-field">
+                  <textarea placeholder="Message" rows={3} className="form-input resize-none" />
+                </div>
+                <button type="button" className="btn-primary w-full md:w-auto justify-center">
                   Send Message
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M2 8H14M10.5 4L14 8L10.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
                 </button>
               </form>
             </div>
 
-            <div className="md:w-1/3 flex flex-col gap-10">
-              <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-md border border-white/10">
-                <div className="text-gray-400 uppercase tracking-widest text-sm mb-2">Email Us</div>
-                <a href="mailto:contact@triolla.io" className="text-2xl font-medium hover:text-yellow-400 transition-colors">contact@triolla.io</a>
-              </div>
-              <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-md border border-white/10">
-                <div className="text-gray-400 uppercase tracking-widest text-sm mb-2">Call Us (TLV)</div>
-                <a href="tel:+972737443322" className="text-2xl font-medium hover:text-yellow-400 transition-colors">+972-73-744-3322</a>
-              </div>
-              <div className="bg-white/5 p-8 rounded-3xl backdrop-blur-md border border-white/10">
-                <div className="text-gray-400 uppercase tracking-widest text-sm mb-2">Drop By</div>
-                <div className="text-xl font-medium text-gray-300">Yigal Alon St 98, Tel Aviv-Yafo</div>
-              </div>
+            <div className="md:w-1/3 flex flex-col gap-5 md:pt-28">
+              {[
+                { label: "Email Us",     value: "contact@triolla.io",       href: "mailto:contact@triolla.io" },
+                { label: "Call Us (TLV)",value: "+972-73-744-3322",          href: "tel:+972737443322" },
+                { label: "Drop By",      value: "Yigal Alon St 98, Tel Aviv-Yafo", href: undefined },
+              ].map((item, i) => (
+                <div key={i} className="contact-info-card">
+                  <div className="contact-info-card__label">{item.label}</div>
+                  {item.href
+                    ? <a href={item.href} className="contact-info-card__value contact-info-card__value--link">{item.value}</a>
+                    : <div className="contact-info-card__value">{item.value}</div>
+                  }
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
+      {/* ══════════════════════════════════════════════
+          GLOBAL STYLES
+      ══════════════════════════════════════════════ */}
+      <style>{`
+        /* ─── Fonts ─────────────────────────────── */
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+
+        /* ─── Grain overlay ─────────────────────── */
+        .grain-overlay {
+          position: fixed;
+          inset: -50%;
+          width: 200%;
+          height: 200%;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+          background-size: 200px 200px;
+          opacity: 0.04;
+          pointer-events: none;
+          z-index: 9999;
+          animation: grain 8s steps(10) infinite;
+        }
+        @keyframes grain {
+          0%   { transform: translate(0,0); }
+          10%  { transform: translate(-5%,-10%); }
+          20%  { transform: translate(-15%, 5%); }
+          30%  { transform: translate( 7%,-25%); }
+          40%  { transform: translate(-5%, 25%); }
+          50%  { transform: translate(-15%, 10%); }
+          60%  { transform: translate(15%, 0%); }
+          70%  { transform: translate( 0%, 15%); }
+          80%  { transform: translate( 3%,  35%); }
+          90%  { transform: translate(-10%, 10%); }
+          100% { transform: translate(0, 0); }
+        }
+
+        /* ─── Hero ambient orbs ─────────────────── */
+        .hero-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          pointer-events: none;
+        }
+        .hero-orb--gold {
+          bottom: -10%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 900px;
+          height: 500px;
+          background: radial-gradient(ellipse at center, rgba(250,204,21,0.14) 0%, transparent 70%);
+          animation: orbPulse 8s ease-in-out infinite;
+        }
+        .hero-orb--amber {
+          top: -5%;
+          left: -10%;
+          width: 600px;
+          height: 600px;
+          background: radial-gradient(circle, rgba(251,146,60,0.06) 0%, transparent 65%);
+          animation: orbPulse 11s ease-in-out infinite reverse;
+        }
+        .hero-orb--dim {
+          top: 10%;
+          right: -8%;
+          width: 500px;
+          height: 500px;
+          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
+          animation: orbPulse 14s ease-in-out infinite;
+        }
+        @keyframes orbPulse {
+          0%,100% { opacity: 1; transform: scale(1) translateX(var(--tx,0)); }
+          50%      { opacity: 0.7; transform: scale(1.08) translateX(var(--tx,0)); }
+        }
+
+        /* ─── Hero grid lines ───────────────────── */
+        .hero-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+          background-size: 80px 80px;
+          mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
+        }
+
+        /* ─── Hero headline golden shimmer ──────── */
+        .hero-headline {
+          background: linear-gradient(135deg, #fff 40%, #facc15 55%, #fff 70%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: textShimmer 6s linear infinite;
+        }
+        @keyframes textShimmer {
+          0%   { background-position: 200% center; }
+          100% { background-position: -200% center; }
+        }
+
+        /* ─── Eyebrow label ─────────────────────── */
+        .eyebrow {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          color: #facc15;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          margin-bottom: 28px;
+        }
+        .eyebrow__dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #facc15;
+          animation: dotBlink 2s ease-in-out infinite;
+        }
+        @keyframes dotBlink {
+          0%,100% { opacity: 1; }
+          50%      { opacity: 0.3; }
+        }
+
+        .section-eyebrow {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #6b7280;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          margin-bottom: 0;
+        }
+
+        /* ─── Buttons ───────────────────────────── */
+        .btn-primary {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #facc15;
+          color: #000;
+          font-weight: 700;
+          font-size: 15px;
+          padding: 14px 28px;
+          border-radius: 999px;
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+          box-shadow: 0 0 0 0 rgba(250,204,21,0);
+        }
+        .btn-primary:hover {
+          background: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 32px rgba(250,204,21,0.3);
+        }
+        .btn-ghost {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: rgba(255,255,255,0.6);
+          font-size: 15px;
+          font-weight: 500;
+          padding: 14px 20px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.1);
+          transition: color 0.2s, border-color 0.2s;
+        }
+        .btn-ghost:hover {
+          color: #fff;
+          border-color: rgba(255,255,255,0.3);
+        }
+        .btn-outline-gold {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          border: 1px solid #facc15;
+          color: #facc15;
+          font-weight: 600;
+          font-size: 16px;
+          padding: 14px 32px;
+          border-radius: 999px;
+          transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .btn-outline-gold:hover {
+          background: #facc15;
+          color: #000;
+          transform: translateY(-2px);
+        }
+
+        /* ─── Scroll cue ────────────────────────── */
+        .scroll-cue {
+          position: absolute;
+          bottom: 32px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+        }
+        .scroll-cue__line {
+          width: 1px;
+          height: 48px;
+          background: linear-gradient(to bottom, transparent, rgba(250,204,21,0.6));
+          animation: scrollPulse 2s ease-in-out infinite;
+        }
+        .scroll-cue__label {
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.3);
+        }
+        @keyframes scrollPulse {
+          0%,100% { opacity: 0.4; transform: scaleY(1); }
+          50%      { opacity: 1;   transform: scaleY(1.1); }
+        }
+
+        /* ─── Portfolio cards ───────────────────── */
+        .portfolio-card {
+          overflow: hidden;
+          border-radius: 20px;
+          position: relative;
+          background: #0f0f0f;
+          box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+          transition: transform 0.5s cubic-bezier(.23,1,.32,1), box-shadow 0.5s;
+          width: 100%;
+        }
+        .portfolio-card:hover {
+          transform: translateY(-5px) scale(1.01);
+          box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(250,204,21,0.18);
+        }
+        /* img absolutely fills the fixed-height card */
+        .portfolio-card__img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: top center;
+          transition: transform 0.7s cubic-bezier(.23,1,.32,1);
+          display: block;
+        }
+        .portfolio-card:hover .portfolio-card__img {
+          transform: scale(1.07);
+        }
+        .portfolio-card__overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 45%, transparent 65%);
+          display: flex;
+          align-items: flex-end;
+          padding: 24px;
+          opacity: 0;
+          transition: opacity 0.35s;
+        }
+        .portfolio-card:hover .portfolio-card__overlay { opacity: 1; }
+        .portfolio-card__tag {
+          background: #facc15;
+          color: #000;
+          font-size: 12px;
+          font-weight: 700;
+          padding: 6px 14px;
+          border-radius: 999px;
+          letter-spacing: 0.05em;
+          transform: translateY(10px);
+          transition: transform 0.4s cubic-bezier(.23,1,.32,1);
+        }
+        .portfolio-card:hover .portfolio-card__tag { transform: translateY(0); }
+        .portfolio-card__shine {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.045) 50%, transparent 60%);
+          background-size: 200% 100%;
+          background-position: 200% 0;
+          transition: background-position 0.55s;
+          pointer-events: none;
+        }
+        .portfolio-card:hover .portfolio-card__shine {
+          background-position: -200% 0;
+        }
+
+        /* ─── Why Us / service section ──────────── */
+        .why-section {
+          background: #0a0a0a;
+          border-radius: 48px;
+          border: 1px solid rgba(255,255,255,0.05);
+        }
+        .why-section__orb {
+          position: absolute;
+          top: -20%;
+          right: -10%;
+          width: 600px;
+          height: 600px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
+          filter: blur(60px);
+          pointer-events: none;
+        }
+
+        /* Service cards */
+        .service-card {
+          position: relative;
+          background: #111;
+          padding: 28px;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.07);
+          overflow: hidden;
+          transition: border-color 0.3s, transform 0.3s;
+        }
+        .service-card:hover { border-color: rgba(250,204,21,0.25); transform: translateY(-4px); }
+        .service-card__num {
+          font-size: 11px;
+          font-weight: 700;
+          color: #facc15;
+          letter-spacing: 0.2em;
+          margin-bottom: 20px;
+          opacity: 0.7;
+        }
+        .service-card__icon-wrap {
+          width: 44px; height: 44px;
+          border-radius: 12px;
+          background: rgba(250,204,21,0.08);
+          border: 1px solid rgba(250,204,21,0.15);
+          display: flex; align-items: center; justify-content: center;
+          transition: background 0.3s, transform 0.3s;
+        }
+        .service-card:hover .service-card__icon-wrap {
+          background: rgba(250,204,21,0.16);
+          transform: scale(1.1) rotate(-3deg);
+        }
+        .service-card__border-anim {
+          position: absolute;
+          inset: 0;
+          border-radius: 20px;
+          background: linear-gradient(135deg, rgba(250,204,21,0.15) 0%, transparent 50%);
+          opacity: 0;
+          transition: opacity 0.4s;
+        }
+        .service-card:hover .service-card__border-anim { opacity: 1; }
+
+        /* ─── Awards ────────────────────────────── */
+        .award-card {
+          background: #0f0f0f;
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 28px;
+          padding: 40px 24px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          transition: border-color 0.3s, transform 0.4s, box-shadow 0.4s;
+        }
+        .award-card:hover {
+          border-color: rgba(250,204,21,0.3);
+          transform: translateY(-8px);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(250,204,21,0.08);
+        }
+        .award-ring-wrap {
+          position: relative;
+          width: 120px;
+          height: 120px;
+        }
+        .award-ring {
+          width: 120px; height: 120px;
+          transform: rotate(-90deg);
+        }
+        .award-ring__track {
+          fill: none;
+          stroke: rgba(255,255,255,0.06);
+          stroke-width: 3;
+        }
+        .award-ring__fill {
+          fill: none;
+          stroke: #facc15;
+          stroke-width: 3;
+          stroke-linecap: round;
+          stroke-dasharray: 326.7;
+          stroke-dashoffset: 326.7;
+          animation: ringFill 1.4s cubic-bezier(.23,1,.32,1) forwards;
+          filter: drop-shadow(0 0 8px rgba(250,204,21,0.6));
+        }
+        @keyframes ringFill {
+          to { stroke-dashoffset: 0; }
+        }
+        .award-ring__number {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 36px;
+          font-weight: 900;
+          color: #facc15;
+          text-shadow: 0 0 20px rgba(250,204,21,0.4);
+        }
+
+        /* ─── Timeline ──────────────────────────── */
+        .timeline-item {
+          position: relative;
+          padding-top: 32px;
+        }
+        .timeline-item__bg-num {
+          position: absolute;
+          top: -16px;
+          left: -16px;
+          font-size: 120px;
+          font-weight: 900;
+          color: rgba(255,255,255,0.025);
+          line-height: 1;
+          pointer-events: none;
+          user-select: none;
+        }
+        .timeline-item__dot {
+          width: 14px; height: 14px;
+          background: #facc15;
+          border-radius: 50%;
+          box-shadow: 0 0 0 4px rgba(250,204,21,0.15), 0 0 20px rgba(250,204,21,0.3);
+        }
+        .timeline-item__line {
+          position: absolute;
+          top: 38px;
+          left: 14px;
+          height: 1px;
+          right: -32px;
+          background: linear-gradient(to right, rgba(250,204,21,0.3), rgba(255,255,255,0.05));
+        }
+
+        /* ─── Contact section ───────────────────── */
+        .contact-section {
+          background: #0a0a0a;
+          border-radius: 48px;
+          border: 1px solid rgba(255,255,255,0.06);
+          box-shadow: 0 40px 120px rgba(0,0,0,0.5);
+        }
+        .contact-section__orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(70px);
+          pointer-events: none;
+        }
+        .contact-section__orb--1 {
+          top: -10%;
+          left: -5%;
+          width: 500px; height: 500px;
+          background: radial-gradient(circle, rgba(250,204,21,0.08) 0%, transparent 65%);
+        }
+        .contact-section__orb--2 {
+          bottom: -10%;
+          right: -5%;
+          width: 400px; height: 400px;
+          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
+        }
+        .contact-section__grid {
+          position: absolute;
+          inset: 0;
+          border-radius: 48px;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+          background-size: 60px 60px;
+          mask-image: radial-gradient(ellipse 80% 80% at 20% 50%, black 0%, transparent 100%);
+        }
+
+        /* ─── Form inputs ───────────────────────── */
+        .form-input {
+          width: 100%;
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(255,255,255,0.12);
+          padding-bottom: 14px;
+          font-size: 17px;
+          color: #fff;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        .form-input::placeholder { color: rgba(255,255,255,0.3); }
+        .form-input:focus { border-color: #facc15; }
+
+        /* ─── Contact info cards ────────────────── */
+        .contact-info-card {
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 20px;
+          padding: 24px;
+          transition: border-color 0.2s, background 0.2s;
+        }
+        .contact-info-card:hover {
+          background: rgba(255,255,255,0.05);
+          border-color: rgba(250,204,21,0.2);
+        }
+        .contact-info-card__label {
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          color: #6b7280;
+          margin-bottom: 8px;
+        }
+        .contact-info-card__value {
+          font-size: 18px;
+          font-weight: 500;
+          color: #e5e7eb;
+        }
+        .contact-info-card__value--link:hover { color: #facc15; transition: color 0.2s; }
+
+        /* ─── Scrollbar hide ────────────────────── */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </main>
   );
 }
