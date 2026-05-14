@@ -38,7 +38,9 @@ export default async function AboutUsPage() {
       >
         {/* Background Vectors */}
         <div className="absolute top-0 left-0 w-full overflow-hidden z-0 pointer-events-none opacity-50">
-          <img src={ap.headerBgOverlayLayer?.node?.sourceUrl || "/assets/_cas/4ef0569f809629c3e2a0f04e359ac9d5cd08dd4d12bfb77f95809b7b559970cd.svg"} alt="" className="w-full mix-blend-screen" />
+          {ap.headerBgOverlayLayer?.node?.sourceUrl && (
+            <img src={ap.headerBgOverlayLayer.node.sourceUrl} alt="" className="w-full mix-blend-screen" />
+          )}
         </div>
         
         <SectionReveal className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center">

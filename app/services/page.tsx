@@ -51,25 +51,13 @@ export default async function ServicesPage() {
     <main className="overflow-hidden bg-[#1a1a1a] text-white">
       {/* Hero Section */}
       <section className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden">
-        {/* Background Grids */}
-        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-          <img src="/assets/_cas/5ddb217d172e57eb7a038ad1d83f266e438aa46b369741df58a9c11e44af1dcc.svg" className="w-full h-full object-cover" alt="" />
-        </div>
-        <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-          <img src="/assets/_cas/b59bd7341705dc6760cf075e92dd067dfa7724afb1d564b3299e4ce57906b433.svg" className="w-full h-full object-cover" alt="" />
+        {/* CSS background — no external SVG assets needed */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full opacity-[0.06]" style={{ background: "radial-gradient(ellipse at center, #facc15 0%, transparent 70%)" }} />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
-          {/* Floating elements */}
-          <div className="absolute -top-10 -left-20 animate-bounce hidden md:block">
-            <img src="/assets/_cas/c12200bbaef70d6c4172232af406c8c65a51b6a6ed0fb25336bebf2c82202c3e.svg" width={215} height={95} alt="" />
-          </div>
-          <div className="absolute top-10 -right-32 animate-pulse hidden md:block">
-            <img src="/assets/_cas/ea54d41f480c438d81e5870a5d2dd48bca3fcdfbea532135f4881de1204c0267.svg" width={263} height={105} alt="" />
-          </div>
-          <div className="absolute -bottom-20 left-10 animate-bounce hidden md:block" style={{animationDelay: "1s"}}>
-            <img src="/assets/_cas/b9d0ce99f3dd1aaa5d585e0346a72da13696d666f56d3506310298f8fbc48a28.svg" width={116} height={107} alt="" />
-          </div>
 
           <h4 className="text-[28px] font-medium mb-2">{sp.headerSubText}</h4>
           <h1 className="text-7xl md:text-[130px] font-bold tracking-tighter mb-8 leading-none">{sp.headerTitle}</h1>
