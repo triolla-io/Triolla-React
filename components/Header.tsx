@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const navLinks = [
+    { href: "/portfolio", label: "Portfolio" },
+    { href: "/services", label: "Services" },
+    { href: "/technology", label: "Technology" },
+    { href: "/about-us", label: "The Company" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-black text-white">
@@ -31,10 +40,18 @@ export default function Header() {
           
           {/* Desktop Menu */}
           <nav className="hidden lg:flex space-x-10">
-            <Link href="/portfolio" className="hover:text-yellow-400 text-[15px] font-medium transition-colors">Portfolio</Link>
-            <Link href="/services" className="hover:text-yellow-400 text-[15px] font-medium transition-colors">Services</Link>
-            <Link href="/technology" className="hover:text-yellow-400 text-[15px] font-medium transition-colors">Technology</Link>
-            <Link href="/about-us" className="hover:text-yellow-400 text-[15px] font-medium transition-colors">The Company</Link>
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`relative text-[15px] font-medium transition-colors hover:text-yellow-400 ${pathname === href ? "text-yellow-400" : ""}`}
+              >
+                {label}
+                {pathname === href && (
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-yellow-400 rounded-full" />
+                )}
+              </Link>
+            ))}
           </nav>
           
           {/* Action Buttons */}
@@ -65,20 +82,36 @@ export default function Header() {
       </div>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-black border-t border-white/10 p-4 shadow-xl">
-          <nav className="flex flex-col space-y-4">
-            <Link href="/portfolio" className="hover:text-yellow-400 text-lg font-medium transition-colors">Portfolio</Link>
-            <Link href="/services" className="hover:text-yellow-400 text-lg font-medium transition-colors">Services</Link>
-            <Link href="/technology" className="hover:text-yellow-400 text-lg font-medium transition-colors">Technology</Link>
-            <Link href="/about-us" className="hover:text-yellow-400 text-lg font-medium transition-colors">The Company</Link>
-            <hr className="border-white/20" />
-            <Link href="/contact-us" className="text-center bg-white text-black py-2 rounded-full font-medium">
-              Contact Us
-            </Link>
-          </nav>
-        </div>
-      )}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="lg:hidden absolute top-full left-0 w-full bg-black border-t border-white/10 p-4 shadow-xl"
+          >
+            <nav className="flex flex-col space-y-4">
+              {navLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`text-lg font-medium transition-colors hover:text-yellow-400 ${pathname === href ? "text-yellow-400" : ""}`}
+                >
+                  {label}
+                </Link>
+              ))}
+              <hr className="border-white/20" />
+              <Link
+                href="/contact-us"
+                className="text-center bg-white text-black py-2 rounded-full font-medium"
+              >
+                Contact Us
+              </Link>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
