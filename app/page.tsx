@@ -3,36 +3,112 @@ import { HeroHeadline } from "@/components/HeroHeadline";
 import { SectionReveal } from "@/components/SectionReveal";
 import { CountUpNumber } from "@/components/CountUpNumber";
 import { PortfolioGrid } from "@/components/PortfolioGrid";
+import { client } from "@/lib/apollo-client";
+import { GET_HOME_PAGE } from "@/lib/queries";
+import { gql } from "@apollo/client";
 
+/* ── WP content helpers ──────────────────────────── */
 
-const SERVICE_CARDS = [
-  { num: "01", title: "Design a new product",        body: "Design and develop an industry-leading product" },
-  { num: "02", title: "Improve an existing product", body: "Upgrade and redesign your product to become a category leader" },
-  { num: "03", title: "First Steps for Start-ups",   body: "Take your vision from concept to launch" },
-  { num: "04", title: "Product consulting",          body: "Accelerate your strategic planning process" },
-];
+function stripHtml(html: string): string {
+  return (html ?? "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
 
-const TIMELINE_STEPS = [
-  { step: "01", title: "Kickoff meeting",          text: "Understanding your vision, goals, and target audience." },
-  { step: "02", title: "Research & Discovery",     text: "Market analysis, competitor review, and user needs." },
-  { step: "03", title: "User Interviews",          text: "Gathering qualitative data directly from your users." },
-  { step: "04", title: "Information Architecture", text: "Structuring the product logic and navigation flow." },
-  { step: "05", title: "Wireframing",              text: "Creating low-fidelity layouts for core screens." },
-  { step: "06", title: "Design Concept",           text: "Establishing the visual language and moodboard." },
-  { step: "07", title: "UI Design",               text: "Applying the visual concept to the wireframes." },
-  { step: "08", title: "Prototyping",             text: "Building interactive models for user testing." },
-  { step: "09", title: "Detailed Design",         text: "Finalizing all screens and creating the Design System." },
-];
+function parseAward(wboxTitle: string): { rank: number; label: string } {
+  const rankMatch = wboxTitle.match(/#(\d+)/);
+  const rank = rankMatch ? parseInt(rankMatch[1]) : 1;
+  const label = wboxTitle
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/#\d+\s*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return { rank, label };
+}
 
-export default function Home() {
+// Splits WP heading HTML into plain/accented segments (uses split, not exec)
+function parseDesignHeading(html: string): { text: string; accent: boolean }[] {
+  const cleaned = html.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ");
+  const segments = cleaned.split(/(<span[^>]*>[\s\S]*?<\/span>)/i);
+  return segments
+    .filter((s) => s.length > 0)
+    .map((seg) => {
+      const inner = seg.match(/^<span[^>]*>([\s\S]*?)<\/span>$/i);
+      return inner
+        ? { text: inner[1], accent: true }
+        : { text: seg, accent: false };
+    });
+}
+
+function htmlToLines(html: string): string[] {
+  return html
+    .split(/<br\s*\/?>/gi)
+    .map((s) => stripHtml(s).trim())
+    .filter(Boolean);
+}
+
+/* ── Data fetching ───────────────────────────────── */
+
+async function getHomeData() {
+  try {
+    const { data } = await client.query<any>({
+      query: gql`${GET_HOME_PAGE}`,
+    });
+    return data?.page?.template?.homePage ?? {};
+  } catch {
+    return {};
+  }
+}
+
+/* ── Page ────────────────────────────────────────── */
+
+export default async function Home() {
+  const hp = await getHomeData();
+
+  const heroHeadline =
+    stripHtml(hp.topsectitle) ||
+    "Creative Design Attracts People. Smart UX Makes Them Stay";
+  const heroSubtext =
+    stripHtml(hp.toptext) ||
+    "Product Design for Tech, Gaming, Medical, Cyber, IoT, Agritech, Mobile, SaaS Platforms & Startups";
+
+  const winTitle =
+    hp.winTitle ?? "Global winners in Product UX/UI Design 2025";
+  const awards = (hp.wboxes ?? []).map((b: any) =>
+    parseAward(b.wboxTitle ?? "")
+  );
+
+  const whyTitle = stripHtml(hp.abthretitle ?? "");
+  const whyText = stripHtml(hp.abtthretext ?? "");
+  const serviceCards: any[] = hp.abthrelist ?? [];
+
+  const clientLogos: { url: string; alt: string }[] = (hp.gImageList ?? [])
+    .map((item: any) => ({
+      url: item.gImage?.node?.sourceUrl ?? "",
+      alt: item.gImage?.node?.altText ?? "",
+    }))
+    .filter((l: { url: string }) => l.url);
+
+  const half = Math.ceil(clientLogos.length / 2);
+  const logoRow1 = clientLogos.slice(0, half);
+  const logoRow2 = clientLogos.slice(half);
+
+  const designSteps: any[] = hp.designType ?? [];
+  const designHeadingParts = parseDesignHeading(
+    hp.uDesignHeading ?? "Our unique Design Process"
+  );
+  const designSubtext = stripHtml(hp.uSortText ?? "");
+
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
 
       {/* ── Grain noise overlay ── */}
-      <div
-        aria-hidden="true"
-        className="grain-overlay"
-      />
+      <div aria-hidden="true" className="grain-overlay" />
 
       {/* ══════════════════════════════════════════════
           HERO
@@ -57,13 +133,12 @@ export default function Home() {
           </div>
 
           <HeroHeadline
-            headline="Creative Design Attracts People. Smart UX Makes Them Stay"
-            subtext="Product Design for Tech, Gaming, Medical, Cyber, IoT, Agritech, Mobile, SaaS Platforms & Startups"
+            headline={heroHeadline}
+            subtext={heroSubtext}
             headlineClassName="text-6xl md:text-[80px] lg:text-[110px] leading-[0.9] font-bold tracking-tighter mb-8 max-w-[1200px] hero-headline"
             subtextClassName="text-xl md:text-2xl font-light text-gray-400 max-w-3xl mx-auto leading-relaxed"
           />
 
-  
         </div>
 
         {/* Scroll cue */}
@@ -90,25 +165,48 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row justify-between mb-20 gap-10">
             <div>
               <h3 className="text-5xl md:text-6xl font-bold max-w-2xl leading-tight">
-                Why startups<br />and global high-tech<br />partner with us...
+                {whyTitle}
               </h3>
             </div>
             <p className="text-xl text-gray-400 max-w-xl leading-relaxed mt-4 lg:mt-10 lg:self-end">
-              Thanks to our exceptionally talented & experienced product designers, we provide customized UX/UI and product design services to most industries: Fintech, Cyber, Medical, Agro & Gaming.
+              {whyText}
             </p>
           </div>
 
           <SectionReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {SERVICE_CARDS.map((card, i) => (
+            {serviceCards.map((card: any, i: number) => (
               <div key={i} className="service-card group">
-                <div className="service-card__num">{card.num}</div>
+                <div className="service-card__num">0{i + 1}</div>
                 <div className="service-card__icon-wrap">
-                  <svg className="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
-                  </svg>
+                  {card.abthreimage?.node?.sourceUrl ? (
+                    <img
+                      src={card.abthreimage.node.sourceUrl}
+                      alt=""
+                      className="w-6 h-6 object-contain"
+                    />
+                  ) : (
+                    <svg
+                      className="w-5 h-5 text-yellow-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z"
+                      />
+                    </svg>
+                  )}
                 </div>
-                <h5 className="text-lg font-bold mb-3 mt-6 leading-snug">{card.title}</h5>
-                <p className="text-gray-400 leading-relaxed text-sm">{card.body}</p>
+                <h5 className="text-lg font-bold mb-3 mt-6 leading-snug">
+                  {stripHtml(card.abteintitle ?? "")}
+                </h5>
+                <p className="text-gray-400 leading-relaxed text-sm">
+                  {stripHtml(card.abthreintext ?? "")}
+                </p>
                 <div className="service-card__border-anim" aria-hidden="true" />
               </div>
             ))}
@@ -118,7 +216,13 @@ export default function Home() {
             <Link href="/contact-us" className="btn-outline-gold">
               Partner with us
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </Link>
           </div>
@@ -131,28 +235,33 @@ export default function Home() {
       <section id="winners-section" className="py-24 max-w-[1400px] mx-auto px-4 mb-32">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h3 className="text-4xl md:text-5xl font-bold">Global winners in Product UX/UI Design 2025</h3>
+            <h3 className="text-4xl md:text-5xl font-bold">{winTitle}</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { target: 1, duration: 800,  label: "Health & Medical", sub: "Design Awards",    delay: "0s" },
-              { target: 1, duration: 800,  label: "Cybersecurity",    sub: "UX Excellence",    delay: "0.15s" },
-              { target: 2, duration: 1000, label: "Fintech & Finance", sub: "Global UI Awards", delay: "0.3s" },
-            ].map((award, i) => (
-              <div key={i} className="award-card group" style={{ animationDelay: award.delay }}>
+            {awards.map((award: { rank: number; label: string }, i: number) => (
+              <div
+                key={i}
+                className="award-card group"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              >
                 {/* SVG progress ring */}
                 <div className="award-ring-wrap" aria-hidden="true">
                   <svg className="award-ring" viewBox="0 0 120 120">
                     <circle className="award-ring__track" cx="60" cy="60" r="52" />
-                    <circle className="award-ring__fill" cx="60" cy="60" r="52" style={{ animationDelay: award.delay }} />
+                    <circle
+                      className="award-ring__fill"
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      style={{ animationDelay: `${i * 0.15}s` }}
+                    />
                   </svg>
                   <div className="award-ring__number">
-                    #<CountUpNumber target={award.target} duration={award.duration} />
+                    #<CountUpNumber target={award.rank} duration={800 + i * 200} />
                   </div>
                 </div>
                 <div className="text-xl font-bold mt-8">{award.label}</div>
-                <div className="text-gray-500 mt-1 text-sm">{award.sub}</div>
               </div>
             ))}
           </div>
@@ -160,23 +269,121 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════
+          CLIENTS SECTION
+      ══════════════════════════════════════════════ */}
+      {clientLogos.length > 0 && (
+        <section className="clients-section py-28 mb-32 relative overflow-hidden">
+          {/* Ambient atmosphere */}
+          <div className="clients-orb clients-orb--left" aria-hidden="true" />
+          <div className="clients-orb clients-orb--right" aria-hidden="true" />
+
+          {/* Heading */}
+          <div className="text-center mb-20 relative z-10 px-4">
+            <div className="clients-eyebrow">
+              <span className="clients-eyebrow__line" />
+              Our Clients
+              <span className="clients-eyebrow__line" />
+            </div>
+            <h3 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mt-6 max-w-3xl mx-auto leading-[0.95]">
+              From small to global,{" "}
+              <br className="hidden md:block" />
+              we&apos;ve partnered with{" "}
+              <br className="hidden lg:block" />
+              <em className="clients-headline-em">great companies</em>
+            </h3>
+          </div>
+
+          {/* Row 1 — scrolls left */}
+          <div className="marquee-wrapper mb-4 relative z-10">
+            <div className="marquee-fade marquee-fade--left" aria-hidden="true" />
+            <div className="marquee-fade marquee-fade--right" aria-hidden="true" />
+            <div className="marquee-track">
+              {[...logoRow1, ...logoRow1].map((logo, i) => (
+                <div key={i} className="logo-card">
+                  <img
+                    src={logo.url}
+                    alt={logo.alt || "Client logo"}
+                    className="logo-card__img"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 2 — scrolls right */}
+          <div className="marquee-wrapper relative z-10">
+            <div className="marquee-fade marquee-fade--left" aria-hidden="true" />
+            <div className="marquee-fade marquee-fade--right" aria-hidden="true" />
+            <div className="marquee-track marquee-track--reverse">
+              {[...logoRow2, ...logoRow2].map((logo, i) => (
+                <div key={i} className="logo-card">
+                  <img
+                    src={logo.url}
+                    alt={logo.alt || "Client logo"}
+                    className="logo-card__img"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-16 relative z-10">
+            <Link href="/contact-us" className="btn-primary">
+              Let&apos;s Talk
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path
+                  d="M2 8H14M10.5 4L14 8L10.5 12"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════════
           DESIGN PROCESS TIMELINE
       ══════════════════════════════════════════════ */}
       <section className="py-24 max-w-[1600px] mx-auto overflow-hidden px-4">
         <div className="text-center mb-24">
-          <h3 className="text-5xl md:text-7xl font-bold tracking-tighter">Our unique Design Process</h3>
-          <p className="text-xl text-gray-400 mt-6 max-w-xl mx-auto">A proven methodology for creating outstanding digital products.</p>
+          <h3 className="text-5xl md:text-7xl font-bold tracking-tighter">
+            {designHeadingParts.map((part, i) =>
+              part.accent ? (
+                <span key={i} className="text-yellow-400">
+                  {part.text}
+                </span>
+              ) : (
+                part.text
+              )
+            )}
+          </h3>
+          <p className="text-xl text-gray-400 mt-6 max-w-xl mx-auto">
+            {designSubtext}
+          </p>
         </div>
 
         <SectionReveal className="flex overflow-x-auto pb-16 hide-scrollbar gap-8 px-10 snap-x">
-          {TIMELINE_STEPS.map((item, i) => (
-            <div key={i} className="timeline-item min-w-[260px] shrink-0 snap-center">
-              <div className="timeline-item__bg-num" aria-hidden="true">{item.step}</div>
+          {designSteps.map((item: any, i: number) => (
+            <div
+              key={i}
+              className="timeline-item min-w-[260px] shrink-0 snap-center"
+            >
+              <div className="timeline-item__bg-num" aria-hidden="true">
+                {(i + 1).toString().padStart(2, "0")}
+              </div>
               <div className="relative z-10">
                 <div className="timeline-item__dot" />
                 <div className="timeline-item__line" />
-                <h4 className="text-xl font-bold mb-3 mt-8">{item.title}</h4>
-                <p className="text-gray-400 text-sm leading-relaxed">{item.text}</p>
+                <h4 className="text-xl font-bold mb-3 mt-8">
+                  {htmlToLines(item.dName ?? "").map((line, li) => (
+                    <span key={li} className="block">
+                      {line}
+                    </span>
+                  ))}
+                </h4>
               </div>
             </div>
           ))}
@@ -194,26 +401,46 @@ export default function Home() {
 
           <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-12 p-10 lg:p-20">
             <div className="md:w-1/2">
-              <h3 className="text-5xl md:text-7xl font-bold mb-6 tracking-tighter">Wanna Chat?</h3>
-              <p className="text-xl text-gray-400 mb-10 max-w-md">Leave your details and we will get back to you as soon as possible.</p>
+              <h3 className="text-5xl md:text-7xl font-bold mb-6 tracking-tighter">
+                Wanna Chat?
+              </h3>
+              <p className="text-xl text-gray-400 mb-10 max-w-md">
+                Leave your details and we will get back to you as soon as possible.
+              </p>
 
               <form className="space-y-8">
                 {[
-                  { key: "name",  type: "text",  label: "Name*" },
+                  { key: "name", type: "text", label: "Name*" },
                   { key: "email", type: "email", label: "Email*" },
-                  { key: "phone", type: "text",  label: "Phone" },
+                  { key: "phone", type: "text", label: "Phone" },
                 ].map((f) => (
                   <div key={f.key} className="form-field">
-                    <input type={f.type} placeholder={f.label} className="form-input" />
+                    <input
+                      type={f.type}
+                      placeholder={f.label}
+                      className="form-input"
+                    />
                   </div>
                 ))}
                 <div className="form-field">
-                  <textarea placeholder="Message" rows={3} className="form-input resize-none" />
+                  <textarea
+                    placeholder="Message"
+                    rows={3}
+                    className="form-input resize-none"
+                  />
                 </div>
-                <button type="button" className="btn-primary w-full md:w-auto justify-center">
+                <button
+                  type="button"
+                  className="btn-primary w-full md:w-auto justify-center"
+                >
                   Send Message
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M2 8H14M10.5 4L14 8L10.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path
+                      d="M2 8H14M10.5 4L14 8L10.5 12"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 </button>
               </form>
@@ -221,16 +448,34 @@ export default function Home() {
 
             <div className="md:w-1/3 flex flex-col gap-5 md:pt-28">
               {[
-                { label: "Email Us",     value: "contact@triolla.io",       href: "mailto:contact@triolla.io" },
-                { label: "Call Us (TLV)",value: "+972-73-744-3322",          href: "tel:+972737443322" },
-                { label: "Drop By",      value: "Yigal Alon St 98, Tel Aviv-Yafo", href: undefined },
+                {
+                  label: "Email Us",
+                  value: "contact@triolla.io",
+                  href: "mailto:contact@triolla.io",
+                },
+                {
+                  label: "Call Us (TLV)",
+                  value: "+972-73-744-3322",
+                  href: "tel:+972737443322",
+                },
+                {
+                  label: "Drop By",
+                  value: "Yigal Alon St 98, Tel Aviv-Yafo",
+                  href: undefined,
+                },
               ].map((item, i) => (
                 <div key={i} className="contact-info-card">
                   <div className="contact-info-card__label">{item.label}</div>
-                  {item.href
-                    ? <a href={item.href} className="contact-info-card__value contact-info-card__value--link">{item.value}</a>
-                    : <div className="contact-info-card__value">{item.value}</div>
-                  }
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      className="contact-info-card__value contact-info-card__value--link"
+                    >
+                      {item.value}
+                    </a>
+                  ) : (
+                    <div className="contact-info-card__value">{item.value}</div>
+                  )}
                 </div>
               ))}
             </div>
@@ -465,7 +710,6 @@ export default function Home() {
           transform: translateY(-5px) scale(1.01);
           box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(250,204,21,0.18);
         }
-        /* img absolutely fills the fixed-height card */
         .portfolio-card__img {
           position: absolute;
           inset: 0;
@@ -628,6 +872,135 @@ export default function Home() {
           font-weight: 900;
           color: #facc15;
           text-shadow: 0 0 20px rgba(250,204,21,0.4);
+        }
+
+        /* ─── Clients section ───────────────────── */
+        .clients-section {
+          position: relative;
+        }
+        .clients-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(100px);
+          pointer-events: none;
+        }
+        .clients-orb--left {
+          top: 50%;
+          left: -10%;
+          transform: translateY(-50%);
+          width: 500px;
+          height: 500px;
+          background: radial-gradient(circle, rgba(250,204,21,0.07) 0%, transparent 65%);
+        }
+        .clients-orb--right {
+          top: 50%;
+          right: -10%;
+          transform: translateY(-50%);
+          width: 400px;
+          height: 400px;
+          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
+        }
+
+        /* Clients eyebrow */
+        .clients-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 16px;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: #facc15;
+        }
+        .clients-eyebrow__line {
+          display: block;
+          width: 40px;
+          height: 1px;
+          background: linear-gradient(to right, transparent, #facc15);
+        }
+        .clients-eyebrow__line:last-child {
+          background: linear-gradient(to left, transparent, #facc15);
+        }
+
+        /* Clients italic gradient headline */
+        .clients-headline-em {
+          font-style: italic;
+          background: linear-gradient(90deg, #facc15 0%, #fb923c 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        /* ─── Logo marquee ───────────────────────── */
+        .marquee-wrapper {
+          position: relative;
+          overflow: hidden;
+          padding: 8px 0;
+        }
+        .marquee-fade {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 200px;
+          z-index: 2;
+          pointer-events: none;
+        }
+        .marquee-fade--left {
+          left: 0;
+          background: linear-gradient(to right, #080808 0%, transparent 100%);
+        }
+        .marquee-fade--right {
+          right: 0;
+          background: linear-gradient(to left, #080808 0%, transparent 100%);
+        }
+        .marquee-track {
+          display: flex;
+          gap: 16px;
+          animation: marqueeLeft 35s linear infinite;
+          width: max-content;
+        }
+        .marquee-track--reverse {
+          animation-name: marqueeRight;
+          animation-duration: 28s;
+        }
+        .marquee-wrapper:hover .marquee-track {
+          animation-play-state: paused;
+        }
+        @keyframes marqueeLeft {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes marqueeRight {
+          0%   { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+
+        /* Logo cards */
+        .logo-card {
+          flex-shrink: 0;
+          width: 160px;
+          height: 100px;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(255,255,255,0.02);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 10px;
+          transition: border-color 0.4s, background 0.4s, transform 0.4s;
+          overflow: hidden;
+        }
+        .logo-card:hover {
+          border-color: rgba(250,204,21,0.18);
+          background: rgba(250,204,21,0.03);
+          transform: translateY(-4px) scale(1.03);
+        }
+        .logo-card__img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          object-position: center;
+          border-radius: 12px;
         }
 
         /* ─── Timeline ──────────────────────────── */

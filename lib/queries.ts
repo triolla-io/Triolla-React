@@ -62,6 +62,89 @@ export const GET_SERVICES_PAGE = `
   }
 `;
 
+export const GET_HOME_PAGE = `
+  query GetHomePage {
+    page(id: "/", idType: URI) {
+      template {
+        ... on Template_HomePageNew {
+          homePage {
+            topsectitle
+            toptext
+            uDesignHeading
+            uSortText
+            designType { dName }
+            gImageList { gImage { node { sourceUrl altText } } }
+            winTitle
+            winSubtitle
+            wboxes { wboxTitle }
+            abthretitle
+            abtthretext
+            abthrelist {
+              abteintitle
+              abthreintext
+              abthreimage { node { sourceUrl } }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_FOOTER_DATA = `
+  query GetFooterData {
+    menus {
+      nodes {
+        name
+        slug
+        menuItems(first: 20) {
+          nodes {
+            label
+            url
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * Fetch global footer options from WordPress.
+ * Requires the "WPGraphQL for ACF" plugin and an ACF Options page
+ * registered under the field group slug "footer_options".
+ * Falls back gracefully — the Footer component uses static defaults
+ * if these fields are absent.
+ */
+export const GET_FOOTER_OPTIONS = `
+  query GetFooterOptions {
+    generalSettings {
+      title
+      url
+    }
+    themeGeneralSettings {
+      footerOptions {
+        contactEmail
+        phoneTlv
+        phoneNy
+        whatsappUrl
+        calendlyUrl
+        sqLinkUrl
+        sqLinkLogo { node { sourceUrl } }
+        triollaLogo { node { sourceUrl } }
+        socialLinks {
+          platform
+          url
+        }
+        mediaMentions {
+          name
+          url
+          logo { node { sourceUrl } }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_ABOUT_PAGE = `
   query GetAboutPage {
     page(id: "about-us", idType: URI) {
