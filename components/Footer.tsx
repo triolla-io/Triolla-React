@@ -2,6 +2,7 @@ import Link from "next/link";
 import { client } from "@/lib/apollo-client";
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import { SectionReveal } from "@/components/SectionReveal";
 
 /* ── Types ──────────────────────────────────────────────── */
 
@@ -346,7 +347,7 @@ export default async function Footer() {
       ══════════════════════════════════════════ */}
       {mentions.length > 0 && (
         <div className="border-b border-white/5 py-8">
-          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-[90%] mx-auto">
             <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
               {mentionsLabel && (
                 <span className="footer-mentions-label">{mentionsLabel}</span>
@@ -382,96 +383,90 @@ export default async function Footer() {
       {/* ══════════════════════════════════════════
           MAIN NAV GRID
       ══════════════════════════════════════════ */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-8 gap-y-12">
-          {columns.map((col, i) => (
-            <div key={i}>
-              {col.heading && (
-                <h3 className="footer-col-heading">{col.heading}</h3>
-              )}
-              <ul className="space-y-3">
-                {col.items.map((item) => (
-                  <li key={item.label}>
-                    <NavLink label={item.label} url={item.url} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          {/* Social + Contact column */}
-          <div className="col-span-2 md:col-span-1">
-            {socials.length > 0 && (
-              <>
-                <h3 className="footer-col-heading">Social</h3>
-                <ul className="space-y-3 mb-10">
-                  {socials.map((s, i) => (
-                    <li key={i}>
-                      {s.socialMediaLink && s.socialMediaText ? (
-                        <a
-                          href={s.socialMediaLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="footer-nav-link"
-                        >
-                          {s.socialMediaText}
-                        </a>
-                      ) : null}
+      <div className="w-[90%] mx-auto py-16">
+        <SectionReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-8 gap-y-12">
+          {[
+            ...columns.map((col, i) => (
+              <div key={i}>
+                {col.heading && (
+                  <h3 className="footer-col-heading">{col.heading}</h3>
+                )}
+                <ul className="space-y-3">
+                  {col.items.map((item) => (
+                    <li key={item.label}>
+                      <NavLink label={item.label} url={item.url} />
                     </li>
                   ))}
                 </ul>
-              </>
-            )}
-
-            <h3 className="footer-col-heading">Talk to Us</h3>
-            <div className="space-y-4">
-              {emailAddress && (
-                <div>
-                  <div className="footer-contact-label">Mail</div>
-                  <a
-                    href={`mailto:${emailAddress}`}
-                    className="footer-nav-link"
-                  >
-                    {emailAddress}
-                  </a>
-                </div>
-              )}
-              {tlvPhone && (
-                <div>
-                  <div className="footer-contact-label">
-                    {tlvLabel ?? "TLV Offices"}
+              </div>
+            )),
+            ...(socials.length > 0
+              ? [
+                  <div key="social">
+                    <h3 className="footer-col-heading">Social</h3>
+                    <ul className="space-y-3">
+                      {socials.map((s, i) => (
+                        <li key={i}>
+                          {s.socialMediaLink && s.socialMediaText ? (
+                            <a
+                              href={s.socialMediaLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="footer-nav-link"
+                            >
+                              {s.socialMediaText}
+                            </a>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>,
+                ]
+              : []),
+            <div key="contact">
+              <h3 className="footer-col-heading">Talk to Us</h3>
+              <div className="space-y-4">
+                {emailAddress && (
+                  <div>
+                    <div className="footer-contact-label">Mail</div>
+                    <a href={`mailto:${emailAddress}`} className="footer-nav-link">
+                      {emailAddress}
+                    </a>
                   </div>
-                  <a
-                    href={`tel:${tlvPhone.replace(/[^+\d]/g, "")}`}
-                    className="footer-nav-link"
-                  >
-                    {tlvPhone}
-                  </a>
-                </div>
-              )}
-              {nyPhone && (
-                <div>
-                  <div className="footer-contact-label">
-                    {nyLabel ?? "NY Offices"}
+                )}
+                {tlvPhone && (
+                  <div>
+                    <div className="footer-contact-label">{tlvLabel ?? "TLV Offices"}</div>
+                    <a
+                      href={`tel:${tlvPhone.replace(/[^+\d]/g, "")}`}
+                      className="footer-nav-link"
+                    >
+                      {tlvPhone}
+                    </a>
                   </div>
-                  <a
-                    href={`tel:${nyPhone.replace(/[^+\d]/g, "")}`}
-                    className="footer-nav-link"
-                  >
-                    {nyPhone}
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+                )}
+                {nyPhone && (
+                  <div>
+                    <div className="footer-contact-label">{nyLabel ?? "NY Offices"}</div>
+                    <a
+                      href={`tel:${nyPhone.replace(/[^+\d]/g, "")}`}
+                      className="footer-nav-link"
+                    >
+                      {nyPhone}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>,
+          ]}
+        </SectionReveal>
       </div>
 
       {/* ══════════════════════════════════════════
           BOTTOM BAR
       ══════════════════════════════════════════ */}
       <div className="border-t border-white/5 py-6">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-[90%] mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             {/* Left: logo */}
             <Link href="/">

@@ -75,7 +75,7 @@ export const GET_HOME_PAGE = `
             designType { dName }
             winTitle
             winSubtitle
-            wboxes { wboxTitle }
+            wboxes { wboxTitle winImg { node { sourceUrl } } }
             abthretitle
             abtthretext
             abthrelist {

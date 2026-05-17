@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HeroHeadline } from "@/components/HeroHeadline";
 import { SectionReveal } from "@/components/SectionReveal";
+import { FadeIn } from "@/components/FadeIn";
 import { CountUpNumber } from "@/components/CountUpNumber";
 import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { FAQAccordion } from "@/components/FAQAccordion";
@@ -87,9 +88,10 @@ export default async function Home() {
 
   const winTitle =
     hp.winTitle ?? "Global winners in Product UX/UI Design 2025";
-  const awards = (hp.wboxes ?? []).map((b: any) =>
-    parseAward(b.wboxTitle ?? "")
-  );
+  const awards = (hp.wboxes ?? []).map((b: any) => ({
+    ...parseAward(b.wboxTitle ?? ""),
+    imgUrl: b.winImg?.node?.sourceUrl ?? null,
+  }));
 
   const whyTitle = stripHtml(hp.abthretitle ?? "");
   const whyText = stripHtml(hp.abtthretext ?? "");
@@ -215,20 +217,19 @@ export default async function Home() {
             </p>
           </div>
 
-          <SectionReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <SectionReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {serviceCards.map((card: any, i: number) => (
               <div key={i} className="service-card group">
-                <div className="service-card__num">0{i + 1}</div>
                 <div className="service-card__icon-wrap">
                   {card.abthreimage?.node?.sourceUrl ? (
                     <img
                       src={card.abthreimage.node.sourceUrl}
                       alt=""
-                      className="w-6 h-6 object-contain"
+                      className="service-card__icon-img"
                     />
                   ) : (
                     <svg
-                      className="w-5 h-5 text-yellow-400"
+                      className="service-card__icon-img text-yellow-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -243,13 +244,12 @@ export default async function Home() {
                     </svg>
                   )}
                 </div>
-                <h5 className="text-lg font-bold mb-3 mt-6 leading-snug">
+                <h5 className="text-xl font-bold mb-3 mt-8 leading-snug text-center">
                   {stripHtml(card.abteintitle ?? "")}
                 </h5>
-                <p className="text-gray-400 leading-relaxed text-sm">
+                <p className="text-gray-400 leading-relaxed text-sm text-center">
                   {stripHtml(card.abthreintext ?? "")}
                 </p>
-                <div className="service-card__border-anim" aria-hidden="true" />
               </div>
             ))}
           </SectionReveal>
@@ -274,39 +274,47 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           AWARDS SECTION
       ══════════════════════════════════════════════ */}
-      <section id="winners-section" className="py-24 max-w-[1400px] mx-auto px-4 mb-32">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl md:text-5xl font-bold">{winTitle}</h3>
-          </div>
+      <section id="winners-section" className="winners-section mb-32 relative overflow-hidden">
+        {/* Ambient light orbs */}
+        <div className="winners-orb winners-orb--tl" aria-hidden="true" />
+        <div className="winners-orb winners-orb--br" aria-hidden="true" />
+        <div className="winners-orb winners-orb--center" aria-hidden="true" />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {awards.map((award: { rank: number; label: string }, i: number) => (
-              <div
-                key={i}
-                className="award-card group"
-                style={{ animationDelay: `${i * 0.15}s` }}
-              >
-                {/* SVG progress ring */}
-                <div className="award-ring-wrap" aria-hidden="true">
-                  <svg className="award-ring" viewBox="0 0 120 120">
-                    <circle className="award-ring__track" cx="60" cy="60" r="52" />
-                    <circle
-                      className="award-ring__fill"
-                      cx="60"
-                      cy="60"
-                      r="52"
-                      style={{ animationDelay: `${i * 0.15}s` }}
+        {/* Floating sparkles */}
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="winners-sparkle" style={{ '--si': i } as React.CSSProperties} aria-hidden="true" />
+        ))}
+
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <FadeIn className="text-center mb-20">
+            <p className="winners-eyebrow">Recognition &amp; Awards</p>
+            <h3 className="winners-title">{winTitle}</h3>
+            <p className="winners-subtitle">Triolla has stood out among the industry&apos;s biggest players</p>
+          </FadeIn>
+
+          <SectionReveal className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {awards.map((award: { rank: number; label: string; imgUrl: string | null }, i: number) => (
+              <div key={i} className="award-card group" style={{ '--ai': i } as React.CSSProperties}>
+                <div className="award-medal-wrap">
+                  {award.imgUrl ? (
+                    <img
+                      src={award.imgUrl}
+                      alt={award.label}
+                      className="award-medal-img"
                     />
-                  </svg>
-                  <div className="award-ring__number">
-                    #<CountUpNumber target={award.rank} duration={800 + i * 200} />
-                  </div>
+                  ) : (
+                    <div className="award-medal-fallback">
+                      #<CountUpNumber target={award.rank} duration={900 + i * 200} />
+                    </div>
+                  )}
                 </div>
-                <div className="text-xl font-bold mt-8">{award.label}</div>
+                <div className="award-label">
+                  <span className="award-label__rank">#{award.rank}</span>
+                  <span>{award.label}</span>
+                </div>
               </div>
             ))}
-          </div>
+          </SectionReveal>
         </div>
       </section>
 
@@ -835,97 +843,170 @@ export default async function Home() {
         .service-card {
           position: relative;
           background: #111;
-          padding: 28px;
-          border-radius: 20px;
-          border: 1px solid rgba(255,255,255,0.07);
-          overflow: hidden;
-          transition: border-color 0.3s, transform 0.3s;
-        }
-        .service-card:hover { border-color: rgba(250,204,21,0.25); transform: translateY(-4px); }
-        .service-card__num {
-          font-size: 11px;
-          font-weight: 700;
-          color: #facc15;
-          letter-spacing: 0.2em;
-          margin-bottom: 20px;
-          opacity: 0.7;
-        }
-        .service-card__icon-wrap {
-          width: 44px; height: 44px;
-          border-radius: 12px;
-          background: rgba(250,204,21,0.08);
-          border: 1px solid rgba(250,204,21,0.15);
-          display: flex; align-items: center; justify-content: center;
-          transition: background 0.3s, transform 0.3s;
-        }
-        .service-card:hover .service-card__icon-wrap {
-          background: rgba(250,204,21,0.16);
-          transform: scale(1.1) rotate(-3deg);
-        }
-        .service-card__border-anim {
-          position: absolute;
-          inset: 0;
-          border-radius: 20px;
-          background: linear-gradient(135deg, rgba(250,204,21,0.15) 0%, transparent 50%);
-          opacity: 0;
-          transition: opacity 0.4s;
-        }
-        .service-card:hover .service-card__border-anim { opacity: 1; }
-
-        /* ─── Awards ────────────────────────────── */
-        .award-card {
-          background: #0f0f0f;
-          border: 1px solid rgba(255,255,255,0.07);
+          padding: 40px 28px 36px;
           border-radius: 28px;
-          padding: 40px 24px;
-          text-align: center;
+          border: 1px solid rgba(255,255,255,0.1);
           display: flex;
           flex-direction: column;
           align-items: center;
-          transition: border-color 0.3s, transform 0.4s, box-shadow 0.4s;
+          text-align: center;
+          height: 100%;
+          transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
         }
-        .award-card:hover {
-          border-color: rgba(250,204,21,0.3);
-          transform: translateY(-8px);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(250,204,21,0.08);
+        .service-card:hover {
+          border-color: rgba(255,255,255,0.18);
+          transform: translateY(-4px);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
-        .award-ring-wrap {
+        .service-card__icon-wrap {
+          width: 160px; height: 160px;
+          display: flex; align-items: center; justify-content: center;
+          transition: transform 0.3s;
+        }
+        .service-card:hover .service-card__icon-wrap {
+          transform: scale(1.05);
+        }
+        .service-card__icon-img {
+          width: 160px;
+          height: 160px;
+          object-fit: contain;
+        }
+
+        /* ─── Winners section ───────────────────── */
+        .winners-section {
           position: relative;
-          width: 120px;
-          height: 120px;
+          padding: 120px 0 140px;
+          background:
+            radial-gradient(ellipse at 15% 50%, rgba(255,180,120,0.35) 0%, transparent 55%),
+            radial-gradient(ellipse at 85% 15%, rgba(255,220,100,0.30) 0%, transparent 50%),
+            radial-gradient(ellipse at 60% 90%, rgba(255,160,160,0.20) 0%, transparent 45%),
+            #faf7f2;
         }
-        .award-ring {
-          width: 120px; height: 120px;
-          transform: rotate(-90deg);
-        }
-        .award-ring__track {
-          fill: none;
-          stroke: rgba(255,255,255,0.06);
-          stroke-width: 3;
-        }
-        .award-ring__fill {
-          fill: none;
-          stroke: #facc15;
-          stroke-width: 3;
-          stroke-linecap: round;
-          stroke-dasharray: 326.7;
-          stroke-dashoffset: 326.7;
-          animation: ringFill 1.4s cubic-bezier(.23,1,.32,1) forwards;
-          filter: drop-shadow(0 0 8px rgba(250,204,21,0.6));
-        }
-        @keyframes ringFill {
-          to { stroke-dashoffset: 0; }
-        }
-        .award-ring__number {
+        .winners-orb {
           position: absolute;
-          inset: 0;
+          border-radius: 50%;
+          pointer-events: none;
+          filter: blur(80px);
+        }
+        .winners-orb--tl {
+          top: -10%; left: -5%;
+          width: 500px; height: 500px;
+          background: radial-gradient(circle, rgba(255,160,80,0.25) 0%, transparent 70%);
+          animation: orbDrift 12s ease-in-out infinite alternate;
+        }
+        .winners-orb--br {
+          bottom: -10%; right: -5%;
+          width: 600px; height: 600px;
+          background: radial-gradient(circle, rgba(250,200,80,0.20) 0%, transparent 70%);
+          animation: orbDrift 16s ease-in-out infinite alternate-reverse;
+        }
+        .winners-orb--center {
+          top: 30%; left: 30%;
+          width: 700px; height: 700px;
+          background: radial-gradient(circle, rgba(255,240,180,0.15) 0%, transparent 65%);
+          animation: orbDrift 20s ease-in-out infinite alternate;
+        }
+        @keyframes orbDrift {
+          from { transform: translate(0, 0) scale(1); }
+          to   { transform: translate(40px, 30px) scale(1.08); }
+        }
+        .winners-sparkle {
+          position: absolute;
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: #d4a017;
+          opacity: 0;
+          animation: sparklePop 4s ease-in-out infinite;
+          animation-delay: calc(var(--si) * 0.6s);
+          top:  calc(15% + var(--si) * 10%);
+          left: calc(5%  + var(--si) * 12%);
+        }
+        @keyframes sparklePop {
+          0%, 100% { opacity: 0; transform: scale(0) translateY(0); }
+          30%       { opacity: 0.8; transform: scale(1.4) translateY(-8px); }
+          60%       { opacity: 0.3; transform: scale(0.8) translateY(-16px); }
+        }
+        .winners-eyebrow {
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #c47a00;
+          margin-bottom: 16px;
+        }
+        .winners-title {
+          font-size: clamp(2.4rem, 5vw, 4.5rem);
+          font-weight: 900;
+          line-height: 1.08;
+          color: #111;
+          max-width: 820px;
+          margin: 0 auto 20px;
+        }
+        .winners-subtitle {
+          font-size: 1.2rem;
+          color: #555;
+          font-weight: 500;
+        }
+
+        /* Award cards */
+        .award-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          animation: cardRise 0.7s cubic-bezier(.23,1,.32,1) both;
+          animation-delay: calc(var(--ai) * 0.18s + 0.2s);
+          cursor: default;
+        }
+        @keyframes cardRise {
+          from { opacity: 0; transform: translateY(36px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .award-medal-wrap {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 36px;
-          font-weight: 900;
-          color: #facc15;
-          text-shadow: 0 0 20px rgba(250,204,21,0.4);
+          animation: medalFloat 5s ease-in-out infinite;
+          animation-delay: calc(var(--ai, 0) * 0.5s);
+        }
+        @keyframes medalFloat {
+          0%, 100% { transform: translateY(0); }
+          50%       { transform: translateY(-10px); }
+        }
+        .award-medal-img {
+          width: 240px;
+          height: 240px;
+          object-fit: contain;
+          filter: drop-shadow(0 12px 32px rgba(180,120,0,0.22));
+          transition: filter 0.3s, transform 0.3s;
+        }
+        .award-card:hover .award-medal-img {
+          filter: drop-shadow(0 18px 48px rgba(180,120,0,0.35));
+          transform: scale(1.04);
+        }
+        .award-medal-fallback {
+          width: 180px; height: 180px;
+          border-radius: 50%;
+          background: radial-gradient(circle at 35% 30%, #f5c842, #d4880a 60%, #8b5a00);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 48px; font-weight: 900; color: #fff;
+          text-shadow: 0 2px 8px rgba(100,60,0,0.4);
+          filter: drop-shadow(0 10px 28px rgba(180,120,0,0.3));
+        }
+        .award-label {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin-top: 24px;
+          line-height: 1.5;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .award-label__rank {
+          font-size: 1.2rem;
+          font-weight: 800;
+          color: #111;
         }
 
         /* ─── Clients section ───────────────────── */
