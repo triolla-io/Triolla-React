@@ -21,6 +21,7 @@ async function getThemeSettings() {
   }
 }
 
+
 async function getPrimaryMenu(): Promise<{
   nav: MenuItem[];
   mobile: MenuItem[];

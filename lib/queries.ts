@@ -172,7 +172,7 @@ export const GET_THEME_SETTINGS = `
 
 export const GET_PRIMARY_MENU = `
   query GetPrimaryMenu {
-    primaryMenu: menu(id: "PRIMARY_MENU", idType: LOCATION) {
+    primaryMenu: menu(id: "header-menu", idType: SLUG) {
       menuItems(first: 30) {
         nodes {
           label
@@ -180,7 +180,7 @@ export const GET_PRIMARY_MENU = `
         }
       }
     }
-    mobileMenu: menu(id: "MOBILE_HEADER_MENU", idType: LOCATION) {
+    mobileMenu: menu(id: "mobile-header-menu", idType: SLUG) {
       menuItems(first: 30) {
         nodes {
           label
