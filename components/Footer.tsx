@@ -183,7 +183,7 @@ async function getThemeSettings() {
         ${GET_THEME_SETTINGS}
       `,
     });
-    return data?.themeSetting?.themeSetting ?? null;
+    return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;
   }

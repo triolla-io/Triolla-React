@@ -71,7 +71,7 @@ async function getThemeSettings() {
     const { data } = await client.query<any>({
       query: gql`${GET_THEME_SETTINGS}`,
     });
-    return data?.themeSetting?.themeSetting ?? null;
+    return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;
   }
@@ -95,10 +95,10 @@ export default async function Home() {
   const whyText = stripHtml(hp.abtthretext ?? "");
   const serviceCards: any[] = hp.abthrelist ?? [];
 
-  const clientLogos: { url: string; alt: string }[] = (hp.gImageList ?? [])
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
     .map((item: any) => ({
-      url: item.gImage?.node?.sourceUrl ?? "",
-      alt: item.gImage?.node?.altText ?? "",
+      url: item.cLogo?.node?.sourceUrl ?? "",
+      alt: item.cLogo?.node?.altText ?? "",
     }))
     .filter((l: { url: string }) => l.url);
 
@@ -321,18 +321,18 @@ export default async function Home() {
 
           {/* Heading */}
           <div className="text-center mb-20 relative z-10 px-4">
-            <div className="clients-eyebrow">
-              <span className="clients-eyebrow__line" />
-              Our Clients
-              <span className="clients-eyebrow__line" />
-            </div>
-            <h3 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mt-6 max-w-3xl mx-auto leading-[0.95]">
-              From small to global,{" "}
-              <br className="hidden md:block" />
-              we&apos;ve partnered with{" "}
-              <br className="hidden lg:block" />
-              <em className="clients-headline-em">great companies</em>
-            </h3>
+            {ts?.ourClientsHeading && (
+              <div className="clients-eyebrow">
+                <span className="clients-eyebrow__line" />
+                {ts.ourClientsHeading}
+                <span className="clients-eyebrow__line" />
+              </div>
+            )}
+            {ts?.ourClientBigText && (
+              <h3 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mt-6 max-w-3xl mx-auto leading-[0.95]">
+                {ts.ourClientBigText}
+              </h3>
+            )}
           </div>
 
           {/* Row 1 — scrolls left */}
@@ -370,19 +370,21 @@ export default async function Home() {
           </div>
 
           {/* CTA */}
-          <div className="text-center mt-16 relative z-10">
-            <Link href="/contact-us" className="btn-primary">
-              Let&apos;s Talk
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path
-                  d="M2 8H14M10.5 4L14 8L10.5 12"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </Link>
-          </div>
+          {ts?.cButton && (
+            <div className="text-center mt-16 relative z-10">
+              <Link href="/contact-us" className="btn-primary">
+                {ts.cButton}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path
+                    d="M2 8H14M10.5 4L14 8L10.5 12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </Link>
+            </div>
+          )}
         </section>
       )}
 

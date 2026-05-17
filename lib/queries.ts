@@ -73,7 +73,6 @@ export const GET_HOME_PAGE = `
             uDesignHeading
             uSortText
             designType { dName }
-            gImageList { gImage { node { sourceUrl altText } } }
             winTitle
             winSubtitle
             wboxes { wboxTitle }
@@ -111,7 +110,7 @@ export const GET_FOOTER_DATA = `
 export const GET_THEME_SETTINGS = `
   query GetThemeSettings {
     themeSetting {
-      themeSetting {
+      themeOptions {
         bookButton
         bookButtonLink
         contactButton
@@ -164,6 +163,12 @@ export const GET_THEME_SETTINGS = `
         questionAnswerList {
           fQuestion
           fAnswer
+        }
+        ourClientsHeading
+        ourClientBigText
+        cButton
+        clientsLogos {
+          cLogo { node { sourceUrl altText } }
         }
       }
     }
