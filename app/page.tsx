@@ -3,8 +3,9 @@ import { HeroHeadline } from "@/components/HeroHeadline";
 import { SectionReveal } from "@/components/SectionReveal";
 import { CountUpNumber } from "@/components/CountUpNumber";
 import { PortfolioGrid } from "@/components/PortfolioGrid";
+import { FAQAccordion } from "@/components/FAQAccordion";
 import { client } from "@/lib/apollo-client";
-import { GET_HOME_PAGE } from "@/lib/queries";
+import { GET_HOME_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
 
 /* ── WP content helpers ──────────────────────────── */
@@ -65,17 +66,24 @@ async function getHomeData() {
   }
 }
 
+async function getThemeSettings() {
+  try {
+    const { data } = await client.query<any>({
+      query: gql`${GET_THEME_SETTINGS}`,
+    });
+    return data?.themeSetting?.themeSetting ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /* ── Page ────────────────────────────────────────── */
 
 export default async function Home() {
-  const hp = await getHomeData();
+  const [hp, ts] = await Promise.all([getHomeData(), getThemeSettings()]);
 
-  const heroHeadline =
-    stripHtml(hp.topsectitle) ||
-    "Creative Design Attracts People. Smart UX Makes Them Stay";
-  const heroSubtext =
-    stripHtml(hp.toptext) ||
-    "Product Design for Tech, Gaming, Medical, Cyber, IoT, Agritech, Mobile, SaaS Platforms & Startups";
+  const heroHeadline = stripHtml(hp.topsectitle ?? "");
+  const heroSubtext = stripHtml(hp.toptext ?? "");
 
   const winTitle =
     hp.winTitle ?? "Global winners in Product UX/UI Design 2025";
@@ -103,6 +111,40 @@ export default async function Home() {
     hp.uDesignHeading ?? "Our unique Design Process"
   );
   const designSubtext = stripHtml(hp.uSortText ?? "");
+
+  const contactItems = [
+    ts?.cEmailLabel && ts?.cEmailAddress
+      ? {
+          label: ts.cEmailLabel,
+          value: ts.cEmailAddress,
+          href: `mailto:${ts.cEmailAddress}`,
+        }
+      : null,
+    ts?.cTlvLabel && ts?.cTlvNumber
+      ? {
+          label: ts.cTlvLabel,
+          value: ts.cTlvNumber,
+          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, "")}`,
+        }
+      : null,
+    ts?.cNyLabel && ts?.cNyNumber
+      ? {
+          label: ts.cNyLabel,
+          value: ts.cNyNumber,
+          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, "")}`,
+        }
+      : null,
+    ts?.cAddressLabel && ts?.cAddress
+      ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined }
+      : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null);
+
+  const faqItems = (ts?.questionAnswerList ?? [])
+    .filter((q: any) => q?.fQuestion)
+    .map((q: any) => ({
+      faqQuestion: q.fQuestion as string,
+      faqAnswer: (q.fAnswer ?? "") as string,
+    }));
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
@@ -391,6 +433,27 @@ export default async function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════
+          FAQ SECTION
+      ══════════════════════════════════════════════ */}
+      {faqItems.length > 0 && (
+        <section className="py-24 max-w-[1400px] mx-auto px-4 lg:px-8 mb-32">
+          <div className="text-center mb-16">
+            {ts?.faqHeading && (
+              <h3 className="text-4xl md:text-5xl font-bold tracking-tighter">
+                {ts.faqHeading}
+              </h3>
+            )}
+            {ts?.faqShortText && (
+              <p className="text-xl text-gray-400 mt-4 max-w-xl mx-auto">
+                {ts.faqShortText}
+              </p>
+            )}
+          </div>
+          <FAQAccordion items={faqItems} />
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════════
           CONTACT SECTION
       ══════════════════════════════════════════════ */}
       <section className="mt-24 max-w-[1400px] mx-auto px-4 lg:px-8">
@@ -447,23 +510,12 @@ export default async function Home() {
             </div>
 
             <div className="md:w-1/3 flex flex-col gap-5 md:pt-28">
-              {[
-                {
-                  label: "Email Us",
-                  value: "contact@triolla.io",
-                  href: "mailto:contact@triolla.io",
-                },
-                {
-                  label: "Call Us (TLV)",
-                  value: "+972-73-744-3322",
-                  href: "tel:+972737443322",
-                },
-                {
-                  label: "Drop By",
-                  value: "Yigal Alon St 98, Tel Aviv-Yafo",
-                  href: undefined,
-                },
-              ].map((item, i) => (
+              {ts?.cCallUsLabel && (
+                <p className="text-sm text-gray-500 uppercase tracking-widest font-semibold">
+                  {ts.cCallUsLabel}
+                </p>
+              )}
+              {contactItems.map((item, i) => (
                 <div key={i} className="contact-info-card">
                   <div className="contact-info-card__label">{item.label}</div>
                   {item.href ? (

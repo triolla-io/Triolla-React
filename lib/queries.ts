@@ -108,37 +108,83 @@ export const GET_FOOTER_DATA = `
   }
 `;
 
-/**
- * Fetch global footer options from WordPress.
- * Requires the "WPGraphQL for ACF" plugin and an ACF Options page
- * registered under the field group slug "footer_options".
- * Falls back gracefully — the Footer component uses static defaults
- * if these fields are absent.
- */
-export const GET_FOOTER_OPTIONS = `
-  query GetFooterOptions {
-    generalSettings {
-      title
-      url
+export const GET_THEME_SETTINGS = `
+  query GetThemeSettings {
+    themeSetting {
+      themeSetting {
+        bookButton
+        bookButtonLink
+        contactButton
+        contactButtonLink
+        whatsappNumber
+        whatsappMessage
+        newsTicker
+        siteLogo { node { sourceUrl altText } }
+        siteLogoWhite { node { sourceUrl altText } }
+        footerLogo { node { sourceUrl altText } }
+        footerMentionsLabel
+        mentionsLogos {
+          mentionLogo { node { sourceUrl } }
+          mentionLogoLink
+        }
+        emailAddress
+        tlvOfficesLabel
+        tlvOfficesPhone
+        nyOfficesLabel
+        nyOfficesPhone
+        sqlink
+        facebookLink
+        instagramLink
+        tiktokLink
+        linkedinLink
+        socialMenuItems {
+          socialMediaLink
+          socialMediaText
+        }
+        footerPrivacyText
+        footerPrivacyLink
+        footerTermText
+        footerTermLink
+        footmenuTitleOne
+        footmenuTitleTwo
+        footmenuTitleThree
+        footmenuTitleFour
+        footmenuTitleFive
+        cCallUsLabel
+        cEmailAddress
+        cEmailLabel
+        cTlvLabel
+        cTlvNumber
+        cNyLabel
+        cNyNumber
+        cAddress
+        cAddressLabel
+        faqHeading
+        faqShortText
+        questionAnswerList {
+          fQuestion
+          fAnswer
+        }
+      }
     }
-    themeGeneralSettings {
-      footerOptions {
-        contactEmail
-        phoneTlv
-        phoneNy
-        whatsappUrl
-        calendlyUrl
-        sqLinkUrl
-        sqLinkLogo { node { sourceUrl } }
-        triollaLogo { node { sourceUrl } }
-        socialLinks {
-          platform
+  }
+`;
+
+export const GET_PRIMARY_MENU = `
+  query GetPrimaryMenu {
+    primaryMenu: menu(id: "PRIMARY_MENU", idType: LOCATION) {
+      menuItems(first: 30) {
+        nodes {
+          label
           url
         }
-        mediaMentions {
-          name
+      }
+    }
+    mobileMenu: menu(id: "MOBILE_HEADER_MENU", idType: LOCATION) {
+      menuItems(first: 30) {
+        nodes {
+          label
           url
-          logo { node { sourceUrl } }
         }
       }
     }
