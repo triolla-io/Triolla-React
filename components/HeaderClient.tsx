@@ -85,7 +85,9 @@ export function HeaderClient({
                   alt="Triolla"
                   className="h-9 w-auto brightness-0 invert"
                 />
-              ) : null}
+              ) : (
+                <span className="text-[28px] font-bold tracking-tighter leading-none">TRIOLLA</span>
+              )}
             </Link>
           </div>
 

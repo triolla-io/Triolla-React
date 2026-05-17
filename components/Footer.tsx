@@ -28,10 +28,49 @@ interface SocialItem {
   socialMediaText?: string | null;
 }
 
-/* ── Menu column slugs (fallback items stay; headings come from WP) ── */
+/* ── Static fallbacks (used when WP ThemeSetting data is unavailable) ── */
+
+const FALLBACK_CONTACT = {
+  email: "Fun@triolla.io",
+  tlvLabel: "TLV Offices",
+  tlvPhone: "+972-73-744-3322",
+  nyLabel: "NY Offices",
+  nyPhone: "+1408-627-7350",
+};
+
+const FALLBACK_SOCIALS = [
+  { socialMediaLink: "https://www.facebook.com/triollaofficial", socialMediaText: "Facebook" },
+  { socialMediaLink: "https://www.linkedin.com/company/triolla-official/", socialMediaText: "LinkedIn" },
+  { socialMediaLink: "https://www.instagram.com/triollaofficial/", socialMediaText: "Instagram" },
+  { socialMediaLink: "https://www.tiktok.com/@triolla.io", socialMediaText: "TikTok" },
+  { socialMediaLink: "https://dribbble.com/Triolla", socialMediaText: "Dribbble" },
+  { socialMediaLink: "https://www.behance.net/asaf8ac9", socialMediaText: "Behance" },
+];
+
+const FALLBACK_MENTIONS = [
+  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_736.svg" } }, mentionLogoLink: "https://13tv.co.il/item/special/recommended/economy/k2fy3-902776824/" },
+  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_biz_735.svg" } }, mentionLogoLink: "https://www.bizportal.co.il/BizTech/news/article/20015580" },
+  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_marker_731.svg" } }, mentionLogoLink: "https://www.themarker.com/labels/2021-04-05/ty-article-labels/0000017f-f88a-d044-adff-fbfb48ad0000" },
+  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_732.svg" } }, mentionLogoLink: "https://www.globes.co.il/news/article.aspx?did=1001450720" },
+  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_733.svg" } }, mentionLogoLink: "https://www.pc.co.il/featured/420350/" },
+  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_mako_734.svg" } }, mentionLogoLink: "https://www.mako.co.il/special-articles/Article-c2a83bbe7224d71026.htm" },
+];
+
+const FALLBACK_SQLINK = "https://www.sqlink.com/";
+const FALLBACK_LOGO = "https://triolla.io/wp-content/uploads/2025/05/triolla.svg";
+const FALLBACK_MENTIONS_LABEL = "Featured In";
+const FALLBACK_SOCIAL_ICONS = {
+  fb: "https://www.facebook.com/triollaofficial",
+  ig: "https://www.instagram.com/triollaofficial/",
+  tt: "https://www.tiktok.com/@triolla.io",
+  li: "https://www.linkedin.com/company/triolla-official/",
+};
+
+/* ── Menu column slugs ──────────────────────────────────────────────── */
 
 const MENU_COLUMNS = [
   {
+    heading: "Product Design",
     slug: "product-menu",
     fallback: [
       {
@@ -45,6 +84,7 @@ const MENU_COLUMNS = [
     ],
   },
   {
+    heading: "Case Studies",
     slug: "case-study-menu",
     fallback: [
       { label: "Mobile Apps", url: "/mobile-apps" },
@@ -57,6 +97,7 @@ const MENU_COLUMNS = [
     ],
   },
   {
+    heading: "Technology",
     slug: "technology-menu",
     fallback: [
       { label: "Dev & Technology", url: "/technology" },
@@ -68,6 +109,7 @@ const MENU_COLUMNS = [
     ],
   },
   {
+    heading: "About",
     slug: "company-menu",
     fallback: [
       { label: "About us", url: "/about-us" },
@@ -82,6 +124,7 @@ const MENU_COLUMNS = [
     ],
   },
   {
+    heading: "Our Blog",
     slug: "blog-menu",
     fallback: [
       { label: "All Blogs", url: "/blog" },
@@ -273,28 +316,28 @@ export default async function Footer() {
     const items = wpMenu?.menuItems?.nodes?.length
       ? wpMenu.menuItems.nodes
       : col.fallback;
-    return { heading: colHeadings[i], items };
+    return { heading: colHeadings[i] ?? col.heading, items };
   });
 
-  const mentions: MentionLogo[] = ts?.mentionsLogos ?? [];
-  const socials: SocialItem[] = ts?.socialMenuItems ?? [];
+  const mentions: MentionLogo[] = ts?.mentionsLogos?.length ? ts.mentionsLogos : FALLBACK_MENTIONS;
+  const socials: SocialItem[] = ts?.socialMenuItems?.length ? ts.socialMenuItems : FALLBACK_SOCIALS;
 
-  const logoUrl: string | null = ts?.siteLogo?.node?.sourceUrl ?? null;
-  const sqlinkUrl: string | null = ts?.sqlink ?? null;
-  const emailAddress: string | null = ts?.emailAddress ?? null;
-  const tlvLabel: string | null = ts?.tlvOfficesLabel ?? null;
-  const tlvPhone: string | null = ts?.tlvOfficesPhone ?? null;
-  const nyLabel: string | null = ts?.nyOfficesLabel ?? null;
-  const nyPhone: string | null = ts?.nyOfficesPhone ?? null;
+  const logoUrl: string = ts?.siteLogo?.node?.sourceUrl ?? FALLBACK_LOGO;
+  const sqlinkUrl: string = ts?.sqlink ?? FALLBACK_SQLINK;
+  const emailAddress: string = ts?.emailAddress ?? FALLBACK_CONTACT.email;
+  const tlvLabel: string = ts?.tlvOfficesLabel ?? FALLBACK_CONTACT.tlvLabel;
+  const tlvPhone: string = ts?.tlvOfficesPhone ?? FALLBACK_CONTACT.tlvPhone;
+  const nyLabel: string = ts?.nyOfficesLabel ?? FALLBACK_CONTACT.nyLabel;
+  const nyPhone: string = ts?.nyOfficesPhone ?? FALLBACK_CONTACT.nyPhone;
   const privacyText: string | null = ts?.footerPrivacyText ?? null;
   const privacyLink: string | null = ts?.footerPrivacyLink ?? null;
   const termText: string | null = ts?.footerTermText ?? null;
   const termLink: string | null = ts?.footerTermLink ?? null;
-  const mentionsLabel: string | null = ts?.footerMentionsLabel ?? null;
-  const fbLink: string | null = ts?.facebookLink ?? null;
-  const igLink: string | null = ts?.instagramLink ?? null;
-  const ttLink: string | null = ts?.tiktokLink ?? null;
-  const liLink: string | null = ts?.linkedinLink ?? null;
+  const mentionsLabel: string = ts?.footerMentionsLabel ?? FALLBACK_MENTIONS_LABEL;
+  const fbLink: string = ts?.facebookLink ?? FALLBACK_SOCIAL_ICONS.fb;
+  const igLink: string = ts?.instagramLink ?? FALLBACK_SOCIAL_ICONS.ig;
+  const ttLink: string = ts?.tiktokLink ?? FALLBACK_SOCIAL_ICONS.tt;
+  const liLink: string = ts?.linkedinLink ?? FALLBACK_SOCIAL_ICONS.li;
 
   return (
     <footer className="bg-[#0f0f0f] text-white overflow-hidden">

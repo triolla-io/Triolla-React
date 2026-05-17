@@ -41,24 +41,34 @@ async function getPrimaryMenu(): Promise<{
   }
 }
 
+const FALLBACK_NAV: MenuItem[] = [
+  { label: "Portfolio", url: "/portfolio" },
+  { label: "Services", url: "/services" },
+  { label: "Technology", url: "/technology" },
+  { label: "The Company", url: "/about-us" },
+];
+
 export default async function Header() {
   const [ts, menus] = await Promise.all([getThemeSettings(), getPrimaryMenu()]);
 
   const whatsappHref = ts?.whatsappNumber
     ? `https://wa.me/${ts.whatsappNumber}${ts.whatsappMessage ? `?text=${encodeURIComponent(ts.whatsappMessage)}` : ""}`
-    : null;
+    : "https://wa.me/+972525956644";
+
+  const nav = menus.nav.length > 0 ? menus.nav : FALLBACK_NAV;
+  const mobile = menus.mobile.length > 0 ? menus.mobile : nav;
 
   return (
     <HeaderClient
       logoUrl={ts?.siteLogo?.node?.sourceUrl ?? null}
       ticker={ts?.newsTicker ?? null}
-      navItems={menus.nav}
-      mobileNavItems={menus.mobile}
+      navItems={nav}
+      mobileNavItems={mobile}
       whatsappHref={whatsappHref}
-      bookButtonText={ts?.bookButton ?? null}
-      bookButtonHref={ts?.bookButtonLink ?? null}
-      contactButtonText={ts?.contactButton ?? null}
-      contactButtonHref={ts?.contactButtonLink ?? null}
+      bookButtonText={ts?.bookButton ?? "Book a Call"}
+      bookButtonHref={ts?.bookButtonLink ?? "https://calendly.com/triolla/pitangoux-introductory-meeting-clone"}
+      contactButtonText={ts?.contactButton ?? "Contact Us"}
+      contactButtonHref={ts?.contactButtonLink ?? "/contact-us"}
     />
   );
 }
