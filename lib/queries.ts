@@ -173,18 +173,22 @@ export const GET_THEME_SETTINGS = `
 export const GET_PRIMARY_MENU = `
   query GetPrimaryMenu {
     primaryMenu: menu(id: "header-menu", idType: SLUG) {
-      menuItems(first: 30) {
+      menuItems(first: 50) {
         nodes {
+          databaseId
           label
           url
+          parentDatabaseId
         }
       }
     }
     mobileMenu: menu(id: "mobile-header-menu", idType: SLUG) {
-      menuItems(first: 30) {
+      menuItems(first: 50) {
         nodes {
+          databaseId
           label
           url
+          parentDatabaseId
         }
       }
     }
