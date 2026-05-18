@@ -204,6 +204,46 @@ export const GET_PRIMARY_MENU = `
   }
 `;
 
+export const GET_CYBER_SECURITY_PAGE = `
+  query GetCyberSecurityPage {
+    page(id: "cyber-security", idType: URI) {
+      template {
+        ... on Template_PortfolioPage {
+          portfolioFields {
+            headerTitle
+            headerSubText
+            boldText
+            shortText
+            moreText
+            buttonText
+            pPartnerButton
+            partnerWithUsText
+            uDesignHeading
+            uSortText
+            whyDoHeading
+            headerBgColor
+            headerBgOverlayLayer { node { sourceUrl } }
+            designType { dName }
+            companyList { companyName }
+            whyDoList { whyTitle whyShortText }
+            gImageList { gImage { node { sourceUrl } } }
+            portfolioList {
+              pTitle
+              sortText
+              pTags { tagName }
+              pImage { node { sourceUrl } }
+              pImageMob { node { sourceUrl } }
+              pLogo { node { sourceUrl } }
+              popupTopText
+              popupGalleryImages { galleryImage { node { sourceUrl } } }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_ABOUT_PAGE = `
   query GetAboutPage {
     page(id: "about-us", idType: URI) {
