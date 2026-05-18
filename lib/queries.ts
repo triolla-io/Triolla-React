@@ -149,6 +149,8 @@ export const GET_THEME_SETTINGS = `
         footmenuTitleThree
         footmenuTitleFour
         footmenuTitleFive
+        cLeftHeading
+        cContactFormHeading
         cCallUsLabel
         cEmailAddress
         cEmailLabel
@@ -170,6 +172,8 @@ export const GET_THEME_SETTINGS = `
         clientsLogos {
           cLogo { node { sourceUrl altText } }
         }
+        commonGridOneImage { node { sourceUrl } }
+        commonGridOneMobile { node { sourceUrl } }
       }
     }
   }

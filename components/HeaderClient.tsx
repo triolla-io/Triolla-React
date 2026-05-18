@@ -185,6 +185,7 @@ export function HeaderClient({
       {/* Floating pill nav */}
       <div className="pointer-events-auto flex justify-center px-4 pt-4">
         <motion.div
+          initial={{ maxWidth: 920 }}
           animate={{ maxWidth: isScrolling ? 340 : 920 }}
           transition={{ type: "spring", stiffness: 120, damping: 28, mass: 1 }}
           className="relative w-full flex items-center bg-[#0a0a0a] text-white rounded-full border border-white/10 shadow-2xl shadow-black/40 px-5 h-[54px] overflow-hidden"

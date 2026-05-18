@@ -4,7 +4,9 @@ import { SectionReveal } from "@/components/SectionReveal";
 import { FadeIn } from "@/components/FadeIn";
 import { CountUpNumber } from "@/components/CountUpNumber";
 import { PortfolioGrid } from "@/components/PortfolioGrid";
-import { FAQAccordion } from "@/components/FAQAccordion";
+import { FAQSection } from "@/components/FAQSection";
+import { GridImageSection } from "@/components/GridImageSection";
+import { WannaChatSection } from "@/components/WannaChatSection";
 import { client } from "@/lib/apollo-client";
 import { GET_HOME_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
@@ -445,105 +447,32 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           FAQ SECTION
       ══════════════════════════════════════════════ */}
-      {faqItems.length > 0 && (
-        <section className="py-24 max-w-[1400px] mx-auto px-4 lg:px-8 mb-32">
-          <div className="text-center mb-16">
-            {ts?.faqHeading && (
-              <h3 className="text-4xl md:text-5xl font-bold tracking-tighter">
-                {ts.faqHeading}
-              </h3>
-            )}
-            {ts?.faqShortText && (
-              <p className="text-xl text-gray-400 mt-4 max-w-xl mx-auto">
-                {ts.faqShortText}
-              </p>
-            )}
-          </div>
-          <FAQAccordion items={faqItems} />
-        </section>
-      )}
+      <FAQSection
+        heading={ts?.faqHeading ?? null}
+        subtext={ts?.faqShortText ?? null}
+        items={faqItems}
+      />
+
+      {/* ══════════════════════════════════════════════
+          GRID IMAGE SECTION
+      ══════════════════════════════════════════════ */}
+      <GridImageSection
+        imageUrl={ts?.commonGridOneImage?.node?.sourceUrl ?? null}
+        imageMobileUrl={ts?.commonGridOneMobile?.node?.sourceUrl ?? null}
+      />
 
       {/* ══════════════════════════════════════════════
           CONTACT SECTION
       ══════════════════════════════════════════════ */}
-      <section className="mt-24 max-w-[1400px] mx-auto px-4 lg:px-8">
-        <div className="contact-section relative overflow-hidden">
-          <div className="contact-section__orb contact-section__orb--1" aria-hidden="true" />
-          <div className="contact-section__orb contact-section__orb--2" aria-hidden="true" />
-          <div className="contact-section__grid" aria-hidden="true" />
-
-          <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-12 p-10 lg:p-20">
-            <div className="md:w-1/2">
-              <h3 className="text-5xl md:text-7xl font-bold mb-6 tracking-tighter">
-                Wanna Chat?
-              </h3>
-              <p className="text-xl text-gray-400 mb-10 max-w-md">
-                Leave your details and we will get back to you as soon as possible.
-              </p>
-
-              <form className="space-y-8">
-                {[
-                  { key: "name", type: "text", label: "Name*" },
-                  { key: "email", type: "email", label: "Email*" },
-                  { key: "phone", type: "text", label: "Phone" },
-                ].map((f) => (
-                  <div key={f.key} className="form-field">
-                    <input
-                      type={f.type}
-                      placeholder={f.label}
-                      className="form-input"
-                    />
-                  </div>
-                ))}
-                <div className="form-field">
-                  <textarea
-                    placeholder="Message"
-                    rows={3}
-                    className="form-input resize-none"
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="btn-primary w-full md:w-auto justify-center"
-                >
-                  Send Message
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path
-                      d="M2 8H14M10.5 4L14 8L10.5 12"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-              </form>
-            </div>
-
-            <div className="md:w-1/3 flex flex-col gap-5 md:pt-28">
-              {ts?.cCallUsLabel && (
-                <p className="text-sm text-gray-500 uppercase tracking-widest font-semibold">
-                  {ts.cCallUsLabel}
-                </p>
-              )}
-              {contactItems.map((item, i) => (
-                <div key={i} className="contact-info-card">
-                  <div className="contact-info-card__label">{item.label}</div>
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      className="contact-info-card__value contact-info-card__value--link"
-                    >
-                      {item.value}
-                    </a>
-                  ) : (
-                    <div className="contact-info-card__value">{item.value}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <WannaChatSection
+        contactItems={contactItems}
+        leftHeading={ts?.cLeftHeading
+          ? ts.cLeftHeading.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "").trim()
+          : null}
+        formHeading={ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null}
+        submitLabel={ts?.cButton ?? null}
+        callUsLabel={ts?.cCallUsLabel ?? null}
+      />
 
       {/* ══════════════════════════════════════════════
           GLOBAL STYLES
@@ -1168,83 +1097,6 @@ export default async function Home() {
           right: -32px;
           background: linear-gradient(to right, rgba(250,204,21,0.3), rgba(255,255,255,0.05));
         }
-
-        /* ─── Contact section ───────────────────── */
-        .contact-section {
-          background: #0a0a0a;
-          border-radius: 48px;
-          border: 1px solid rgba(255,255,255,0.06);
-          box-shadow: 0 40px 120px rgba(0,0,0,0.5);
-        }
-        .contact-section__orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(70px);
-          pointer-events: none;
-        }
-        .contact-section__orb--1 {
-          top: -10%;
-          left: -5%;
-          width: 500px; height: 500px;
-          background: radial-gradient(circle, rgba(250,204,21,0.08) 0%, transparent 65%);
-        }
-        .contact-section__orb--2 {
-          bottom: -10%;
-          right: -5%;
-          width: 400px; height: 400px;
-          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
-        }
-        .contact-section__grid {
-          position: absolute;
-          inset: 0;
-          border-radius: 48px;
-          background-image:
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-          background-size: 60px 60px;
-          mask-image: radial-gradient(ellipse 80% 80% at 20% 50%, black 0%, transparent 100%);
-        }
-
-        /* ─── Form inputs ───────────────────────── */
-        .form-input {
-          width: 100%;
-          background: transparent;
-          border: none;
-          border-bottom: 1px solid rgba(255,255,255,0.12);
-          padding-bottom: 14px;
-          font-size: 17px;
-          color: #fff;
-          outline: none;
-          transition: border-color 0.2s;
-        }
-        .form-input::placeholder { color: rgba(255,255,255,0.3); }
-        .form-input:focus { border-color: #facc15; }
-
-        /* ─── Contact info cards ────────────────── */
-        .contact-info-card {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 20px;
-          padding: 24px;
-          transition: border-color 0.2s, background 0.2s;
-        }
-        .contact-info-card:hover {
-          background: rgba(255,255,255,0.05);
-          border-color: rgba(250,204,21,0.2);
-        }
-        .contact-info-card__label {
-          font-size: 10px;
-          text-transform: uppercase;
-          letter-spacing: 0.2em;
-          color: #6b7280;
-          margin-bottom: 8px;
-        }
-        .contact-info-card__value {
-          font-size: 18px;
-          font-weight: 500;
-          color: #e5e7eb;
-        }
-        .contact-info-card__value--link:hover { color: #facc15; transition: color 0.2s; }
 
         /* ─── Scrollbar hide ────────────────────── */
         .hide-scrollbar::-webkit-scrollbar { display: none; }

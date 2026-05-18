@@ -1,0 +1,403 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface FAQItem {
+  faqQuestion: string;
+  faqAnswer: string;
+}
+
+interface FAQSectionProps {
+  heading?: string | null;
+  subtext?: string | null;
+  items: FAQItem[];
+}
+
+/* Renders trusted WP HTML content via ref — same as dangerouslySetInnerHTML pattern
+   used in FAQAccordion.tsx; content originates solely from the WP backend. */
+function WPAnswer({ html, className }: { html: string; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.innerHTML = html;
+  }, [html]);
+  return <div ref={ref} className={className} />;
+}
+
+export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
+  const [open, setOpen] = useState<number | null>(null);
+
+  if (!items.length) return null;
+
+  return (
+    <>
+      <section className="fq-root">
+        <div className="fq-card">
+          <div className="fq-orb fq-orb--a" />
+          <div className="fq-orb fq-orb--b" />
+          <div className="fq-orb fq-orb--c" />
+          <div className="fq-grid" />
+
+          <div className="fq-layout">
+
+            {/* LEFT — sticky heading */}
+            <div className="fq-col-left">
+              <div className="fq-left-inner">
+                {heading && <h2 className="fq-heading">{heading}</h2>}
+                {subtext  && <p className="fq-subtext">{subtext}</p>}
+                <div className="fq-rule" />
+                <div className="fq-count" aria-hidden="true">
+                  {String(items.length).padStart(2, "0")}
+                  <span className="fq-count__label">questions</span>
+                </div>
+              </div>
+              <div className="fq-deco" aria-hidden="true">?</div>
+            </div>
+
+            {/* RIGHT — accordion */}
+            <div className="fq-col-right">
+              {items.map((item, i) => {
+                const isOpen = open === i;
+                return (
+                  <div
+                    key={i}
+                    className={`fq-item${isOpen ? " fq-item--open" : ""}`}
+                  >
+                    <button
+                      className="fq-item__btn"
+                      onClick={() => setOpen(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                    >
+                      <span className="fq-item__num">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="fq-item__q">{item.faqQuestion}</span>
+                      <span className="fq-item__icon" aria-hidden="true">
+                        <span className="fq-item__icon-h" />
+                        <span className="fq-item__icon-v" />
+                      </span>
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.38, ease: [0.23, 1, 0.32, 1] }}
+                          style={{ overflow: "hidden" }}
+                        >
+                          <WPAnswer html={item.faqAnswer} className="fq-item__ans" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <style>{`
+        /* ═══════════════════════════════════════════════
+           FAQ SECTION — premium accordion
+        ═══════════════════════════════════════════════ */
+
+        .fq-root {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 16px;
+        }
+        @media (min-width: 1024px) { .fq-root { padding: 0 32px; } }
+
+        /* outer card */
+        .fq-card {
+          position: relative;
+          overflow: hidden;
+          border-radius: 52px;
+          background:
+            radial-gradient(ellipse at 100% 0%,   rgba(250,204,21,0.07) 0%, transparent 50%),
+            radial-gradient(ellipse at   0% 100%, rgba(251,146,60,0.04) 0%, transparent 50%),
+            #090909;
+          border: 1px solid rgba(255,255,255,0.06);
+          box-shadow:
+            0 60px 140px rgba(0,0,0,0.65),
+            inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        /* orbs */
+        .fq-orb {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          filter: blur(100px);
+        }
+        .fq-orb--a {
+          top: -20%; right: -8%;
+          width: 640px; height: 640px;
+          background: radial-gradient(circle, rgba(250,204,21,0.09) 0%, transparent 60%);
+          animation: fqFloat 14s ease-in-out infinite;
+        }
+        .fq-orb--b {
+          bottom: -15%; left: -6%;
+          width: 500px; height: 500px;
+          background: radial-gradient(circle, rgba(251,146,60,0.06) 0%, transparent 60%);
+          animation: fqFloat 18s ease-in-out infinite reverse;
+        }
+        .fq-orb--c {
+          top: 50%; left: 30%;
+          width: 320px; height: 320px;
+          background: radial-gradient(circle, rgba(250,204,21,0.03) 0%, transparent 60%);
+          animation: fqFloat 24s ease-in-out infinite;
+        }
+        @keyframes fqFloat {
+          0%,100% { transform: translate(0,0)        scale(1);    opacity: 0.85; }
+          33%      { transform: translate(-20px,16px) scale(1.05); opacity: 1;    }
+          66%      { transform: translate(14px,-20px) scale(0.96); opacity: 0.8;  }
+        }
+
+        /* grid texture */
+        .fq-grid {
+          position: absolute;
+          inset: 0;
+          border-radius: 52px;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+          background-size: 60px 60px;
+          mask-image: radial-gradient(ellipse 85% 80% at 85% 50%, black 0%, transparent 100%);
+        }
+
+        /* layout */
+        .fq-layout {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+          gap: 52px;
+          padding: 72px 40px;
+        }
+        @media (min-width: 900px) {
+          .fq-layout {
+            flex-direction: row;
+            align-items: flex-start;
+            padding: 88px 88px;
+            gap: 72px;
+          }
+        }
+
+        /* left column */
+        .fq-col-left {
+          flex: 0 0 auto;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          overflow: hidden;
+        }
+        @media (min-width: 900px) {
+          .fq-col-left {
+            width: 290px;
+            position: sticky;
+            top: 120px;
+            overflow: visible;
+          }
+        }
+
+        .fq-left-inner { position: relative; z-index: 2; }
+
+        .fq-heading {
+          font-size: clamp(2rem, 3.6vw, 3.2rem);
+          font-weight: 900;
+          line-height: 1.08;
+          letter-spacing: -0.04em;
+          color: #fff;
+          margin-bottom: 18px;
+        }
+
+        .fq-subtext {
+          font-size: 0.97rem;
+          line-height: 1.78;
+          color: rgba(255,255,255,0.36);
+          max-width: 260px;
+          margin-bottom: 32px;
+        }
+
+        .fq-rule {
+          width: 40px; height: 2px;
+          background: linear-gradient(to right, rgba(250,204,21,0.8), transparent);
+          border-radius: 2px;
+          margin-bottom: 24px;
+        }
+
+        .fq-count {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          font-size: 2.6rem;
+          font-weight: 900;
+          letter-spacing: -0.04em;
+          background: linear-gradient(128deg, #facc15, #f59e0b);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .fq-count__label {
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.22);
+          -webkit-text-fill-color: rgba(255,255,255,0.22);
+        }
+
+        /* decorative "?" */
+        .fq-deco {
+          position: absolute;
+          bottom: -30px;
+          right: -16px;
+          font-size: 200px;
+          font-weight: 900;
+          line-height: 1;
+          letter-spacing: -0.06em;
+          color: rgba(250,204,21,0.045);
+          pointer-events: none;
+          user-select: none;
+          z-index: 1;
+        }
+
+        /* right column */
+        .fq-col-right {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        /* accordion item card */
+        .fq-item {
+          position: relative;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.07);
+          background: rgba(255,255,255,0.022);
+          overflow: hidden;
+          transition:
+            border-color 0.35s cubic-bezier(.23,1,.32,1),
+            background   0.35s,
+            box-shadow   0.35s;
+        }
+        .fq-item::before {
+          content: '';
+          position: absolute;
+          left: 0; top: 0; bottom: 0;
+          width: 3px;
+          background: linear-gradient(to bottom, #facc15, #f59e0b);
+          border-radius: 3px 0 0 3px;
+          transform: scaleY(0);
+          transform-origin: top center;
+          transition: transform 0.42s cubic-bezier(.23,1,.32,1);
+        }
+        .fq-item:hover {
+          border-color: rgba(255,255,255,0.12);
+          background: rgba(255,255,255,0.03);
+        }
+        .fq-item--open {
+          border-color: rgba(250,204,21,0.22);
+          background: rgba(250,204,21,0.028);
+          box-shadow:
+            0 0 0 1px rgba(250,204,21,0.06),
+            0 16px 56px rgba(0,0,0,0.35),
+            0 0 48px rgba(250,204,21,0.05);
+        }
+        .fq-item--open::before { transform: scaleY(1); }
+
+        /* button row */
+        .fq-item__btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 22px 22px;
+          text-align: left;
+          background: none;
+          border: none;
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        /* number */
+        .fq-item__num {
+          flex-shrink: 0;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          color: rgba(255,255,255,0.18);
+          min-width: 22px;
+          transition: color 0.3s;
+        }
+        .fq-item--open .fq-item__num { color: #facc15; }
+
+        /* question */
+        .fq-item__q {
+          flex: 1;
+          font-size: 17px;
+          font-weight: 600;
+          color: rgba(255,255,255,0.75);
+          line-height: 1.45;
+          transition: color 0.25s;
+        }
+        .fq-item:hover .fq-item__q { color: rgba(255,255,255,0.92); }
+        .fq-item--open .fq-item__q  { color: #fff; }
+
+        /* plus/minus circle */
+        .fq-item__icon {
+          flex-shrink: 0;
+          width: 34px; height: 34px;
+          border-radius: 50%;
+          border: 1.5px solid rgba(255,255,255,0.13);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          transition: border-color 0.35s, box-shadow 0.35s;
+        }
+        .fq-item:hover .fq-item__icon { border-color: rgba(255,255,255,0.24); }
+        .fq-item--open .fq-item__icon {
+          border-color: #facc15;
+          box-shadow: 0 0 16px rgba(250,204,21,0.45), 0 0 4px rgba(250,204,21,0.2);
+        }
+
+        .fq-item__icon-h,
+        .fq-item__icon-v {
+          position: absolute;
+          border-radius: 2px;
+          background: rgba(255,255,255,0.5);
+          transition:
+            transform  0.38s cubic-bezier(.23,1,.32,1),
+            opacity    0.3s,
+            background 0.3s;
+        }
+        .fq-item__icon-h { width: 12px; height: 1.5px; }
+        .fq-item__icon-v { width: 1.5px; height: 12px; }
+
+        .fq-item--open .fq-item__icon-h,
+        .fq-item--open .fq-item__icon-v { background: #facc15; }
+        .fq-item--open .fq-item__icon-v { transform: scaleY(0); opacity: 0; }
+
+        /* answer body */
+        .fq-item__ans {
+          padding: 4px 22px 24px 56px;
+          font-size: 15px;
+          line-height: 1.85;
+          color: rgba(255,255,255,0.42);
+        }
+        .fq-item__ans p            { margin: 0 0 10px; }
+        .fq-item__ans p:last-child  { margin-bottom: 0; }
+        .fq-item__ans a            { color: #facc15; text-decoration: none; border-bottom: 1px solid rgba(250,204,21,0.3); transition: border-color 0.2s; }
+        .fq-item__ans a:hover      { border-color: #facc15; }
+        .fq-item__ans strong       { color: rgba(255,255,255,0.68); font-weight: 600; }
+      `}</style>
+    </>
+  );
+}

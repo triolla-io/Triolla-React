@@ -29,46 +29,6 @@ interface SocialItem {
   socialMediaText?: string | null;
 }
 
-/* ── Static fallbacks (used when WP ThemeSetting data is unavailable) ── */
-
-const FALLBACK_CONTACT = {
-  email: "Fun@triolla.io",
-  tlvLabel: "TLV Offices",
-  tlvPhone: "+972-73-744-3322",
-  nyLabel: "NY Offices",
-  nyPhone: "+1408-627-7350",
-};
-
-const FALLBACK_SOCIALS = [
-  { socialMediaLink: "https://www.facebook.com/triollaofficial", socialMediaText: "Facebook" },
-  { socialMediaLink: "https://www.linkedin.com/company/triolla-official/", socialMediaText: "LinkedIn" },
-  { socialMediaLink: "https://www.instagram.com/triollaofficial/", socialMediaText: "Instagram" },
-  { socialMediaLink: "https://www.tiktok.com/@triolla.io", socialMediaText: "TikTok" },
-  { socialMediaLink: "https://dribbble.com/Triolla", socialMediaText: "Dribbble" },
-  { socialMediaLink: "https://www.behance.net/asaf8ac9", socialMediaText: "Behance" },
-];
-
-const FALLBACK_MENTIONS = [
-  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_736.svg" } }, mentionLogoLink: "https://13tv.co.il/item/special/recommended/economy/k2fy3-902776824/" },
-  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_biz_735.svg" } }, mentionLogoLink: "https://www.bizportal.co.il/BizTech/news/article/20015580" },
-  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_marker_731.svg" } }, mentionLogoLink: "https://www.themarker.com/labels/2021-04-05/ty-article-labels/0000017f-f88a-d044-adff-fbfb48ad0000" },
-  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_732.svg" } }, mentionLogoLink: "https://www.globes.co.il/news/article.aspx?did=1001450720" },
-  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_733.svg" } }, mentionLogoLink: "https://www.pc.co.il/featured/420350/" },
-  { mentionLogo: { node: { sourceUrl: "https://triolla.io/wp-content/uploads/2025/05/logo_mako_734.svg" } }, mentionLogoLink: "https://www.mako.co.il/special-articles/Article-c2a83bbe7224d71026.htm" },
-];
-
-const FALLBACK_SQLINK = "https://www.sqlink.com/";
-const FALLBACK_LOGO = "https://triolla.io/wp-content/uploads/2025/05/triolla.svg";
-const FALLBACK_MENTIONS_LABEL = "Featured In";
-const FALLBACK_SOCIAL_ICONS = {
-  fb: "https://www.facebook.com/triollaofficial",
-  ig: "https://www.instagram.com/triollaofficial/",
-  tt: "https://www.tiktok.com/@triolla.io",
-  li: "https://www.linkedin.com/company/triolla-official/",
-};
-
-/* ── Menu column slugs ──────────────────────────────────────────────── */
-
 const MENU_COLUMNS = [
   {
     heading: "Product Design",
@@ -320,25 +280,29 @@ export default async function Footer() {
     return { heading: colHeadings[i] ?? col.heading, items };
   });
 
-  const mentions: MentionLogo[] = ts?.mentionsLogos?.length ? ts.mentionsLogos : FALLBACK_MENTIONS;
-  const socials: SocialItem[] = ts?.socialMenuItems?.length ? ts.socialMenuItems : FALLBACK_SOCIALS;
+  const mentions: MentionLogo[] = ts?.mentionsLogos?.length
+    ? ts.mentionsLogos
+    : [];
+  const socials: SocialItem[] = ts?.socialMenuItems?.length
+    ? ts.socialMenuItems
+    : [];
 
-  const logoUrl: string = ts?.siteLogo?.node?.sourceUrl ?? FALLBACK_LOGO;
-  const sqlinkUrl: string = ts?.sqlink ?? FALLBACK_SQLINK;
-  const emailAddress: string = ts?.emailAddress ?? FALLBACK_CONTACT.email;
-  const tlvLabel: string = ts?.tlvOfficesLabel ?? FALLBACK_CONTACT.tlvLabel;
-  const tlvPhone: string = ts?.tlvOfficesPhone ?? FALLBACK_CONTACT.tlvPhone;
-  const nyLabel: string = ts?.nyOfficesLabel ?? FALLBACK_CONTACT.nyLabel;
-  const nyPhone: string = ts?.nyOfficesPhone ?? FALLBACK_CONTACT.nyPhone;
+  const logoUrl: string = ts?.siteLogo?.node?.sourceUrl ?? "";
+  const sqlinkUrl: string = ts?.sqlink ?? "";
+  const emailAddress: string = ts?.emailAddress ?? "";
+  const tlvLabel: string = ts?.tlvOfficesLabel ?? "";
+  const tlvPhone: string = ts?.tlvOfficesPhone ?? "";
+  const nyLabel: string = ts?.nyOfficesLabel ?? "";
+  const nyPhone: string = ts?.nyOfficesPhone ?? "";
   const privacyText: string | null = ts?.footerPrivacyText ?? null;
   const privacyLink: string | null = ts?.footerPrivacyLink ?? null;
   const termText: string | null = ts?.footerTermText ?? null;
   const termLink: string | null = ts?.footerTermLink ?? null;
-  const mentionsLabel: string = ts?.footerMentionsLabel ?? FALLBACK_MENTIONS_LABEL;
-  const fbLink: string = ts?.facebookLink ?? FALLBACK_SOCIAL_ICONS.fb;
-  const igLink: string = ts?.instagramLink ?? FALLBACK_SOCIAL_ICONS.ig;
-  const ttLink: string = ts?.tiktokLink ?? FALLBACK_SOCIAL_ICONS.tt;
-  const liLink: string = ts?.linkedinLink ?? FALLBACK_SOCIAL_ICONS.li;
+  const mentionsLabel: string = ts?.footerMentionsLabel ?? "";
+  const fbLink: string = ts?.facebookLink ?? "";
+  const igLink: string = ts?.instagramLink ?? "";
+  const ttLink: string = ts?.tiktokLink ?? "";
+  const liLink: string = ts?.linkedinLink ?? "";
 
   return (
     <footer className="bg-[#0f0f0f] text-white overflow-hidden">
@@ -429,14 +393,19 @@ export default async function Footer() {
                 {emailAddress && (
                   <div>
                     <div className="footer-contact-label">Mail</div>
-                    <a href={`mailto:${emailAddress}`} className="footer-nav-link">
+                    <a
+                      href={`mailto:${emailAddress}`}
+                      className="footer-nav-link"
+                    >
                       {emailAddress}
                     </a>
                   </div>
                 )}
                 {tlvPhone && (
                   <div>
-                    <div className="footer-contact-label">{tlvLabel ?? "TLV Offices"}</div>
+                    <div className="footer-contact-label">
+                      {tlvLabel ?? "TLV Offices"}
+                    </div>
                     <a
                       href={`tel:${tlvPhone.replace(/[^+\d]/g, "")}`}
                       className="footer-nav-link"
@@ -447,7 +416,9 @@ export default async function Footer() {
                 )}
                 {nyPhone && (
                   <div>
-                    <div className="footer-contact-label">{nyLabel ?? "NY Offices"}</div>
+                    <div className="footer-contact-label">
+                      {nyLabel ?? "NY Offices"}
+                    </div>
                     <a
                       href={`tel:${nyPhone.replace(/[^+\d]/g, "")}`}
                       className="footer-nav-link"
