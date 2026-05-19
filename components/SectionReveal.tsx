@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
-import { ReactNode } from "react";
+import { motion, useInView } from "motion/react";
+import { useRef, ReactNode } from "react";
 
 interface SectionRevealProps {
   children: ReactNode | ReactNode[];
@@ -26,13 +26,18 @@ export function SectionReveal({
   children,
   className = "",
 }: SectionRevealProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  // amount: 0 → fires as soon as any pixel is visible, including elements
+  // already in viewport at mount time (fixes whileInView race on SPA navigation)
+  const isInView = useInView(ref, { once: true, amount: 0 });
+
   return (
     <motion.div
+      ref={ref}
       className={className}
       variants={container}
       initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: "-80px" }}
+      animate={isInView ? "show" : "hidden"}
     >
       {(Array.isArray(children) ? children : [children]).map((child, i) => (
         <motion.div key={i} variants={item}>

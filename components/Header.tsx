@@ -61,11 +61,7 @@ async function getPrimaryMenu(): Promise<{
       `,
     });
     const flatNav: FlatMenuItem[] = data?.primaryMenu?.menuItems?.nodes ?? [];
-    const flatMobile: FlatMenuItem[] = data?.mobileMenu?.menuItems?.nodes
-      ?.length
-      ? data.mobileMenu.menuItems.nodes
-      : flatNav;
-    return { nav: buildNavTree(flatNav), mobile: buildNavTree(flatMobile) };
+    return { nav: buildNavTree(flatNav), mobile: buildNavTree(flatNav) };
   } catch {
     return { nav: [], mobile: [] };
   }

@@ -191,16 +191,6 @@ export const GET_PRIMARY_MENU = `
         }
       }
     }
-    mobileMenu: menu(id: "mobile-header-menu", idType: SLUG) {
-      menuItems(first: 50) {
-        nodes {
-          databaseId
-          label
-          url
-          parentDatabaseId
-        }
-      }
-    }
   }
 `;
 

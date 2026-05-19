@@ -138,8 +138,6 @@ export function HeaderClient({
   const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
-  console.log({ mobileNavItems, navItems });
-
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY < 40) {

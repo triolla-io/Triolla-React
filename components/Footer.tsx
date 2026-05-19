@@ -30,88 +30,11 @@ interface SocialItem {
 }
 
 const MENU_COLUMNS = [
-  {
-    heading: "Product Design",
-    slug: "product-menu",
-    fallback: [
-      {
-        label: "Product UX & UI Design",
-        url: "/services/product-ux-ui-design",
-      },
-      { label: "UX Research", url: "/services/ux-research" },
-      { label: "Prototype", url: "/services/prototyping" },
-      { label: "Digital Branding", url: "/branding-studio" },
-      { label: "Front End Development", url: "/services/front-end-dev" },
-    ],
-  },
-  {
-    heading: "Case Studies",
-    slug: "case-study-menu",
-    fallback: [
-      { label: "Mobile Apps", url: "/mobile-apps" },
-      { label: "Fintech & Finance", url: "/fintech-finance" },
-      { label: "IOT & Devices", url: "/device-iot" },
-      { label: "SaaS", url: "/saas-platforms" },
-      { label: "Gaming", url: "/gaming" },
-      { label: "Medical", url: "/medical-healthcare" },
-      { label: "Agritech", url: "/agritech" },
-    ],
-  },
-  {
-    heading: "Technology",
-    slug: "technology-menu",
-    fallback: [
-      { label: "Dev & Technology", url: "/technology" },
-      { label: "Front End", url: "/services/front-end-dev" },
-      { label: "React.js", url: "/services/front-end-dev" },
-      { label: "Vue.js", url: "/services/front-end-dev" },
-      { label: "Back End", url: "/services/back-end-dev" },
-      { label: "Node.js", url: "/services/back-end-dev" },
-    ],
-  },
-  {
-    heading: "About",
-    slug: "company-menu",
-    fallback: [
-      { label: "About us", url: "/about-us" },
-      { label: "Careers", url: "/careers" },
-      { label: "Our Services", url: "/services" },
-      { label: "Talk to us", url: "/contact-us" },
-      {
-        label: "Press",
-        url: "https://www.themarker.com/labels/2021-04-05/ty-article-labels/0000017f-f88a-d044-adff-fbfb48ad0000",
-      },
-      { label: "Accessibility", url: "/accessibility-statement" },
-    ],
-  },
-  {
-    heading: "Our Blog",
-    slug: "blog-menu",
-    fallback: [
-      { label: "All Blogs", url: "/blog" },
-      { label: "Fintech & Finance", url: "/blog/the-fintech-ux-playbook/" },
-      {
-        label: "IOT & Devices",
-        url: "/blog/designing-intuitive-and-secure-iot-products-for-the-future/",
-      },
-      {
-        label: "SaaS",
-        url: "/blog/the-3-most-common-pain-points-when-hiring-ui-ux-agency-for-a-saas-product/",
-      },
-      {
-        label: "Gaming",
-        url: "/blog/level-up-your-gaming-app-with-triollas-expert-ux-tips-boost-user-engagement-and-retention/",
-      },
-      {
-        label: "Medical",
-        url: "/blog/ux-in-medtech-when-trust-is-a-matter-of-life-and-death/",
-      },
-      {
-        label: "Agritech",
-        url: "/blog/designing-an-engaging-and-effective-agritech-app/",
-      },
-    ],
-  },
+  { slug: "product-menu" },
+  { slug: "case-study-menu" },
+  { slug: "technology-menu" },
+  { slug: "company-menu" },
+  { slug: "blog-menu" },
 ];
 
 const COL_HEADING_FIELDS = [
@@ -274,10 +197,9 @@ export default async function Footer() {
         m.slug === `footer-${col.slug}` ||
         m.name.toLowerCase().replace(/\s+/g, "-") === col.slug,
     );
-    const items = wpMenu?.menuItems?.nodes?.length
-      ? wpMenu.menuItems.nodes
-      : col.fallback;
-    return { heading: colHeadings[i] ?? col.heading, items };
+    const items = wpMenu?.menuItems?.nodes ?? [];
+    const heading = colHeadings[i] ?? null;
+    return { heading, items };
   });
 
   const mentions: MentionLogo[] = ts?.mentionsLogos?.length
@@ -354,20 +276,22 @@ export default async function Footer() {
       <div className="w-[90%] mx-auto py-10 md:py-16">
         <SectionReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-5 md:gap-x-8 gap-y-10 md:gap-y-12">
           {[
-            ...columns.map((col, i) => (
-              <div key={i}>
-                {col.heading && (
-                  <h3 className="footer-col-heading">{col.heading}</h3>
-                )}
-                <ul className="space-y-3">
-                  {col.items.map((item) => (
-                    <li key={item.label}>
-                      <NavLink label={item.label} url={item.url} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )),
+            ...columns
+              .filter((col) => col.heading || col.items.length > 0)
+              .map((col, i) => (
+                <div key={i}>
+                  {col.heading && (
+                    <h3 className="footer-col-heading">{col.heading}</h3>
+                  )}
+                  <ul className="space-y-3">
+                    {col.items.map((item) => (
+                      <li key={item.label}>
+                        <NavLink label={item.label} url={item.url} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )),
             ...(socials.length > 0
               ? [
                   <div key="social">
