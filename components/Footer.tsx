@@ -310,13 +310,16 @@ export default async function Footer() {
           MENTIONS STRIP
       ══════════════════════════════════════════ */}
       {mentions.length > 0 && (
-        <div className="border-b border-white/5 py-5 md:py-8">
+        <div className="footer-mentions-strip border-b border-white/5 py-5 md:py-8">
           <div className="w-[90%] mx-auto">
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-10">
+            <div className="flex items-center gap-6 md:gap-10">
               {mentionsLabel && (
-                <span className="footer-mentions-label shrink-0">{mentionsLabel}</span>
+                <div className="footer-mentions-label-wrap shrink-0">
+                  <span className="footer-mentions-label">{mentionsLabel}</span>
+                </div>
               )}
-              <div className="flex overflow-x-auto sm:flex-wrap items-center justify-start sm:justify-start gap-5 md:gap-10 hide-scrollbar w-full sm:w-auto">
+              <div className="footer-mentions-sep" aria-hidden="true" />
+              <div className="flex flex-1 overflow-x-auto sm:flex-wrap items-center justify-start sm:justify-start gap-6 md:gap-10 hide-scrollbar">
                 {mentions.map((m, i) => {
                   const src = m.mentionLogo?.node?.sourceUrl;
                   if (!src) return null;
@@ -327,6 +330,7 @@ export default async function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="footer-mention"
+                      style={{ '--mi': i } as React.CSSProperties}
                     >
                       <img
                         src={src}
@@ -614,36 +618,73 @@ export default async function Footer() {
       ══════════════════════════════════════════ */}
       <style>{`
         /* ── Mentions strip ────────────────────── */
+        .footer-mentions-label-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
         .footer-mentions-label {
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 700;
-          letter-spacing: 0.22em;
+          letter-spacing: 0.28em;
           text-transform: uppercase;
-          color: #4b5563;
+          color: #374151;
           white-space: nowrap;
+        }
+        .footer-mentions-sep {
+          width: 1px;
+          height: 32px;
+          background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.08), transparent);
           flex-shrink: 0;
-          min-width: 80px;
+        }
+        .footer-mentions-strip {
+          position: relative;
+          overflow: hidden;
+        }
+        .footer-mentions-strip::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            105deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.03) 50%,
+            transparent 70%
+          );
+          background-size: 200% 100%;
+          background-position: -200% 0;
+          animation: stripShimmer 8s ease-in-out infinite;
+          pointer-events: none;
+        }
+        @keyframes stripShimmer {
+          0%, 40%  { background-position: -200% 0; }
+          60%, 100% { background-position: 200% 0; }
+        }
+        @keyframes mentionFadeIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
         .footer-mention {
           display: flex;
           align-items: center;
-          transition: transform 0.25s, opacity 0.25s;
-          opacity: 0.45;
+          transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
+          opacity: 1;
+          animation: mentionFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+          animation-delay: calc(var(--mi, 0) * 0.08s + 0.1s);
         }
         .footer-mention:hover {
-          opacity: 0.85;
-          transform: translateY(-2px);
+          transform: translateY(-3px) scale(1.04);
         }
         .footer-mention__img {
-          height: 30px;
+          height: 32px;
           width: auto;
-          max-width: 110px;
+          max-width: 120px;
           object-fit: contain;
-          filter: brightness(0) invert(1);
-          transition: filter 0.25s;
+          filter: grayscale(0.25) opacity(0.65);
+          transition: filter 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .footer-mention:hover .footer-mention__img {
-          filter: brightness(0) saturate(100%) invert(87%) sepia(63%) saturate(600%) hue-rotate(1deg) brightness(103%) contrast(102%);
+          filter: grayscale(0) opacity(1);
         }
 
         /* ── Nav columns ───────────────────────── */
@@ -752,7 +793,10 @@ export default async function Footer() {
             height: 22px;
           }
           .footer-mentions-label {
-            font-size: 9px;
+            font-size: 8px;
+          }
+          .footer-mentions-sep {
+            height: 22px;
           }
         }
       `}</style>
