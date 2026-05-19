@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 // Actual WP homepage grid images (hometopimage1–9 from triolla.io)
 const WP_IMAGES = [
