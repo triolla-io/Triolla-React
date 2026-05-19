@@ -21,7 +21,8 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
       const vh   = window.innerHeight;
       if (rect.bottom < -200 || rect.top > vh + 200) return;
       const progress  = (vh - rect.top) / (vh + rect.height);
-      const translate = (progress - 0.5) * -130;
+      const intensity = window.innerWidth < 768 ? -55 : -130;
+      const translate = (progress - 0.5) * intensity;
       imgInnerRef.current.style.transform = `translateY(${translate}px)`;
     };
     window.addEventListener("scroll", tick, { passive: true });
@@ -352,6 +353,74 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
           );
           pointer-events: none;
           z-index: 14;
+        }
+
+        /* ══════════════════════════════════════════
+           MOBILE — full-bleed editorial billboard
+        ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+          /* Full bleed: no horizontal padding, flush edges */
+          .gi-section {
+            padding: 0;
+            margin-top: 48px;
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+          }
+
+          /* Frameless cinematic look */
+          .gi-frame {
+            border-radius: 0;
+            cursor: default;
+          }
+
+          /* Pulsing border adapts to rectangular frame */
+          .gi-pulse {
+            border-radius: 0;
+          }
+
+          /* Taller crop shows more image content on narrow screens */
+          .gi-viewport {
+            aspect-ratio: 4 / 3;
+          }
+
+          /* Less parallax travel headroom needed */
+          .gi-img-inner {
+            inset: -30px 0;
+          }
+
+          /* Reduce edge fades so image content is more visible */
+          .gi-fade--top    { height: 16%; }
+          .gi-fade--bottom { height: 16%; }
+          .gi-fade--left   { width: 0; }
+          .gi-fade--right  { width: 0; }
+
+          /* Badge — moved to bottom for a cinematic caption feel */
+          .gi-badge {
+            top: auto;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            padding: 7px 16px;
+            letter-spacing: 0.18em;
+            gap: 8px;
+          }
+
+          /* Corner brackets — tighter to frame edges */
+          .gi-corner { width: 20px; height: 20px; }
+          .gi-corner--tl { top: 14px;    left: 14px; }
+          .gi-corner--tr { top: 14px;    right: 14px; }
+          .gi-corner--bl { bottom: 14px; left: 14px; }
+          .gi-corner--br { bottom: 14px; right: 14px; }
+
+          /* Orbs scaled down — still atmospheric */
+          .gi-orb--a { width: 260px; height: 260px; }
+          .gi-orb--b { width: 220px; height: 220px; }
+          .gi-orb--c { display: none; }
+
+          /* Grid texture more subtle on mobile */
+          .gi-grid { opacity: 0.45; }
         }
       `}</style>
     </>

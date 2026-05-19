@@ -579,6 +579,83 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
           flex-shrink: 0;
         }
         @keyframes wcSpin { to { transform: rotate(360deg); } }
+
+        /* ══════════════════════════════════════════
+           MOBILE — premium stacked contact layout
+        ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+          /* Section spacing */
+          .wc-root { margin-top: 56px; }
+
+          /* Card corners proportional to mobile width */
+          .wc-card { border-radius: 24px; }
+          .wc-grid { border-radius: 24px; }
+
+          /* Layout: tighter padding, smaller gap */
+          .wc-layout {
+            padding: 44px 22px 48px;
+            gap: 40px;
+          }
+
+          /* Orbs: much smaller so they don't bleed everywhere */
+          .wc-orb--a {
+            width: 260px; height: 260px;
+            top: -15%; left: -15%;
+          }
+          .wc-orb--b {
+            width: 200px; height: 200px;
+            bottom: -10%; right: -10%;
+          }
+          .wc-orb--c { display: none; }
+
+          /* Heading: fluid, commands the space */
+          .wc-heading {
+            font-size: clamp(2rem, 9vw, 4.5rem);
+            margin-bottom: 20px;
+            letter-spacing: -0.03em;
+          }
+
+          /* Rule + info spacing */
+          .wc-rule { margin-bottom: 28px; }
+          .wc-info { gap: 16px; }
+          .wc-item__val { font-size: 14px; }
+
+          /* Form card: breathable padding on mobile */
+          .wc-form {
+            padding: 30px 22px 34px;
+            border-radius: 20px;
+          }
+
+          /* Form heading */
+          .wc-form__kicker {
+            font-size: clamp(1.25rem, 5vw, 2.2rem);
+            margin-bottom: 28px;
+          }
+
+          /* Fields: slightly tighter stack */
+          .wc-fields {
+            gap: 28px;
+            margin-bottom: 28px;
+          }
+
+          /* Input font size: 16px minimum prevents iOS auto-zoom */
+          .wc-field__inp {
+            font-size: 16px;
+          }
+          .wc-field__lbl {
+            font-size: 16px;
+          }
+
+          /* Submit button: more touch-friendly height */
+          .wc-btn {
+            padding: 18px 24px;
+            font-size: 14px;
+            border-radius: 14px;
+          }
+
+          /* Dots: fewer, less distracting on small screen */
+          .wc-dot:nth-child(n+6) { display: none; }
+        }
       `}</style>
     </>
   );

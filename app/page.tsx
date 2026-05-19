@@ -159,7 +159,7 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           HERO
       ══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex flex-col items-center pt-32 pb-20 px-4 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center pt-24 md:pt-32 pb-14 md:pb-20 px-4 overflow-hidden">
 
         {/* Ambient orb cluster */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -181,8 +181,8 @@ export default async function Home() {
           <HeroHeadline
             headline={heroHeadline}
             subtext={heroSubtext}
-            headlineClassName="text-6xl md:text-[80px] lg:text-[110px] leading-[0.9] font-bold tracking-tighter mb-8 max-w-[1200px] hero-headline"
-            subtextClassName="text-xl md:text-2xl font-light text-gray-400 max-w-3xl mx-auto leading-relaxed"
+            headlineClassName="text-[clamp(2.2rem,10vw,110px)] leading-[0.9] font-bold tracking-tighter mb-6 md:mb-8 max-w-[1200px] hero-headline"
+            subtextClassName="text-base md:text-xl lg:text-2xl font-light text-gray-400 max-w-3xl mx-auto leading-relaxed"
           />
 
         </div>
@@ -197,24 +197,24 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           PORTFOLIO GRID
       ══════════════════════════════════════════════ */}
-      <section className="relative z-20 max-w-[1600px] mx-auto px-4 -mt-10 mb-32">
+      <section className="relative z-20 max-w-[1600px] mx-auto px-4 -mt-10 mb-16 md:mb-32">
         <PortfolioGrid />
       </section>
 
       {/* ══════════════════════════════════════════════
           WHY US SECTION
       ══════════════════════════════════════════════ */}
-      <section className="why-section py-24 mx-4 md:mx-10 px-8 lg:px-24 mb-32 relative overflow-hidden">
+      <section className="why-section py-16 md:py-24 mx-2 md:mx-4 lg:mx-10 px-5 md:px-8 lg:px-24 mb-16 md:mb-32 relative overflow-hidden">
         <div className="why-section__orb" aria-hidden="true" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col lg:flex-row justify-between mb-20 gap-10">
             <div>
-              <h3 className="text-5xl md:text-6xl font-bold max-w-2xl leading-tight">
+              <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold max-w-2xl leading-tight">
                 {whyTitle}
               </h3>
             </div>
-            <p className="text-xl text-gray-400 max-w-xl leading-relaxed mt-4 lg:mt-10 lg:self-end">
+            <p className="text-base md:text-xl text-gray-400 max-w-xl leading-relaxed mt-4 lg:mt-10 lg:self-end">
               {whyText}
             </p>
           </div>
@@ -256,8 +256,8 @@ export default async function Home() {
             ))}
           </SectionReveal>
 
-          <div className="mt-20 flex justify-center">
-            <Link href="/contact-us" className="btn-outline-gold">
+          <div className="mt-12 md:mt-20 flex justify-center px-4 md:px-0">
+            <Link href="/contact-us" className="btn-outline-gold w-full md:w-auto justify-center">
               Partner with us
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path
@@ -276,7 +276,7 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           AWARDS SECTION
       ══════════════════════════════════════════════ */}
-      <section id="winners-section" className="winners-section mb-32 relative overflow-hidden">
+      <section id="winners-section" className="winners-section mb-16 md:mb-32 relative overflow-hidden">
         {/* Ambient light orbs */}
         <div className="winners-orb winners-orb--tl" aria-hidden="true" />
         <div className="winners-orb winners-orb--br" aria-hidden="true" />
@@ -324,13 +324,13 @@ export default async function Home() {
           CLIENTS SECTION
       ══════════════════════════════════════════════ */}
       {clientLogos.length > 0 && (
-        <section className="clients-section py-28 mb-32 relative overflow-hidden">
+        <section className="clients-section py-16 md:py-28 mb-16 md:mb-32 relative overflow-hidden">
           {/* Ambient atmosphere */}
           <div className="clients-orb clients-orb--left" aria-hidden="true" />
           <div className="clients-orb clients-orb--right" aria-hidden="true" />
 
           {/* Heading */}
-          <div className="text-center mb-20 relative z-10 px-4">
+          <div className="text-center mb-12 md:mb-20 relative z-10 px-4">
             {ts?.ourClientsHeading && (
               <div className="clients-eyebrow">
                 <span className="clients-eyebrow__line" />
@@ -401,9 +401,9 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           DESIGN PROCESS TIMELINE
       ══════════════════════════════════════════════ */}
-      <section className="py-24 max-w-[1600px] mx-auto overflow-hidden px-4">
+      <section className="py-16 md:py-24 max-w-[1600px] mx-auto overflow-hidden px-4 md:px-4">
         <div className="text-center mb-24">
-          <h3 className="text-5xl md:text-7xl font-bold tracking-tighter">
+          <h3 className="text-[clamp(2rem,8vw,5rem)] md:text-7xl font-bold tracking-tighter">
             {designHeadingParts.map((part, i) =>
               part.accent ? (
                 <span key={i} className="text-yellow-400">
@@ -419,7 +419,15 @@ export default async function Home() {
           </p>
         </div>
 
-        <SectionReveal className="flex overflow-x-auto pb-16 hide-scrollbar gap-8 px-10 snap-x">
+        {/* Mobile swipe hint */}
+        <div className="mobile-swipe-hint px-4 md:hidden">
+          <span>Swipe</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 7H12M8.5 3.5L12 7L8.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+
+        <SectionReveal className="flex overflow-x-auto pb-12 md:pb-16 hide-scrollbar gap-6 md:gap-8 px-4 md:px-10 snap-x">
           {designSteps.map((item: any, i: number) => (
             <div
               key={i}
@@ -1101,6 +1109,137 @@ export default async function Home() {
         /* ─── Scrollbar hide ────────────────────── */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ══════════════════════════════════════════
+           MOBILE-ONLY STYLES (max-width: 768px)
+        ══════════════════════════════════════════ */
+
+        /* ─── Hero orbs — feel bigger on mobile ── */
+        @media (max-width: 768px) {
+          .hero-orb--gold {
+            width: 560px; height: 320px;
+          }
+          .hero-orb--amber {
+            width: 400px; height: 400px; top: 0; left: -20%;
+          }
+          .hero-orb--dim {
+            width: 320px; height: 320px;
+          }
+        }
+
+        /* ─── Winners section ──────────────────── */
+        @media (max-width: 768px) {
+          .winners-section {
+            padding: 72px 0 80px;
+          }
+          .winners-title {
+            font-size: clamp(1.8rem, 8vw, 2.6rem);
+          }
+          .winners-subtitle {
+            font-size: 1rem;
+          }
+          .award-medal-img {
+            width: 170px; height: 170px;
+          }
+          .award-medal-fallback {
+            width: 140px; height: 140px; font-size: 38px;
+          }
+          .award-label {
+            font-size: 0.875rem;
+          }
+          .award-label__rank {
+            font-size: 1rem;
+          }
+        }
+
+        /* ─── Service cards ────────────────────── */
+        @media (max-width: 768px) {
+          .service-card {
+            padding: 28px 20px 24px;
+            border-radius: 20px;
+          }
+          .service-card__icon-wrap {
+            width: 110px; height: 110px;
+          }
+          .service-card__icon-img {
+            width: 110px; height: 110px;
+          }
+        }
+
+        /* ─── Logo marquee ─────────────────────── */
+        @media (max-width: 768px) {
+          .logo-card {
+            width: 120px; height: 76px;
+            border-radius: 14px;
+          }
+          .marquee-track {
+            animation-duration: 25s;
+          }
+          .marquee-track--reverse {
+            animation-duration: 20s;
+          }
+          .marquee-fade {
+            width: 80px;
+          }
+        }
+
+        /* ─── Timeline ─────────────────────────── */
+        @media (max-width: 768px) {
+          .timeline-item {
+            min-width: 200px;
+          }
+          .timeline-item__bg-num {
+            font-size: 76px;
+            top: -8px; left: -8px;
+          }
+        }
+
+        /* ─── Mobile swipe hint ────────────────── */
+        .mobile-swipe-hint {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          .mobile-swipe-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(250,204,21,0.55);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            animation: swipeHintPulse 2s ease-in-out infinite;
+          }
+        }
+        @keyframes swipeHintPulse {
+          0%,100% { opacity: 0.5; transform: translateX(0); }
+          50%      { opacity: 1;   transform: translateX(6px); }
+        }
+
+        /* ─── Why section orb ──────────────────── */
+        @media (max-width: 768px) {
+          .why-section__orb {
+            width: 300px; height: 300px;
+            top: -10%; right: -15%;
+          }
+        }
+
+        /* ─── Clients section ──────────────────── */
+        @media (max-width: 768px) {
+          .clients-section {
+            padding-top: 64px;
+            padding-bottom: 64px;
+          }
+        }
+
+        /* ─── Button full-width on mobile ──────── */
+        @media (max-width: 768px) {
+          .btn-outline-gold {
+            padding: 14px 24px;
+            font-size: 15px;
+          }
+        }
       `}</style>
     </main>
   );

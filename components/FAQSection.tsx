@@ -397,6 +397,72 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
         .fq-item__ans a            { color: #facc15; text-decoration: none; border-bottom: 1px solid rgba(250,204,21,0.3); transition: border-color 0.2s; }
         .fq-item__ans a:hover      { border-color: #facc15; }
         .fq-item__ans strong       { color: rgba(255,255,255,0.68); font-weight: 600; }
+
+        /* ══════════════════════════════════════════
+           MOBILE — compact premium accordion
+        ══════════════════════════════════════════ */
+        @media (max-width: 768px) {
+          /* Card corners proportional to mobile width */
+          .fq-card { border-radius: 24px; }
+          .fq-grid { border-radius: 24px; }
+
+          /* Layout: tighter, more breathing room for content */
+          .fq-layout {
+            padding: 40px 20px 44px;
+            gap: 32px;
+          }
+
+          /* Left column: streamlined on mobile */
+          .fq-col-left { overflow: hidden; }
+
+          .fq-heading {
+            font-size: clamp(1.8rem, 7vw, 2.8rem);
+            margin-bottom: 12px;
+          }
+          .fq-subtext {
+            font-size: 0.875rem;
+            max-width: 100%;
+            margin-bottom: 24px;
+          }
+          .fq-count { font-size: 2rem; }
+          .fq-count__label { font-size: 0.65rem; }
+
+          /* Hide the huge decorative "?" on mobile — wastes space */
+          .fq-deco { display: none; }
+
+          /* Orbs scaled down */
+          .fq-orb--a { width: 260px; height: 260px; top: -15%; right: -10%; }
+          .fq-orb--b { width: 220px; height: 220px; }
+          .fq-orb--c { display: none; }
+
+          /* Accordion items — touch-friendly, compact */
+          .fq-item { border-radius: 16px; }
+          .fq-item__btn {
+            padding: 16px 14px;
+            gap: 12px;
+          }
+          .fq-item__q {
+            font-size: 14.5px;
+            line-height: 1.4;
+          }
+          .fq-item__num { font-size: 10px; }
+
+          /* Icon circle slightly smaller but still tappable */
+          .fq-item__icon {
+            width: 30px; height: 30px;
+            flex-shrink: 0;
+          }
+
+          /* Answer body: left-align with minimal indent on mobile */
+          .fq-item__ans {
+            padding: 4px 14px 20px 14px;
+            font-size: 13.5px;
+            line-height: 1.75;
+          }
+
+          /* Reduce item gap slightly */
+          .fq-col-right { gap: 8px; }
+        }
       `}</style>
     </>
   );

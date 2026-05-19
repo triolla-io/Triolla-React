@@ -163,7 +163,7 @@ export function HeaderClient({
     <header className="sticky top-0 z-50 w-full pointer-events-none">
       {/* Ticker — full width, above the pill */}
       {ticker && !isTickerDismissed && (
-        <div className="pointer-events-auto bg-yellow-400 text-black py-2 px-4 text-center text-[13px] font-medium relative flex items-center justify-center">
+        <div className="pointer-events-auto bg-yellow-400 text-black py-1.5 md:py-2 px-10 text-center text-[11px] md:text-[13px] font-medium relative flex items-center justify-center">
           <span>{ticker}</span>
           <button
             className="absolute right-4 text-black hover:opacity-60 transition-opacity"
@@ -286,8 +286,21 @@ export function HeaderClient({
             </Link>
           )}
 
-          {/* Mobile hamburger — always visible */}
-          <div className="lg:hidden flex items-center ml-auto">
+          {/* Mobile: WhatsApp + hamburger */}
+          <div className="lg:hidden flex items-center gap-2 ml-auto">
+            {whatsappHref && (
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="WhatsApp"
+                className="w-8 h-8 bg-[#25D366] rounded-full flex items-center justify-center hover:bg-[#1fb958] transition-colors shrink-0"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+              </a>
+            )}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white hover:text-yellow-400 p-2 transition-colors"
@@ -307,69 +320,198 @@ export function HeaderClient({
         </motion.div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — full-screen vault overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="pointer-events-auto lg:hidden mx-4 mt-2 bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-2xl shadow-black/40"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="pointer-events-auto lg:hidden fixed inset-0 z-[9999] bg-[#080808] flex flex-col overflow-hidden"
           >
-            <nav className="flex flex-col gap-4">
-              {mobileNavItems.map((item, i) => {
-                const href = toHref(item.url);
-                return (
-                  <div key={`mobile-${item.label}-${i}`}>
-                    <Link
-                      href={href}
-                      className={`text-[15px] font-medium transition-colors hover:text-yellow-400 block ${
-                        pathname === href ? "text-yellow-400" : "text-white"
-                      }`}
+            {/* Grain overlay */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: "-50%",
+                width: "200%",
+                height: "200%",
+                backgroundImage:
+                  "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")",
+                backgroundSize: "200px 200px",
+                opacity: 0.03,
+                pointerEvents: "none",
+                zIndex: 0,
+              }}
+            />
+
+            {/* Gold ambient orb — top right */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: "-80px",
+                right: "-80px",
+                width: "360px",
+                height: "360px",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, rgba(250,204,21,0.12) 0%, transparent 65%)",
+                filter: "blur(80px)",
+                pointerEvents: "none",
+                zIndex: 0,
+              }}
+            />
+            {/* Gold ambient orb — bottom left */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                bottom: "-60px",
+                left: "-60px",
+                width: "280px",
+                height: "280px",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, rgba(250,204,21,0.07) 0%, transparent 65%)",
+                filter: "blur(60px)",
+                pointerEvents: "none",
+                zIndex: 0,
+              }}
+            />
+
+            {/* Header row */}
+            <div className="relative z-10 flex items-center justify-between px-6 pt-5 pb-4 shrink-0">
+              <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Triolla" className="h-5 w-auto brightness-0 invert" />
+                ) : (
+                  <span className="text-[18px] font-bold tracking-tight text-white lowercase">triolla</span>
+                )}
+              </Link>
+              <motion.button
+                initial={{ rotate: 0 }}
+                animate={{ rotate: 90 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close menu"
+                className="w-11 h-11 rounded-full border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-white/25 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </motion.button>
+            </div>
+
+            {/* Gold hairline */}
+            <div className="relative z-10 mx-6 h-px bg-gradient-to-r from-yellow-400/30 via-yellow-400/10 to-transparent shrink-0" />
+
+            {/* Nav items */}
+            <nav className="relative z-10 flex-1 overflow-y-auto px-6 pt-8 pb-4">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
+                }}
+                className="flex flex-col gap-1"
+              >
+                {mobileNavItems.map((item, i) => {
+                  const href = toHref(item.url);
+                  const isActive = pathname === href;
+                  return (
+                    <motion.div
+                      key={`mobile-${item.label}-${i}`}
+                      variants={{
+                        hidden: { opacity: 0, x: 30 },
+                        visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+                      }}
+                    >
+                      <div className="flex items-center gap-0 group">
+                        {/* Gold left bar */}
+                        <motion.div
+                          initial={{ scaleY: 0 }}
+                          animate={{ scaleY: 1 }}
+                          transition={{ delay: 0.15 + i * 0.07, duration: 0.35, ease: "easeOut" }}
+                          style={{ transformOrigin: "top" }}
+                          className={`w-[3px] rounded-full mr-4 self-stretch ${isActive ? "bg-yellow-400" : "bg-yellow-400/0 group-hover:bg-yellow-400/40"} transition-colors duration-200`}
+                        />
+                        <Link
+                          href={href}
+                          className={`py-3 flex-1 text-[clamp(1.5rem,7vw,2.2rem)] font-extrabold leading-tight tracking-[-0.02em] transition-colors duration-200 ${
+                            isActive ? "text-yellow-400" : "text-white/90 hover:text-white"
+                          }`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      </div>
+                      {item.children.length > 0 && (
+                        <div className="ml-7 mb-3 flex flex-wrap gap-2">
+                          {item.children.map((child) => (
+                            <Link
+                              key={`${child.url}-${child.label}`}
+                              href={toHref(child.url)}
+                              className="text-[12px] text-white/40 hover:text-white/70 transition-colors bg-white/5 hover:bg-white/8 px-3 py-1.5 rounded-full"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            </nav>
+
+            {/* Bottom CTA section */}
+            <div className="relative z-10 shrink-0 px-6 pb-8" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}>
+              {/* Gold divider */}
+              <div className="h-px bg-gradient-to-r from-transparent via-yellow-400/20 to-transparent mb-6" />
+              <div className="flex flex-col gap-3">
+                {contactButtonHref && contactButtonText && (
+                  <Link
+                    href={toHref(contactButtonHref)}
+                    className="flex items-center justify-center h-14 rounded-2xl bg-yellow-400 text-black font-bold text-[15px] tracking-tight hover:bg-yellow-300 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {contactButtonText}
+                  </Link>
+                )}
+                <div className="grid grid-cols-2 gap-3">
+                  {bookButtonHref && bookButtonText && (
+                    <a
+                      href={toHref(bookButtonHref)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center h-12 rounded-2xl bg-blue-600 text-white font-semibold text-[13px] hover:bg-blue-500 transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      {item.label}
-                    </Link>
-                    {item.children.length > 0 && (
-                      <div className="mt-2 ml-4 flex flex-col gap-2">
-                        {item.children.map((child) => (
-                          <Link
-                            key={`${child.url}-${child.label}`}
-                            href={toHref(child.url)}
-                            className="text-[13px] text-white/60 hover:text-white transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {child.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-              <hr className="border-white/10" />
-              {contactButtonHref && contactButtonText && (
-                <Link
-                  href={toHref(contactButtonHref)}
-                  className="text-center bg-yellow-400 text-black py-2.5 rounded-full font-semibold text-[14px]"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {contactButtonText}
-                </Link>
-              )}
-              {bookButtonHref && bookButtonText && (
-                <a
-                  href={toHref(bookButtonHref)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-center bg-blue-600 text-white py-2.5 rounded-full font-semibold text-[14px]"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {bookButtonText}
-                </a>
-              )}
-            </nav>
+                      {bookButtonText}
+                    </a>
+                  )}
+                  {whatsappHref && (
+                    <a
+                      href={whatsappHref}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center gap-2 h-12 rounded-2xl bg-[#25D366] text-white font-semibold text-[13px] hover:bg-[#1fb958] transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                      </svg>
+                      WhatsApp
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

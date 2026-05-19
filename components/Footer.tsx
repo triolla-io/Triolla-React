@@ -310,13 +310,13 @@ export default async function Footer() {
           MENTIONS STRIP
       ══════════════════════════════════════════ */}
       {mentions.length > 0 && (
-        <div className="border-b border-white/5 py-8">
+        <div className="border-b border-white/5 py-5 md:py-8">
           <div className="w-[90%] mx-auto">
-            <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-10">
               {mentionsLabel && (
-                <span className="footer-mentions-label">{mentionsLabel}</span>
+                <span className="footer-mentions-label shrink-0">{mentionsLabel}</span>
               )}
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-6 md:gap-10">
+              <div className="flex overflow-x-auto sm:flex-wrap items-center justify-start sm:justify-start gap-5 md:gap-10 hide-scrollbar w-full sm:w-auto">
                 {mentions.map((m, i) => {
                   const src = m.mentionLogo?.node?.sourceUrl;
                   if (!src) return null;
@@ -347,8 +347,8 @@ export default async function Footer() {
       {/* ══════════════════════════════════════════
           MAIN NAV GRID
       ══════════════════════════════════════════ */}
-      <div className="w-[90%] mx-auto py-16">
-        <SectionReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-8 gap-y-12">
+      <div className="w-[90%] mx-auto py-10 md:py-16">
+        <SectionReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-5 md:gap-x-8 gap-y-10 md:gap-y-12">
           {[
             ...columns.map((col, i) => (
               <div key={i}>
@@ -436,7 +436,7 @@ export default async function Footer() {
       {/* ══════════════════════════════════════════
           BOTTOM BAR
       ══════════════════════════════════════════ */}
-      <div className="border-t border-white/5 py-6">
+      <div className="border-t border-white/5 py-4 md:py-6">
         <div className="w-[90%] mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             {/* Left: logo */}
@@ -473,14 +473,26 @@ export default async function Footer() {
               )}
             </p>
 
-            {/* Mobile social icons */}
+            {/* Mobile social icons — premium round buttons */}
             <div className="flex items-center gap-3 md:hidden">
+              {liLink && (
+                <a
+                  href={liLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-yellow-400/30 transition-colors"
+                >
+                  <LinkedInIcon />
+                </a>
+              )}
               {ttLink && (
                 <a
                   href={ttLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="TikTok"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-yellow-400/30 transition-colors"
                 >
                   <TikTokIcon />
                 </a>
@@ -491,6 +503,7 @@ export default async function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-yellow-400/30 transition-colors"
                 >
                   <InstagramIcon />
                 </a>
@@ -501,13 +514,14 @@ export default async function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-yellow-400/30 transition-colors"
                 >
                   <FacebookIcon />
                 </a>
               )}
             </div>
 
-            {/* Right: language + sqlink + social (desktop) */}
+            {/* Right: language + sqlink + social (desktop only) */}
             <div className="hidden md:flex items-center gap-5">
               <div className="footer-lang flex items-center gap-2">
                 <GlobeIcon />
@@ -717,6 +731,30 @@ export default async function Footer() {
           transition: color 0.2s;
         }
         .footer-social-icon:hover { color: #e5e7eb; }
+
+        /* ── Scrollbar hide ───────────────────── */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ── Mobile overrides ──────────────────── */
+        @media (max-width: 768px) {
+          .footer-col-heading {
+            font-size: 10px;
+            margin-bottom: 12px;
+          }
+          .footer-nav-link {
+            font-size: 13px;
+          }
+          .footer-contact-label {
+            font-size: 9px;
+          }
+          .footer-mention__img {
+            height: 22px;
+          }
+          .footer-mentions-label {
+            font-size: 9px;
+          }
+        }
       `}</style>
     </footer>
   );
