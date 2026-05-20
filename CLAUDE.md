@@ -15,41 +15,17 @@ No test suite is configured.
 
 ## Architecture
 
-**Next.js 16 App Router** with **headless WordPress + WPGraphQL** as the CMS backend. This is a CMS-managed landing page — **all content must come from WordPress**. Do not hardcode text, images, links, menu items, or any other content in the React code.
+**Next.js 16 App Router** with **headless WordPress + WPGraphQL** as the CMS backend. **All content must come from WordPress** — never hardcode text, images, links, or menu items in React code. On data absence render `null`; never substitute fallback strings.
 
-### GraphQL Schema Reference
+### Data Fetching
 
-`schema.graphql` (repo root) is the authoritative reference for every available type, field, and ACF group. Generated via:
+Apollo Client v4 in Server Components. Query strings live in `lib/queries.ts`; pages wrap with `gql` at call-site. Response shape: `page.template.<TemplateName>.<fieldGroup>` (e.g. `Template_ServicePage → servicePage`). Wrap fetches in `try/catch`; hide sections on failure.
 
-```bash
-npx get-graphql-schema https://triolla.io/graphql > schema.graphql
-```
-
-Regenerate it when new ACF fields or page templates are added in WP. Before writing or modifying a query, read `schema.graphql` to confirm the exact field names and nesting — do not guess field names.
-
-### Data Fetching Pattern
-
-WordPress content is fetched via Apollo Client v4 in Server Components:
-
-1. Query strings (not `gql` tagged template literals) are defined in `lib/queries.ts`
-2. Pages wrap them with `gql` at call-site: `client.query({ query: gql\`${GET_MY_QUERY}\` })`
-3. WordPress uses **custom page templates** mapped to ACF field groups — the GraphQL response shape is `page.template.<TemplateName>.<fieldGroup>`
-4. Data fetching is wrapped in `try/catch`; on failure, render empty/hidden states — do not substitute hardcoded text
-
-Example shape for the services page:
-
-```
-page(id: "services", idType: URI)
-  → template → Template_ServicePage → servicePage → { all fields }
-```
-
-The Apollo client (`lib/apollo-client.ts`) reads `NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL` from `.env`. The live WP instance is at `https://triolla.io/graphql`.
+Read `schema.graphql` before writing any query — never guess field names. Regenerate it after adding ACF fields: `npx get-graphql-schema https://triolla.io/graphql > schema.graphql`. ACF fields are camelCase in GraphQL. Image fields: `{ node { sourceUrl } }`. Repeater fields: arrays.
 
 ### `use client` vs Server Components
 
-- App Router pages (`app/**/page.tsx`) are Server Components — they fetch from WP at request time
-- Components that require `"use client"`: `HeaderClient`, `HeroHeadline`, `SectionReveal`, `FadeIn`, `CountUpNumber`, `CookieBanner`, `FAQAccordion`, `LearnCarousel`, `PortfolioGrid`, `ClientLogoStrip`
-- `Header` and `Footer` are Server Components. `Header` fetches `GET_THEME_SETTINGS` + `GET_PRIMARY_MENU`; `Footer` fetches `GET_FOOTER_DATA` + `GET_THEME_SETTINGS`
+Pages (`app/**/page.tsx`) are Server Components. Client components: `HeaderClient`, `HeroHeadline`, `SectionReveal`, `FadeIn`, `CountUpNumber`, `CookieBanner`, `FAQAccordion`, `LearnCarousel`, `PortfolioGrid`, `ClientLogoStrip`. `Header`/`Footer` are Server Components.
 
 ### Adding a New Page
 
@@ -58,6 +34,7 @@ The Apollo client (`lib/apollo-client.ts`) reads `NEXT_PUBLIC_WORDPRESS_GRAPHQL_
 3. Add the query to `lib/queries.ts` as a plain string constant
 4. Create `app/slug/page.tsx` as an async Server Component that calls `client.query()`
 5. Destructure `data?.page?.template?.newPage` — if a field is absent, hide that UI section rather than substituting hardcoded content
+6. Style sections using the shared Design Language above — do not invent new type scales, spacings, or color values
 
 ### Styling
 
@@ -68,28 +45,41 @@ Two-layer approach:
 
 Tailwind CSS v4 (PostCSS plugin, no `tailwind.config.js`). Brand tokens: `yellow-400` / `#facc15` (accent), `#080808`/`#0a0a0a`/`#0f0f0f`/`#111` (dark backgrounds), `#F5F5F5` (light bg on root layout).
 
+### Design Language
+
+All pages share a consistent visual language — do not invent new patterns.
+
+**Typography**
+
+| Role | Classes |
+|------|---------|
+| Hero title | `text-[clamp(2.2rem,10vw,110px)] font-bold tracking-tighter leading-none` |
+| Section heading | `text-[clamp(2rem,8vw,5rem)] md:text-7xl font-bold tracking-tighter` |
+| Lead text | `text-xl md:text-2xl text-gray-400 leading-relaxed font-light` |
+| Body | `text-[17px] md:text-[22px] text-gray-300 leading-relaxed` |
+| Accent label | `text-yellow-400 font-bold` |
+
+**Layout:** Padding `py-16 md:py-24` (standard) / `py-24`–`py-32` (hero). Between sections: `mb-16 md:mb-32`. Container: `max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8` (standard) / `max-w-[1600px] mx-auto px-4` (wide).
+
+**Backgrounds & cards:** Dark bg: `#0a0a0a`/`#0f0f0f`/`#111`. Inverted card: `bg-white text-black rounded-[4rem]`. Dark cards: `rounded-2xl`/`rounded-3xl shadow-2xl`. Dividers: `border-t border-white/10` (dark) / `border-black/10` (light).
+
+**Glow orbs:** One per dark hero section — `radial-gradient(ellipse at center, #facc15 0%, transparent 70%)`, `opacity: 0.04–0.08`, positioned `absolute top-0 left-1/2 -translate-x-1/2`, `aria-hidden="true"`.
+
+**Images:** Always from WP `sourceUrl` — never local paths. Cards: `rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-500`.
+
+**CTAs:** Primary: `bg-yellow-400 text-black font-bold hover:bg-yellow-300 transition-colors`. Ghost: `text-gray-400 hover:text-white transition-colors`. Link lists: `border-b border-white/10 py-6`.
+
 ### Animation
 
-Two Framer Motion wrapper components:
-
-- **`SectionReveal`** (`components/SectionReveal.tsx`) — staggered children: wraps an array of children and animates each with `opacity 0→1, y 40→0` staggered at 0.12s. Use when animating a grid or list of items together.
-- **`FadeIn`** (`components/FadeIn.tsx`) — single element fade-up with configurable `delay`, `duration`, `yOffset`. Use for standalone sections.
+- **`SectionReveal`** — staggered grid/list: `opacity 0→1, y 40→0` at 0.12s stagger
+- **`FadeIn`** — single element with configurable `delay`, `duration`, `yOffset`
 
 Both use `whileInView` with `once: true`.
 
-### Theme Settings — Critical Gotcha
+### Theme Settings Gotcha
 
-The ACF field group "Theme Setting" and the WPGraphQL options page share the same name, causing a GraphQL type conflict where all fields silently return null. The group's GraphQL field name was manually set to `themeOptions` in ACF → Field Groups → Theme Setting → GraphQL tab.
-
-**Correct path:** `themeSetting { themeOptions { … } }`  
-**Wrong (returns null):** `themeSetting { themeSetting { … } }`
-
-All consumers (Header, Footer, home page) use `data?.themeSetting?.themeOptions`. If theme settings ever return null unexpectedly, verify the ACF GraphQL field name is still `themeOptions`.
-
-### ACF Fields in WP Queries
-
-ACF field names in GraphQL are camelCase versions of the WP field slugs — always verify in `schema.graphql` before writing a query. Image fields resolve as `{ node { sourceUrl } }`. Repeater fields resolve as arrays. Fields not yet created in WP can be added to the query commented out (see `faqItems` / `clientLogos` in the services and about queries).
+ACF field group name collision causes silent null returns. Always use `themeSetting { themeOptions { … } }` — not `themeSetting { themeSetting { … } }`. All consumers use `data?.themeSetting?.themeOptions`.
 
 ### HTML from WordPress
 
-Rich text fields from WP arrive as raw HTML strings. Use the `stripHtml()` helper (defined in `app/page.tsx`) for plain-text extraction. Raw HTML rendering must only be done with content from the trusted WP backend.
+Use `stripHtml()` (in `app/page.tsx`) for plain-text extraction. Raw HTML rendering must only be done with content from the trusted WP backend.
