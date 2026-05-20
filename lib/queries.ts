@@ -9,8 +9,12 @@ export const GET_SERVICES_PAGE = `
             boldText
             shortText
             moreText
+            buttonText
+            headerBgColor
+            headerBgOverlayLayer { node { sourceUrl } }
 
             prodtitle
+            prodtitleLink
             proddtxt
             prodrightMenu {
               prodmtitle
@@ -27,6 +31,7 @@ export const GET_SERVICES_PAGE = `
             prodleftImageNine { node { sourceUrl } }
 
             brandtitle
+            brandtitleLink
             brandtext
             brandrightMenu {
               rightmetitle
@@ -40,7 +45,12 @@ export const GET_SERVICES_PAGE = `
             brandimageSix { node { sourceUrl } }
 
             devtitle
+            devtitleLink
             devtext
+            devrightMenuToptitle
+            devrightMenuToptitleCopy
+            devrightMenuToptitleLink
+            rightMenuTopList { rightTopMenuItem }
             devrightMenuBottitle
             devrightMenuBottitleLink
             rightMenuBotList {
@@ -52,9 +62,6 @@ export const GET_SERVICES_PAGE = `
               rightThreeMenuItem
             }
             devleftimage { node { sourceUrl } }
-            # faqItems and clientLogos — uncomment once ACF fields are created in WP
-            # faqItems { faqQuestion faqAnswer }
-            # clientLogos { logoImage { node { sourceUrl } } logoName }
           }
         }
       }

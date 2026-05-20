@@ -6,12 +6,27 @@ import { SectionReveal } from "@/components/SectionReveal";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { AboutImageCarousel } from "@/components/AboutImageCarousel";
+import { WhyUsSection } from "@/components/WhyUsSection";
+
+function stripHtml(html: string): string {
+  return (html ?? "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
 
 async function getAboutData() {
-  const { data } = await client.query<any>({
-    query: gql`${GET_ABOUT_PAGE}`,
-  });
-  return data.page.template.aboutPage;
+  try {
+    const { data } = await client.query<any>({
+      query: gql`${GET_ABOUT_PAGE}`,
+    });
+    return data?.page?.template?.aboutPage ?? {};
+  } catch {
+    return {};
+  }
 }
 
 export default async function AboutUsPage() {
@@ -25,7 +40,20 @@ export default async function AboutUsPage() {
     }))
     .filter((l: { sourceUrl: string }) => l.sourceUrl);
 
-  const heroColor = ap.headerBgColor || "#fed125";
+  const heroTitle = stripHtml(ap.headerTitle ?? "");
+
+  // Showcase images for the carousel directly below the hero
+  const showcaseImages = [
+    ap.abtopleftImageTop?.node?.sourceUrl,
+    ap.abtopleftImageTwo?.node?.sourceUrl,
+    ap.leftImageTopThree?.node?.sourceUrl,
+  ].filter(Boolean) as string[];
+
+  // Category strip at bottom of hero — derived from why-us card titles
+  const heroStripWords = (ap.abthrelist ?? [])
+    .map((c: any) => stripHtml(c.abteintitle ?? ""))
+    .filter(Boolean)
+    .slice(0, 6);
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
@@ -34,19 +62,22 @@ export default async function AboutUsPage() {
       <div aria-hidden="true" className="about-grain" />
 
       {/* ══ HERO ══ */}
-      <section className="about-hero" style={{ backgroundColor: heroColor }}>
-        {/* Dot grid texture */}
-        <div className="about-hero__dots" aria-hidden="true" />
+      <section className="about-hero">
+        <div className="about-hero__orb about-hero__orb--gold" aria-hidden="true" />
+        <div className="about-hero__orb about-hero__orb--amber" aria-hidden="true" />
+        <div className="about-hero__grid" aria-hidden="true" />
 
-        {/* Decorative rings — wrapper handles position, inner handles rotation */}
-        <div className="about-hero__ring-wrap" aria-hidden="true">
-          <div className="about-hero__ring">
-            <div className="about-hero__ring-inner" />
-          </div>
-        </div>
+        {/* Corner frame brackets */}
+        <div className="about-hero__corner about-hero__corner--tl" aria-hidden="true" />
+        <div className="about-hero__corner about-hero__corner--tr" aria-hidden="true" />
+        <div className="about-hero__corner about-hero__corner--bl" aria-hidden="true" />
+        <div className="about-hero__corner about-hero__corner--br" aria-hidden="true" />
+
+        {/* Ghost number */}
+        <div className="about-hero__ghost" aria-hidden="true">01</div>
 
         {/* Editorial section index */}
-        <div className="about-hero__index" aria-hidden="true">— 01 —</div>
+        <div className="about-hero__index" aria-hidden="true">— ABOUT —</div>
 
         {ap.headerBgOverlayLayer?.node?.sourceUrl && (
           <div className="about-hero__layer" aria-hidden="true">
@@ -54,24 +85,22 @@ export default async function AboutUsPage() {
           </div>
         )}
 
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className="about-hero__spark" style={{ "--si": i } as React.CSSProperties} aria-hidden="true" />
-        ))}
-
         <div className="about-hero__content">
-          <div className="about-hero__top">
+          {ap.headerSubText && (
             <FadeIn yOffset={20} duration={0.7}>
-              <div className="about-eyebrow about-eyebrow--dark">
+              <div className="about-eyebrow about-eyebrow--gold">
                 <span className="about-eyebrow__dot" />
-                About Triolla
+                {ap.headerSubText}
                 <span className="about-eyebrow__dot" />
               </div>
             </FadeIn>
-          </div>
+          )}
 
-          <FadeIn yOffset={70} delay={0.1} duration={1}>
-            <h1 className="about-hero__title">{ap.headerTitle}</h1>
-          </FadeIn>
+          {heroTitle && (
+            <FadeIn yOffset={70} delay={0.1} duration={1}>
+              <h1 className="about-hero__title">{heroTitle}</h1>
+            </FadeIn>
+          )}
 
           <FadeIn delay={0.22} duration={0.8}>
             <div className="about-hero__rule" aria-hidden="true" />
@@ -80,20 +109,20 @@ export default async function AboutUsPage() {
           <div className="about-hero__meta">
             <div className="about-hero__meta-l">
               {ap.boldText && (
-                <FadeIn yOffset={20} delay={0.32}>
+                <FadeIn yOffset={16} delay={0.32}>
                   <p className="about-hero__bold">{ap.boldText}</p>
                 </FadeIn>
               )}
               {ap.shortText && (
-                <FadeIn yOffset={16} delay={0.4}>
+                <FadeIn yOffset={14} delay={0.4}>
                   <p className="about-hero__short">{ap.shortText}</p>
                 </FadeIn>
               )}
             </div>
             <div className="about-hero__meta-r">
-
               {ap.moreText && (
-                <FadeIn yOffset={16} delay={0.46}>
+                <FadeIn yOffset={14} delay={0.46}>
+                  {/* WP-sourced HTML — trusted backend only */}
                   <div
                     className="about-hero__more"
                     dangerouslySetInnerHTML={{ __html: ap.moreText }}
@@ -114,77 +143,158 @@ export default async function AboutUsPage() {
           </div>
         </div>
 
-        {/* Multi-point jagged cut into dark */}
-        <div className="about-hero__wave" aria-hidden="true">
-          <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 75 L240 38 L480 82 L720 28 L960 72 L1200 32 L1440 65 L1440 100 L0 100 Z" fill="#080808" />
-          </svg>
+        {/* Scroll cue */}
+        <div className="about-scroll-cue" aria-hidden="true">
+          <div className="about-scroll-cue__line" />
+          <span className="about-scroll-cue__label">Scroll</span>
         </div>
+
+        {/* Scrolling category strip — derived from why-us titles */}
+        {heroStripWords.length > 0 && (
+          <div className="about-hero__strip" aria-hidden="true">
+            <div className="about-hero__strip-track">
+              {[...heroStripWords, ...heroStripWords, ...heroStripWords, ...heroStripWords].map((w, i) => (
+                <span key={i} className="about-hero__strip-item">
+                  {w}
+                  <span className="about-hero__strip-dot">✦</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
+
+      {/* ══ SHOWCASE CAROUSEL (below hero) ══ */}
+      {showcaseImages.length > 0 && (
+        <section className="about-showcase">
+          <div className="about-showcase__orb" aria-hidden="true" />
+
+          <FadeIn yOffset={40} duration={0.9}>
+            <div className="about-showcase__stage">
+              <div className="about-showcase__card about-showcase__card--left">
+                <img src={showcaseImages[1] ?? showcaseImages[0]} alt="" className="about-showcase__img" />
+                <div className="about-showcase__shine" aria-hidden="true" />
+              </div>
+
+              <div className="about-showcase__card about-showcase__card--main">
+                <img src={showcaseImages[0]} alt="" className="about-showcase__img" />
+                <div className="about-showcase__shine" aria-hidden="true" />
+                <span className="about-showcase__tag">— Inside Triolla —</span>
+              </div>
+
+              <div className="about-showcase__card about-showcase__card--right">
+                <img src={showcaseImages[2] ?? showcaseImages[0]} alt="" className="about-showcase__img" />
+                <div className="about-showcase__shine" aria-hidden="true" />
+              </div>
+
+              {/* Decorative spark dots */}
+              {[...Array(6)].map((_, i) => (
+                <span
+                  key={i}
+                  className="about-showcase__spark"
+                  style={{ "--si": i } as React.CSSProperties}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+          </FadeIn>
+
+          {/* Auto-scroll caption ticker */}
+          <div className="about-showcase__ticker" aria-hidden="true">
+            <div className="about-showcase__ticker-track">
+              {[...Array(8)].map((_, i) => (
+                <span key={i} className="about-showcase__ticker-item">
+                  Studio
+                  <span className="about-showcase__ticker-dot">✦</span>
+                  Craft
+                  <span className="about-showcase__ticker-dot">✦</span>
+                  Process
+                  <span className="about-showcase__ticker-dot">✦</span>
+                  People
+                  <span className="about-showcase__ticker-dot">✦</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ══ CRAFTING SECTION ══ */}
       <section className="about-crafting">
         <div className="about-crafting__inner">
-          <div className="about-crafting__visual">
-            {ap.abtopleftImageTop?.node?.sourceUrl && (
-              <div className="about-img-main">
-                <img src={ap.abtopleftImageTop.node.sourceUrl} alt="" className="about-img-main__img" />
-                <div className="about-img-main__shine" aria-hidden="true" />
+          <FadeIn yOffset={40}>
+            <div className="about-section-head">
+              <div className="about-eyebrow about-eyebrow--center about-eyebrow--gold">
+                <span className="about-eyebrow__line about-eyebrow__line--gold" />
+                — 02 —
+                <span className="about-eyebrow__line about-eyebrow__line--gold" />
               </div>
-            )}
-            <div className="about-img-row">
-              {ap.leftImageTopThree?.node?.sourceUrl && (
-                <div className="about-img-b">
-                  <img src={ap.leftImageTopThree.node.sourceUrl} alt="" className="about-img-b__img" />
-                </div>
+              {ap.toprightTitle && (
+                <h2 className="about-section-title">{ap.toprightTitle}</h2>
               )}
-              {ap.abtopleftImageTwo?.node?.sourceUrl && (
-                <div className="about-img-c">
-                  <img src={ap.abtopleftImageTwo.node.sourceUrl} alt="" className="about-img-c__img" />
-                </div>
+              {ap.toprightext && (
+                /* WP-sourced HTML — trusted backend only */
+                <div
+                  className="about-section-sub"
+                  dangerouslySetInnerHTML={{ __html: ap.toprightext }}
+                />
               )}
             </div>
-          </div>
+          </FadeIn>
 
-          <div className="about-crafting__text">
-            <FadeIn yOffset={40}>
-              <h2 className="about-crafting__title">{ap.toprightTitle}</h2>
-              <div
-                className="about-crafting__body"
-                dangerouslySetInnerHTML={{ __html: ap.toprightext }}
-              />
-            </FadeIn>
-
-            {(ap.imagesSection ?? []).length > 0 && (
-              <div className="about-partners">
-                {(ap.imagesSection ?? []).map((item: any, idx: number) => (
-                  <FadeIn key={idx} delay={idx * 0.12} yOffset={20}>
-                    <div className="about-partner">
-                      <div className="about-partner__head">
-                        {item.imageText && <span className="about-partner__label">{item.imageText}</span>}
-                        {item.topimages?.node?.sourceUrl && (
-                          <img src={item.topimages.node.sourceUrl} alt="" className="about-partner__logo" />
-                        )}
-                      </div>
+          {(ap.imagesSection ?? []).length > 0 && (
+            <div className="about-partners">
+              {(ap.imagesSection ?? []).map((item: any, idx: number) => (
+                <FadeIn key={idx} delay={idx * 0.12} yOffset={20}>
+                  <div className="about-partner">
+                    <div className="about-partner__head">
+                      {item.imageText && <span className="about-partner__label">{item.imageText}</span>}
+                      {item.topimages?.node?.sourceUrl && (
+                        <img src={item.topimages.node.sourceUrl} alt="" className="about-partner__logo" />
+                      )}
+                    </div>
+                    {item.topabtext && (
+                      /* WP-sourced HTML — trusted backend only */
                       <div
                         className="about-partner__body"
                         dangerouslySetInnerHTML={{ __html: item.topabtext }}
                       />
-                    </div>
-                  </FadeIn>
-                ))}
-              </div>
-            )}
-          </div>
+                    )}
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Wave: dark → cream */}
+        <div className="about-wave-down" aria-hidden="true">
+          <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z" fill="#f0eeea" />
+          </svg>
         </div>
       </section>
 
       {/* ══ SERVICES ══ */}
       <section className="about-services">
+        <div className="about-services__dots" aria-hidden="true" />
         <div className="about-services__inner">
-          <FadeIn className="about-svc__head">
-            <h2 className="about-svc__title">{ap.servtitle}</h2>
-            <div className="about-svc__sub" dangerouslySetInnerHTML={{ __html: ap.servtext }} />
+          <FadeIn className="about-section-head">
+            <div className="about-eyebrow about-eyebrow--center about-eyebrow--dark-text">
+              <span className="about-eyebrow__line about-eyebrow__line--dark" />
+              — 03 —
+              <span className="about-eyebrow__line about-eyebrow__line--dark" />
+            </div>
+            {ap.servtitle && (
+              <h2 className="about-section-title about-section-title--dark">{ap.servtitle}</h2>
+            )}
+            {ap.servtext && (
+              /* WP-sourced HTML — trusted backend only */
+              <div
+                className="about-section-sub about-section-sub--dark"
+                dangerouslySetInnerHTML={{ __html: ap.servtext }}
+              />
+            )}
           </FadeIn>
 
           <div className="about-svc__rows">
@@ -218,73 +328,47 @@ export default async function AboutUsPage() {
             ))}
           </div>
         </div>
+
+        {/* Wave: cream → dark */}
+        <div className="about-wave-down" aria-hidden="true">
+          <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z" fill="#080808" />
+          </svg>
+        </div>
       </section>
 
       {/* ══ WHY US ══ */}
-      <section className="about-why">
-        <div className="about-why__orb-l" aria-hidden="true" />
-        <div className="about-why__orb-r" aria-hidden="true" />
-
-        <div className="about-why__inner">
-          <div className="about-why__header">
-            <FadeIn className="about-why__h-left">
-              <h2
-                className="about-why__title"
-                dangerouslySetInnerHTML={{ __html: ap.abthretitle }}
-              />
-            </FadeIn>
-            <FadeIn delay={0.12} className="about-why__h-right">
-              <div
-                className="about-why__sub"
-                dangerouslySetInnerHTML={{ __html: ap.abtthretext }}
-              />
-              {ap.abthrebuttonText && (
-                <Link href={ap.abthrebuttonLink || "#"} className="about-why__cta">
-                  {ap.abthrebuttonText}
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                    <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
-              )}
-            </FadeIn>
-          </div>
-
-          <SectionReveal className="about-why__grid">
-            {(ap.abthrelist ?? []).map((item: any, i: number) => (
-              <div key={i} className="about-card" style={{ "--ci": i } as React.CSSProperties}>
-                <div className="about-card__ghost" aria-hidden="true">{(i + 1).toString().padStart(2, "0")}</div>
-                {item.abthreimage?.node?.sourceUrl && (
-                  <div className="about-card__icon-wrap">
-                    <img src={item.abthreimage.node.sourceUrl} alt="" className="about-card__icon" />
-                  </div>
-                )}
-                <h4
-                  className="about-card__title"
-                  dangerouslySetInnerHTML={{ __html: item.abteintitle }}
-                />
-                <p
-                  className="about-card__body"
-                  dangerouslySetInnerHTML={{ __html: item.abthreintext }}
-                />
-                <div className="about-card__bar" aria-hidden="true" />
-              </div>
-            ))}
-          </SectionReveal>
-        </div>
-      </section>
+      <WhyUsSection
+        title={ap.abthretitle ?? ""}
+        text={ap.abtthretext ?? ""}
+        cards={ap.abthrelist ?? []}
+        ctaText={ap.abthrebuttonText}
+        ctaLink={ap.abthrebuttonLink}
+      />
 
       {/* ══ DESIGN PROCESS ══ */}
       <section className="about-process">
         <div className="about-process__inner">
-          <FadeIn className="about-process__head">
-            <h2
-              className="about-process__title"
-              dangerouslySetInnerHTML={{ __html: ap.uDesignHeading }}
-            />
-            <p
-              className="about-process__sub"
-              dangerouslySetInnerHTML={{ __html: ap.uSortText }}
-            />
+          <FadeIn className="about-section-head">
+            <div className="about-eyebrow about-eyebrow--center about-eyebrow--gold">
+              <span className="about-eyebrow__line about-eyebrow__line--gold" />
+              — 04 —
+              <span className="about-eyebrow__line about-eyebrow__line--gold" />
+            </div>
+            {ap.uDesignHeading && (
+              /* WP-sourced HTML — trusted backend only */
+              <h2
+                className="about-section-title"
+                dangerouslySetInnerHTML={{ __html: ap.uDesignHeading }}
+              />
+            )}
+            {ap.uSortText && (
+              /* WP-sourced HTML — trusted backend only */
+              <div
+                className="about-section-sub"
+                dangerouslySetInnerHTML={{ __html: ap.uSortText }}
+              />
+            )}
           </FadeIn>
 
           <div className="about-process__hint md:hidden" aria-hidden="true">
@@ -302,6 +386,7 @@ export default async function AboutUsPage() {
                 <div className="about-pstep__line" aria-hidden="true" />
                 <div className="about-pstep__body">
                   <span className="about-pstep__num">{(i + 1).toString().padStart(2, "0")}</span>
+                  {/* WP-sourced HTML — trusted backend only */}
                   <h4
                     className="about-pstep__name"
                     dangerouslySetInnerHTML={{ __html: item.dName }}
@@ -318,12 +403,22 @@ export default async function AboutUsPage() {
         <section className="about-learn">
           <div className="about-learn__orb" aria-hidden="true" />
           <div className="about-learn__inner">
-            <FadeIn className="about-learn__head">
-              <h2 className="about-learn__title">{ap.learntitle}</h2>
-              <div
-                className="about-learn__sub"
-                dangerouslySetInnerHTML={{ __html: ap.learntext }}
-              />
+            <FadeIn className="about-section-head">
+              <div className="about-eyebrow about-eyebrow--center about-eyebrow--gold">
+                <span className="about-eyebrow__line about-eyebrow__line--gold" />
+                — 05 —
+                <span className="about-eyebrow__line about-eyebrow__line--gold" />
+              </div>
+              {ap.learntitle && (
+                <h2 className="about-section-title">{ap.learntitle}</h2>
+              )}
+              {ap.learntext && (
+                /* WP-sourced HTML — trusted backend only */
+                <div
+                  className="about-section-sub"
+                  dangerouslySetInnerHTML={{ __html: ap.learntext }}
+                />
+              )}
             </FadeIn>
             <AboutImageCarousel
               images={(ap.learnslider ?? []).map((s: any) => s.learnimage?.node?.sourceUrl ?? null)}
@@ -357,10 +452,10 @@ export default async function AboutUsPage() {
         <section className="about-faq">
           <div className="about-faq__inner">
             <FadeIn>
-              <div className="about-eyebrow">
-                <span className="about-eyebrow__line" />
+              <div className="about-eyebrow about-eyebrow--gold">
+                <span className="about-eyebrow__line about-eyebrow__line--gold" />
                 Got Questions
-                <span className="about-eyebrow__line" />
+                <span className="about-eyebrow__line about-eyebrow__line--gold" />
               </div>
               <h2 className="about-faq__title">Frequently Asked Questions</h2>
             </FadeIn>
@@ -371,6 +466,10 @@ export default async function AboutUsPage() {
 
       <style>{`
 
+        /* ─── Text selection ─────────────────── */
+        ::selection { background: #fed125; color: #000; }
+        .about-services ::selection { background: #0a0a0a; color: #fff; }
+
         /* ─── Grain ──────────────────────────── */
         .about-grain {
           position: fixed; inset: -50%;
@@ -378,9 +477,9 @@ export default async function AboutUsPage() {
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
           background-size: 200px 200px;
           opacity: 0.04; pointer-events: none; z-index: 9999;
-          animation: grain 8s steps(10) infinite;
+          animation: aboutGrain 8s steps(10) infinite;
         }
-        @keyframes grain {
+        @keyframes aboutGrain {
           0%   { transform: translate(0,0); }
           10%  { transform: translate(-5%,-10%); }
           20%  { transform: translate(-15%,5%); }
@@ -397,208 +496,343 @@ export default async function AboutUsPage() {
         /* ─── Eyebrow ────────────────────────── */
         .about-eyebrow {
           display: inline-flex; align-items: center; gap: 14px;
-          color: rgba(255,255,255,0.35);
+          color: rgba(255,255,255,0.3);
           font-size: 10px; font-weight: 700;
-          letter-spacing: 0.3em; text-transform: uppercase;
-          margin-bottom: 28px;
+          letter-spacing: 0.32em; text-transform: uppercase;
+          margin-bottom: 24px;
         }
-        .about-eyebrow--dark { color: rgba(0,0,0,0.45); }
         .about-eyebrow--center { display: flex; justify-content: center; }
-        .about-eyebrow__line {
-          display: block; width: 36px; height: 1px;
-          background: currentColor; opacity: 0.6;
-        }
+        .about-eyebrow--gold { color: #facc15; }
+        .about-eyebrow--dark-text { color: rgba(0,0,0,0.45); }
         .about-eyebrow__dot {
           width: 5px; height: 5px; border-radius: 50%;
           background: currentColor;
-          animation: eyeDot 2.2s ease-in-out infinite;
+          animation: aboutDot 2.2s ease-in-out infinite;
         }
-        @keyframes eyeDot { 0%,100%{opacity:1} 50%{opacity:0.25} }
+        @keyframes aboutDot { 0%,100%{opacity:1} 50%{opacity:0.22} }
+        .about-eyebrow__line {
+          display: block; width: 32px; height: 1px;
+          background: currentColor; opacity: 0.55;
+        }
+        .about-eyebrow__line--dark { background: rgba(0,0,0,0.35); opacity: 1; }
+        .about-eyebrow__line--gold { background: #facc15; opacity: 0.7; }
 
-        /* ─── HERO ───────────────────────────── */
+        /* ─── HERO (dark, services-style) ─────── */
         .about-hero {
           position: relative; min-height: 100vh;
           display: flex; flex-direction: column;
-          align-items: center;
-          padding: 128px 24px 200px;
+          align-items: center; justify-content: center;
+          padding: 128px 24px 164px;
           overflow: hidden;
         }
-
-        /* dot grid texture */
-        .about-hero__dots {
-          position: absolute; inset: 0; z-index: 0; pointer-events: none;
-          background-image: radial-gradient(circle, rgba(0,0,0,0.2) 1.2px, transparent 1.2px);
-          background-size: 36px 36px;
-          opacity: 0.55;
+        .about-hero__orb {
+          position: absolute; border-radius: 50%;
+          filter: blur(80px); pointer-events: none; z-index: 0;
         }
-
-        /* ring — wrapper handles translateY, inner handles rotation so transforms don't conflict */
-        .about-hero__ring-wrap {
-          position: absolute;
-          top: 50%; right: -260px;
-          transform: translateY(-50%);
-          width: 920px; height: 920px;
-          pointer-events: none; z-index: 0;
+        .about-hero__orb--gold {
+          bottom: -12%; left: 50%; transform: translateX(-50%);
+          width: 900px; height: 480px;
+          background: radial-gradient(ellipse at center, rgba(250,204,21,0.14) 0%, transparent 70%);
+          animation: aboutOrbGold 9s ease-in-out infinite;
         }
-        .about-hero__ring {
-          position: absolute; inset: 0;
-          border-radius: 50%;
-          border: 1px dashed rgba(0,0,0,0.11);
-          animation: heroRingRotate 80s linear infinite;
+        @keyframes aboutOrbGold { 0%,100%{opacity:0.85} 50%{opacity:0.5} }
+        .about-hero__orb--amber {
+          top: -8%; left: -12%;
+          width: 640px; height: 640px;
+          background: radial-gradient(circle, rgba(251,146,60,0.06) 0%, transparent 65%);
+          animation: aboutOrbAmber 13s ease-in-out infinite alternate;
         }
-        .about-hero__ring-inner {
-          position: absolute; inset: 112px;
-          border-radius: 50%;
-          border: 1px solid rgba(0,0,0,0.07);
+        @keyframes aboutOrbAmber {
+          from { opacity: 0.6; transform: translate(0,0); }
+          to   { opacity: 1; transform: translate(24px,18px); }
         }
-        @keyframes heroRingRotate {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+        .about-hero__grid {
+          position: absolute; inset: 0; pointer-events: none; z-index: 0;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+          background-size: 80px 80px;
+          mask-image: radial-gradient(ellipse 75% 60% at 50% 50%, black 0%, transparent 100%);
         }
-
-        /* editorial section index */
+        .about-hero__corner {
+          position: absolute; width: 28px; height: 28px;
+          pointer-events: none; z-index: 2;
+        }
+        .about-hero__corner--tl { top: 88px; left: 48px; border-top: 1.5px solid rgba(250,204,21,0.32); border-left: 1.5px solid rgba(250,204,21,0.32); }
+        .about-hero__corner--tr { top: 88px; right: 48px; border-top: 1.5px solid rgba(250,204,21,0.32); border-right: 1.5px solid rgba(250,204,21,0.32); }
+        .about-hero__corner--bl { bottom: 168px; left: 48px; border-bottom: 1.5px solid rgba(250,204,21,0.32); border-left: 1.5px solid rgba(250,204,21,0.32); }
+        .about-hero__corner--br { bottom: 168px; right: 48px; border-bottom: 1.5px solid rgba(250,204,21,0.32); border-right: 1.5px solid rgba(250,204,21,0.32); }
+        .about-hero__ghost {
+          position: absolute; top: 50%; right: -2%; transform: translateY(-52%);
+          font-size: clamp(180px, 26vw, 400px); font-weight: 900; line-height: 1;
+          color: rgba(250,204,21,0.026); pointer-events: none; user-select: none;
+          letter-spacing: -0.06em; z-index: 0;
+        }
         .about-hero__index {
-          position: absolute; top: 48px; right: 72px; z-index: 2;
+          position: absolute; top: 52px; right: 72px; z-index: 3;
           font-size: 10px; font-weight: 700;
-          letter-spacing: 0.25em; text-transform: uppercase;
-          color: rgba(0,0,0,0.2);
+          letter-spacing: 0.26em; text-transform: uppercase;
+          color: rgba(255,255,255,0.17);
         }
-
         .about-hero__layer {
           position: absolute; inset: 0; z-index: 0; overflow: hidden;
         }
         .about-hero__layer img {
-          width: 100%; height: 100%; object-fit: cover;
-          mix-blend-mode: multiply; opacity: 0.22;
+          width: 100%; height: 100%; object-fit: cover; mix-blend-mode: screen; opacity: 0.08;
         }
-        .about-hero__spark {
-          position: absolute; width: 6px; height: 6px;
-          border-radius: 50%; background: rgba(0,0,0,0.2);
-          animation: heroSpark 6s ease-in-out infinite;
-          animation-delay: calc(var(--si) * 0.7s);
-          top: calc(10% + var(--si) * 10%);
-          left: calc(3% + var(--si) * 12%);
-          pointer-events: none; z-index: 1;
-        }
-        @keyframes heroSpark {
-          0%,100%{opacity:0;transform:scale(0) translateY(0)}
-          40%{opacity:0.5;transform:scale(1.8) translateY(-18px)}
-          70%{opacity:0.1;transform:scale(0.7) translateY(-30px)}
-        }
-
-        /* centered layout — same language as home page hero */
         .about-hero__content {
           position: relative; z-index: 2;
           max-width: 1100px; width: 100%;
           display: flex; flex-direction: column;
           align-items: center; text-align: center;
         }
-        .about-hero__top { margin-bottom: 36px; }
-
         .about-hero__title {
-          font-size: clamp(3.8rem, 12vw, 148px);
-          font-weight: 900; line-height: 0.87;
-          letter-spacing: -0.055em; color: #0a0a0a;
-          margin-bottom: 52px; word-break: break-word;
+          font-size: clamp(3.6rem, 11vw, 128px);
+          font-weight: 900; line-height: 0.88;
+          letter-spacing: -0.055em;
+          background: linear-gradient(135deg, #fff 38%, #facc15 52%, #fff 68%);
+          background-size: 200% auto;
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background-clip: text; color: transparent;
+          animation: aboutShimmer 6s linear infinite;
+          margin-bottom: 48px; word-break: break-word;
         }
-
+        @keyframes aboutShimmer {
+          0%   { background-position: 200% center; }
+          100% { background-position: -200% center; }
+        }
         .about-hero__rule {
-          width: 55%; max-width: 560px; height: 1px;
-          background: linear-gradient(to right, transparent, rgba(0,0,0,0.25), transparent);
+          width: 52%; max-width: 540px; height: 1px;
+          background: linear-gradient(to right, transparent, rgba(250,204,21,0.38), transparent);
           margin-bottom: 44px;
         }
-
         .about-hero__meta {
           display: flex; flex-direction: column;
-          align-items: center; gap: 14px;
-          max-width: 700px;
+          align-items: center; gap: 12px; max-width: 680px;
         }
         .about-hero__meta-l { display: flex; flex-direction: column; gap: 10px; align-items: center; }
         .about-hero__meta-r { display: flex; flex-direction: column; gap: 18px; align-items: center; }
-
-        .about-hero__bold {
-          font-size: clamp(1.1rem, 2vw, 1.5rem);
-          font-weight: 700; color: rgba(0,0,0,0.74); line-height: 1.35;
-        }
-        .about-hero__short {
-          font-size: 1rem; color: rgba(0,0,0,0.52); max-width: 580px; line-height: 1.72;
-        }
-        .about-hero__more {
-          font-size: 0.92rem; color: rgba(0,0,0,0.42); line-height: 1.78; max-width: 580px;
-        }
+        .about-hero__bold { font-size: clamp(1rem,1.9vw,1.4rem); font-weight: 700; color: rgba(255,255,255,0.88); line-height: 1.35; }
+        .about-hero__short { font-size: 1rem; color: rgba(255,255,255,0.46); line-height: 1.74; max-width: 560px; }
+        .about-hero__more { font-size: 0.9rem; color: rgba(255,255,255,0.32); line-height: 1.8; max-width: 560px; }
         .about-hero__cta {
           display: inline-flex; align-items: center; gap: 10px;
-          background: #0a0a0a; color: #facc15;
-          font-weight: 700; font-size: 15px;
-          padding: 17px 36px; border-radius: 999px;
-          transition: transform 0.25s, box-shadow 0.25s;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+          background: #facc15; color: #000; font-weight: 700; font-size: 15px;
+          padding: 16px 34px; border-radius: 999px;
+          transition: background 0.22s, transform 0.25s, box-shadow 0.25s;
+          box-shadow: 0 4px 28px rgba(250,204,21,0.24);
         }
-        .about-hero__cta:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 14px 44px rgba(0,0,0,0.28);
+        .about-hero__cta:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 14px 48px rgba(250,204,21,0.3); }
+        .about-scroll-cue {
+          position: absolute; bottom: 72px; left: 50%; transform: translateX(-50%);
+          display: flex; flex-direction: column; align-items: center; gap: 8px;
+          z-index: 4; pointer-events: none;
         }
-        .about-hero__wave {
-          position: absolute; bottom: -1px; left: 0; right: 0;
-          z-index: 3; line-height: 0;
+        .about-scroll-cue__line {
+          width: 1px; height: 44px;
+          background: linear-gradient(to bottom, transparent, rgba(250,204,21,0.55));
+          animation: aboutScrollPulse 2s ease-in-out infinite;
         }
-        .about-hero__wave svg { width: 100%; height: auto; display: block; }
+        .about-scroll-cue__label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.26); }
+        @keyframes aboutScrollPulse { 0%,100%{opacity:0.4;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.1)} }
+        .about-hero__strip {
+          position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+          height: 52px; overflow: hidden;
+          display: flex; align-items: center;
+          border-top: 1px solid rgba(255,255,255,0.06);
+          background: rgba(10,10,10,0.6); backdrop-filter: blur(12px);
+        }
+        .about-hero__strip-track {
+          display: flex; align-items: center; white-space: nowrap;
+          animation: aboutStrip 44s linear infinite;
+        }
+        .about-hero__strip-item {
+          display: inline-flex; align-items: center; gap: 14px; padding: 0 28px;
+          font-size: 9px; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase;
+          color: rgba(255,255,255,0.28);
+        }
+        .about-hero__strip-dot { color: #facc15; font-size: 7px; }
+        @keyframes aboutStrip { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 
-        /* ─── CRAFTING ───────────────────────── */
-        .about-crafting { padding: 96px 0 112px; position: relative; }
-        .about-crafting__inner {
-          max-width: 1400px; margin: 0 auto; padding: 0 32px;
-          display: grid; grid-template-columns: 1.1fr 0.9fr;
-          gap: 80px; align-items: start;
+        /* ─── SHOWCASE (carousel below hero) ─── */
+        .about-showcase {
+          position: relative;
+          padding: 96px 0 80px;
+          overflow: hidden;
         }
-        .about-crafting__visual { display: flex; flex-direction: column; gap: 20px; }
-        .about-img-main {
-          position: relative; border-radius: 24px;
-          overflow: hidden; background: #111;
-          box-shadow: 0 24px 72px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
+        .about-showcase__orb {
+          position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+          width: 1100px; height: 600px;
+          background: radial-gradient(ellipse at center, rgba(250,204,21,0.05) 0%, transparent 65%);
+          filter: blur(100px); pointer-events: none; z-index: 0;
         }
-        .about-img-main__img {
-          width: 100%; height: auto; object-fit: cover; display: block;
-          transition: transform 0.8s cubic-bezier(.23,1,.32,1);
+        .about-showcase__stage {
+          position: relative;
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 32px;
+          display: grid;
+          grid-template-columns: 1fr 1.5fr 1fr;
+          gap: 28px;
+          align-items: center;
+          perspective: 1400px;
         }
-        .about-img-main:hover .about-img-main__img { transform: scale(1.04); }
-        .about-img-main__shine {
-          position: absolute; inset: 0;
-          background: linear-gradient(125deg, transparent 38%, rgba(250,204,21,0.06) 52%, transparent 64%);
+        .about-showcase__card {
+          position: relative;
+          border-radius: 26px;
+          overflow: hidden;
+          background: #111;
+          box-shadow: 0 26px 80px rgba(0,0,0,0.68), 0 0 0 1px rgba(255,255,255,0.05);
+          transition: transform 0.7s cubic-bezier(.23,1,.32,1), box-shadow 0.7s;
+          will-change: transform;
+        }
+        .about-showcase__card--left {
+          aspect-ratio: 3 / 4;
+          transform: rotate(-3.2deg) translateY(20px);
+          animation: scFloatL 7s ease-in-out infinite;
+        }
+        .about-showcase__card--main {
+          aspect-ratio: 4 / 3;
+          transform: rotate(0.3deg);
+          z-index: 2;
+          box-shadow: 0 40px 100px rgba(0,0,0,0.72), 0 0 0 1px rgba(250,204,21,0.1);
+          animation: scFloatM 8s ease-in-out infinite;
+        }
+        .about-showcase__card--right {
+          aspect-ratio: 3 / 4;
+          transform: rotate(2.6deg) translateY(28px);
+          animation: scFloatR 7.5s ease-in-out infinite;
+        }
+        @keyframes scFloatL {
+          0%,100% { transform: rotate(-3.2deg) translateY(20px); }
+          50%      { transform: rotate(-2.4deg) translateY(8px); }
+        }
+        @keyframes scFloatM {
+          0%,100% { transform: rotate(0.3deg) translateY(0); }
+          50%      { transform: rotate(-0.4deg) translateY(-10px); }
+        }
+        @keyframes scFloatR {
+          0%,100% { transform: rotate(2.6deg) translateY(28px); }
+          50%      { transform: rotate(1.8deg) translateY(14px); }
+        }
+        .about-showcase__card:hover {
+          transform: rotate(0deg) translateY(-8px) scale(1.025);
+          box-shadow: 0 48px 120px rgba(0,0,0,0.78), 0 0 0 1px rgba(250,204,21,0.18);
+          animation-play-state: paused;
+          z-index: 3;
+        }
+        .about-showcase__img {
+          width: 100%; height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.85s cubic-bezier(.23,1,.32,1);
+        }
+        .about-showcase__card:hover .about-showcase__img { transform: scale(1.06); }
+        .about-showcase__shine {
+          position: absolute; inset: 0; pointer-events: none;
+          background: linear-gradient(128deg, transparent 36%, rgba(250,204,21,0.06) 50%, transparent 62%);
+        }
+        .about-showcase__tag {
+          position: absolute; bottom: 14px; left: 14px;
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 0.28em; text-transform: uppercase;
+          color: rgba(255,255,255,0.72);
+          background: rgba(0,0,0,0.55);
+          backdrop-filter: blur(10px);
+          padding: 6px 12px; border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+        .about-showcase__spark {
+          position: absolute;
+          width: 5px; height: 5px;
+          border-radius: 50%;
+          background: #facc15;
+          opacity: 0;
+          animation: scSpark 5s ease-in-out infinite;
+          animation-delay: calc(var(--si) * 0.7s);
+          top: calc(15% + var(--si) * 12%);
+          left: calc(8% + var(--si) * 14%);
+          z-index: 1;
           pointer-events: none;
         }
-        .about-img-row {
-          display: grid; grid-template-columns: 3fr 2fr;
-          gap: 20px; align-items: end;
+        @keyframes scSpark {
+          0%,100% { opacity: 0; transform: scale(0) translateY(0); }
+          40%      { opacity: 0.85; transform: scale(1.6) translateY(-12px); }
+          70%      { opacity: 0.25; transform: scale(0.7) translateY(-22px); }
         }
-        .about-img-b, .about-img-c {
-          border-radius: 20px; overflow: hidden; background: #111;
-          box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
-        }
-        .about-img-b__img, .about-img-c__img {
-          width: 100%; height: 100%; object-fit: cover; display: block;
-          transition: transform 0.8s cubic-bezier(.23,1,.32,1);
-        }
-        .about-img-b:hover .about-img-b__img,
-        .about-img-c:hover .about-img-c__img { transform: scale(1.05); }
-        .about-img-c { position: relative; top: -28px; }
-        .about-crafting__text { padding-top: 32px; }
-        .about-crafting__title {
-          font-size: clamp(1.9rem, 3.8vw, 3.4rem);
-          font-weight: 800; line-height: 1.08;
-          letter-spacing: -0.03em; margin-bottom: 24px; color: #fff;
-        }
-        .about-crafting__body {
-          font-size: 1.1rem; line-height: 1.78;
-          color: #6b7280; margin-bottom: 52px;
-        }
-        .about-partners { border-top: 1px solid rgba(255,255,255,0.07); }
-        .about-partner {
-          padding: 28px 0;
+
+        /* Ticker */
+        .about-showcase__ticker {
+          margin-top: 60px;
+          overflow: hidden;
+          padding: 14px 0;
+          border-top: 1px solid rgba(255,255,255,0.06);
           border-bottom: 1px solid rgba(255,255,255,0.06);
-          transition: padding-left 0.3s;
+          background: rgba(10,10,10,0.5);
+          backdrop-filter: blur(8px);
         }
-        .about-partner:hover { padding-left: 6px; }
+        .about-showcase__ticker-track {
+          display: flex;
+          width: max-content;
+          animation: scTicker 38s linear infinite;
+        }
+        .about-showcase__ticker-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 18px;
+          padding: 0 18px;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.4em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.32);
+        }
+        .about-showcase__ticker-dot {
+          color: #facc15;
+          font-size: 8px;
+        }
+        @keyframes scTicker {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        /* ─── Shared section heads ───────────── */
+        .about-section-head { text-align: center; margin-bottom: 72px; }
+        .about-section-title {
+          font-size: clamp(2.2rem, 5.5vw, 4.8rem);
+          font-weight: 900; letter-spacing: -0.04em; line-height: 1;
+          color: #fff; margin-bottom: 18px;
+        }
+        .about-section-title--dark { color: #0a0a0a; }
+        .about-section-sub { font-size: 1.05rem; color: #6b7280; max-width: 620px; margin: 0 auto; line-height: 1.74; }
+        .about-section-sub--dark { color: #4b5563; }
+
+        /* ─── Wave transitions ───────────────── */
+        .about-wave-down { position: relative; line-height: 0; z-index: 2; margin-top: 64px; }
+        .about-wave-down svg { width: 100%; display: block; }
+
+        /* ─── CRAFTING ───────────────────────── */
+        .about-crafting { padding: 96px 0 0; position: relative; }
+        .about-crafting__inner {
+          max-width: 1100px; margin: 0 auto; padding: 0 32px;
+        }
+        .about-partners {
+          margin-top: 64px;
+          border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        .about-partner {
+          padding: 32px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
+          transition: padding-left 0.32s cubic-bezier(.23,1,.32,1);
+          position: relative;
+        }
+        .about-partner::before {
+          content: ''; position: absolute; left: -12px; top: 0; bottom: 0; width: 3px;
+          background: #facc15; transform: scaleY(0); transform-origin: top;
+          transition: transform 0.4s cubic-bezier(.23,1,.32,1);
+        }
+        .about-partner:hover { padding-left: 12px; }
+        .about-partner:hover::before { transform: scaleY(1); }
         .about-partner__head {
           display: flex; align-items: center; gap: 16px; margin-bottom: 12px;
         }
@@ -608,35 +842,29 @@ export default async function AboutUsPage() {
           color: rgba(255,255,255,0.28);
         }
         .about-partner__logo {
-          height: 38px; object-fit: contain;
+          height: 36px; object-fit: contain;
           filter: brightness(10) opacity(0.55);
           transition: filter 0.3s;
         }
         .about-partner:hover .about-partner__logo { filter: brightness(10) opacity(0.9); }
-        .about-partner__body { font-size: 0.9rem; color: #4b5563; line-height: 1.65; }
+        .about-partner__body { font-size: 0.95rem; color: #6b7280; line-height: 1.7; }
 
         /* ─── SERVICES ───────────────────────── */
         .about-services {
           position: relative;
           background: #f0eeea;
-          padding: 120px 0 140px;
+          padding: 96px 0 0;
           overflow: hidden;
         }
+        .about-services__dots {
+          position: absolute; inset: 0; pointer-events: none; z-index: 0;
+          background-image: radial-gradient(circle, rgba(0,0,0,0.13) 1.2px, transparent 1.2px);
+          background-size: 36px 36px; opacity: 0.5;
+        }
         .about-services__inner {
-          max-width: 960px; margin: 0 auto; padding: 0 32px;
+          max-width: 1000px; margin: 0 auto; padding: 0 32px;
           position: relative; z-index: 2;
         }
-        .about-svc__head { text-align: center; margin-bottom: 80px; }
-        .about-svc__title {
-          font-size: clamp(2.8rem, 7vw, 6rem);
-          font-weight: 900; letter-spacing: -0.04em; line-height: 1;
-          color: #0a0a0a; margin-bottom: 18px;
-        }
-        .about-svc__sub {
-          font-size: 1.05rem; color: #6b7280;
-          max-width: 480px; margin: 0 auto; line-height: 1.7;
-        }
-        .about-svc__rows {}
         .about-srow {
           display: grid;
           grid-template-columns: 260px 1fr;
@@ -682,122 +910,17 @@ export default async function AboutUsPage() {
           user-select: none;
         }
 
-        /* ─── WHY US ─────────────────────────── */
-        .about-why {
-          position: relative; background: #0a0a0a;
-          padding: 112px 0 128px; overflow: hidden;
-        }
-        .about-why__orb-l {
-          position: absolute; top: 5%; left: -8%;
-          width: 700px; height: 700px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(250,204,21,0.04) 0%, transparent 65%);
-          filter: blur(100px); pointer-events: none;
-        }
-        .about-why__orb-r {
-          position: absolute; bottom: -10%; right: -8%;
-          width: 600px; height: 600px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(250,204,21,0.03) 0%, transparent 65%);
-          filter: blur(80px); pointer-events: none;
-        }
-        .about-why__inner {
-          max-width: 1400px; margin: 0 auto; padding: 0 32px;
-          position: relative; z-index: 2;
-        }
-        .about-why__header {
-          display: flex; flex-direction: column; gap: 28px; margin-bottom: 80px;
-          align-items: center; text-align: center;
-        }
-        .about-why__h-left { flex: 1; width: 100%; }
-        .about-why__title {
-          font-size: clamp(2.2rem, 5vw, 4.5rem);
-          font-weight: 800; letter-spacing: -0.03em; line-height: 1.08;
-          max-width: 720px; margin: 0 auto;
-        }
-        .about-why__h-right { max-width: 520px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
-        .about-why__sub { font-size: 1.1rem; color: #6b7280; line-height: 1.75; text-align: center; }
-        .about-why__cta {
-          display: inline-flex; align-items: center; gap: 10px;
-          border: 1px solid #facc15; color: #facc15;
-          font-weight: 700; font-size: 15px;
-          padding: 14px 28px; border-radius: 999px; width: fit-content;
-          transition: background 0.2s, color 0.2s, transform 0.2s;
-        }
-        .about-why__cta:hover { background: #facc15; color: #000; transform: translateY(-2px); }
-        .about-why__grid {
-          display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;
-        }
-        .about-card {
-          position: relative;
-          background: rgba(14,14,14,0.9);
-          border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 28px; padding: 44px 28px 40px;
-          display: flex; flex-direction: column; gap: 14px;
-          overflow: hidden;
-          transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
-          animation: cardRise 0.65s cubic-bezier(.23,1,.32,1) both;
-          animation-delay: calc(var(--ci, 0) * 0.1s + 0.2s);
-        }
-        @keyframes cardRise {
-          from { opacity: 0; transform: translateY(44px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .about-card:hover {
-          border-color: rgba(250,204,21,0.22); transform: translateY(-7px);
-          box-shadow: 0 28px 72px rgba(0,0,0,0.5), 0 0 0 1px rgba(250,204,21,0.08), 0 0 48px rgba(250,204,21,0.04);
-        }
-        .about-card__ghost {
-          position: absolute; top: -14px; right: 10px;
-          font-size: 108px; font-weight: 900;
-          color: rgba(255,255,255,0.028); line-height: 1;
-          pointer-events: none; user-select: none; transition: color 0.4s;
-        }
-        .about-card:hover .about-card__ghost { color: rgba(250,204,21,0.05); }
-        .about-card__icon-wrap {
-          width: 72px; height: 72px;
-          display: flex; align-items: center; justify-content: center;
-          border-radius: 18px;
-          background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
-          transition: background 0.35s, border-color 0.35s; flex-shrink: 0;
-        }
-        .about-card:hover .about-card__icon-wrap {
-          background: rgba(250,204,21,0.07); border-color: rgba(250,204,21,0.18);
-        }
-        .about-card__icon {
-          width: 44px; height: 44px; object-fit: contain; transition: transform 0.35s;
-        }
-        .about-card:hover .about-card__icon { transform: scale(1.1); }
-        .about-card__title {
-          font-size: 1.2rem;
-          font-weight: 700; color: #fff; line-height: 1.3; margin-top: 6px;
-        }
-        .about-card__body { font-size: 0.88rem; color: #6b7280; line-height: 1.65; flex: 1; }
-        .about-card__bar {
-          position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-          background: linear-gradient(to right, transparent, #facc15, transparent);
-          transform: scaleX(0); transform-origin: left;
-          transition: transform 0.45s cubic-bezier(.23,1,.32,1);
-        }
-        .about-card:hover .about-card__bar { transform: scaleX(1); }
-
         /* ─── DESIGN PROCESS ─────────────────── */
         .about-process { padding: 112px 0 96px; overflow: hidden; }
         .about-process__inner { max-width: 1600px; margin: 0 auto; padding: 0 32px; }
-        .about-process__head { text-align: center; margin-bottom: 80px; }
-        .about-process__title {
-          font-size: clamp(2rem, 6vw, 5.2rem);
-          font-weight: 900; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 18px;
-        }
-        .about-process__sub {
-          font-size: 1.1rem; color: #6b7280; max-width: 480px; margin: 0 auto; line-height: 1.7;
-        }
         .about-process__hint {
           display: flex; align-items: center; gap: 8px;
           color: rgba(250,204,21,0.55); font-size: 10px; font-weight: 700;
           letter-spacing: 0.22em; text-transform: uppercase;
           margin-bottom: 20px; padding: 0 16px;
-          animation: swipeHint 2s ease-in-out infinite;
+          animation: aboutSwipeHint 2s ease-in-out infinite;
         }
-        @keyframes swipeHint {
+        @keyframes aboutSwipeHint {
           0%,100%{opacity:0.5;transform:translateX(0)}
           50%{opacity:1;transform:translateX(6px)}
         }
@@ -854,14 +977,6 @@ export default async function AboutUsPage() {
           max-width: 1600px; margin: 0 auto; padding: 0 32px;
           position: relative; z-index: 2;
         }
-        .about-learn__head { margin-bottom: 52px; text-align: center; }
-        .about-learn__title {
-          font-size: clamp(1.9rem, 4vw, 3.6rem);
-          font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px;
-        }
-        .about-learn__sub {
-          font-size: 1.1rem; color: #6b7280; max-width: 580px; margin: 0 auto; line-height: 1.7;
-        }
 
         /* ─── CLIENTS ────────────────────────── */
         .about-clients { padding: 96px 0; }
@@ -908,25 +1023,33 @@ export default async function AboutUsPage() {
 
         /* ─── RESPONSIVE ─────────────────────── */
         @media (max-width: 1100px) {
-          .about-crafting__inner { grid-template-columns: 1fr; gap: 40px; }
-          .about-crafting__text { padding-top: 0; }
+          .about-showcase__stage {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 520px;
+          }
+          .about-showcase__card--left,
+          .about-showcase__card--right {
+            aspect-ratio: 4 / 3;
+          }
+          .about-showcase__card--left { transform: rotate(-1.6deg); animation: none; }
+          .about-showcase__card--main { transform: rotate(0deg); animation: none; }
+          .about-showcase__card--right { transform: rotate(1.4deg); animation: none; }
         }
         @media (max-width: 768px) {
-          .about-hero { padding: 96px 20px 160px; }
-          .about-hero__title { font-size: clamp(3rem, 14vw, 72px); margin-bottom: 36px; }
-          .about-hero__rule { margin-bottom: 28px; }
-          .about-hero__index { right: 24px; top: 28px; }
-          .about-hero__ring-wrap { width: 360px; height: 360px; right: -140px; }
-          .about-crafting { padding: 64px 0 80px; }
-          .about-crafting__inner { padding: 0 20px; gap: 40px; }
-          .about-img-c { top: 0; }
-          .about-services { padding: 80px 0 96px; }
+          .about-hero { padding: 96px 20px 148px; }
+          .about-hero__corner { display: none; }
+          .about-hero__ghost { font-size: clamp(110px, 38vw, 180px); }
+          .about-hero__index { right: 20px; top: 30px; }
+          .about-showcase { padding: 64px 0 56px; }
+          .about-showcase__stage { padding: 0 20px; }
+          .about-showcase__ticker { margin-top: 40px; }
+          .about-crafting { padding-top: 64px; }
+          .about-crafting__inner { padding: 0 20px; }
+          .about-services { padding: 80px 0 0; }
           .about-services__inner { padding: 0 20px; }
           .about-srow { grid-template-columns: 1fr; gap: 8px; padding: 32px 0; }
           .about-srow__cat { font-size: 1.6rem; }
-          .about-why { padding: 80px 0 96px; }
-          .about-why__inner { padding: 0 20px; }
-          .about-why__grid { grid-template-columns: 1fr; }
           .about-process { padding: 80px 0 64px; }
           .about-process__inner { padding: 0 20px; }
           .about-pstep { min-width: 220px; }
