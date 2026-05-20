@@ -21,7 +21,9 @@ function stripHtml(html: string): string {
 async function getAboutData() {
   try {
     const { data } = await client.query<any>({
-      query: gql`${GET_ABOUT_PAGE}`,
+      query: gql`
+        ${GET_ABOUT_PAGE}
+      `,
     });
     return data?.page?.template?.aboutPage ?? {};
   } catch {
@@ -32,8 +34,11 @@ async function getAboutData() {
 export default async function AboutUsPage() {
   const ap = await getAboutData();
 
-  const faqItems: { faqQuestion: string; faqAnswer: string }[] = ap.faqItems ?? [];
-  const clientLogos: { sourceUrl: string; name: string }[] = (ap.clientLogos ?? [])
+  const faqItems: { faqQuestion: string; faqAnswer: string }[] =
+    ap.faqItems ?? [];
+  const clientLogos: { sourceUrl: string; name: string }[] = (
+    ap.clientLogos ?? []
+  )
     .map((l: any) => ({
       sourceUrl: l.logoImage?.node?.sourceUrl ?? "",
       name: l.logoName ?? "",
@@ -57,27 +62,48 @@ export default async function AboutUsPage() {
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
-
       {/* Grain overlay */}
       <div aria-hidden="true" className="about-grain" />
 
       {/* ══ HERO ══ */}
       <section className="about-hero">
-        <div className="about-hero__orb about-hero__orb--gold" aria-hidden="true" />
-        <div className="about-hero__orb about-hero__orb--amber" aria-hidden="true" />
+        <div
+          className="about-hero__orb about-hero__orb--gold"
+          aria-hidden="true"
+        />
+        <div
+          className="about-hero__orb about-hero__orb--amber"
+          aria-hidden="true"
+        />
         <div className="about-hero__grid" aria-hidden="true" />
 
         {/* Corner frame brackets */}
-        <div className="about-hero__corner about-hero__corner--tl" aria-hidden="true" />
-        <div className="about-hero__corner about-hero__corner--tr" aria-hidden="true" />
-        <div className="about-hero__corner about-hero__corner--bl" aria-hidden="true" />
-        <div className="about-hero__corner about-hero__corner--br" aria-hidden="true" />
+        <div
+          className="about-hero__corner about-hero__corner--tl"
+          aria-hidden="true"
+        />
+        <div
+          className="about-hero__corner about-hero__corner--tr"
+          aria-hidden="true"
+        />
+        <div
+          className="about-hero__corner about-hero__corner--bl"
+          aria-hidden="true"
+        />
+        <div
+          className="about-hero__corner about-hero__corner--br"
+          aria-hidden="true"
+        />
 
         {/* Ghost number */}
-        <div className="about-hero__ghost" aria-hidden="true">01</div>
+        <div className="about-hero__ghost" aria-hidden="true">
+          01
+        </div>
 
         {/* Editorial section index */}
-        <div className="about-hero__index" aria-hidden="true">— ABOUT —</div>
+        <div className="about-hero__index" aria-hidden="true">
+          — ABOUT —
+        </div>
 
         {ap.headerBgOverlayLayer?.node?.sourceUrl && (
           <div className="about-hero__layer" aria-hidden="true">
@@ -123,18 +149,31 @@ export default async function AboutUsPage() {
               {ap.moreText && (
                 <FadeIn yOffset={14} delay={0.46}>
                   {/* WP-sourced HTML — trusted backend only */}
-                  <div
+                  <p className="about-hero__more">{ap.moreText}</p>
+                  {/* <div
                     className="about-hero__more"
                     dangerouslySetInnerHTML={{ __html: ap.moreText }}
-                  />
+                  /> */}
                 </FadeIn>
               )}
               {ap.buttonText && (
                 <FadeIn yOffset={20} delay={0.56}>
                   <Link href="/contact-us" className="about-hero__cta">
                     {ap.buttonText}
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                      <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </Link>
                 </FadeIn>
@@ -153,7 +192,12 @@ export default async function AboutUsPage() {
         {heroStripWords.length > 0 && (
           <div className="about-hero__strip" aria-hidden="true">
             <div className="about-hero__strip-track">
-              {[...heroStripWords, ...heroStripWords, ...heroStripWords, ...heroStripWords].map((w, i) => (
+              {[
+                ...heroStripWords,
+                ...heroStripWords,
+                ...heroStripWords,
+                ...heroStripWords,
+              ].map((w, i) => (
                 <span key={i} className="about-hero__strip-item">
                   {w}
                   <span className="about-hero__strip-dot">✦</span>
@@ -172,18 +216,30 @@ export default async function AboutUsPage() {
           <FadeIn yOffset={40} duration={0.9}>
             <div className="about-showcase__stage">
               <div className="about-showcase__card about-showcase__card--left">
-                <img src={showcaseImages[1] ?? showcaseImages[0]} alt="" className="about-showcase__img" />
+                <img
+                  src={showcaseImages[1] ?? showcaseImages[0]}
+                  alt=""
+                  className="about-showcase__img"
+                />
                 <div className="about-showcase__shine" aria-hidden="true" />
               </div>
 
               <div className="about-showcase__card about-showcase__card--main">
-                <img src={showcaseImages[0]} alt="" className="about-showcase__img" />
+                <img
+                  src={showcaseImages[0]}
+                  alt=""
+                  className="about-showcase__img"
+                />
                 <div className="about-showcase__shine" aria-hidden="true" />
                 <span className="about-showcase__tag">— Inside Triolla —</span>
               </div>
 
               <div className="about-showcase__card about-showcase__card--right">
-                <img src={showcaseImages[2] ?? showcaseImages[0]} alt="" className="about-showcase__img" />
+                <img
+                  src={showcaseImages[2] ?? showcaseImages[0]}
+                  alt=""
+                  className="about-showcase__img"
+                />
                 <div className="about-showcase__shine" aria-hidden="true" />
               </div>
 
@@ -248,9 +304,17 @@ export default async function AboutUsPage() {
                 <FadeIn key={idx} delay={idx * 0.12} yOffset={20}>
                   <div className="about-partner">
                     <div className="about-partner__head">
-                      {item.imageText && <span className="about-partner__label">{item.imageText}</span>}
+                      {item.imageText && (
+                        <span className="about-partner__label">
+                          {item.imageText}
+                        </span>
+                      )}
                       {item.topimages?.node?.sourceUrl && (
-                        <img src={item.topimages.node.sourceUrl} alt="" className="about-partner__logo" />
+                        <img
+                          src={item.topimages.node.sourceUrl}
+                          alt=""
+                          className="about-partner__logo"
+                        />
                       )}
                     </div>
                     {item.topabtext && (
@@ -269,8 +333,15 @@ export default async function AboutUsPage() {
 
         {/* Wave: dark → cream */}
         <div className="about-wave-down" aria-hidden="true">
-          <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z" fill="#f0eeea" />
+          <svg
+            viewBox="0 0 1440 90"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z"
+              fill="#f0eeea"
+            />
           </svg>
         </div>
       </section>
@@ -286,7 +357,9 @@ export default async function AboutUsPage() {
               <span className="about-eyebrow__line about-eyebrow__line--dark" />
             </div>
             {ap.servtitle && (
-              <h2 className="about-section-title about-section-title--dark">{ap.servtitle}</h2>
+              <h2 className="about-section-title about-section-title--dark">
+                {ap.servtitle}
+              </h2>
             )}
             {ap.servtext && (
               /* WP-sourced HTML — trusted backend only */
@@ -302,25 +375,35 @@ export default async function AboutUsPage() {
               <FadeIn key={i} delay={i * 0.08} yOffset={20}>
                 <div className="about-srow">
                   <div className="about-srow__left">
-                    <div className="about-srow__num">{(i + 1).toString().padStart(2, "0")}</div>
+                    <div className="about-srow__num">
+                      {(i + 1).toString().padStart(2, "0")}
+                    </div>
                     <h3 className="about-srow__cat">{serv.servlleftText}</h3>
                   </div>
                   <div className="about-srow__right">
                     <p className="about-srow__items">
-                      {(serv.servrightList ?? []).map((item: any, j: number) => (
-                        <span key={j}>
-                          <Link
-                            href={item.itemLink || "#"}
-                            target={item.linkTarget || "_self"}
-                            className="about-sitem"
-                          >
-                            {item.listItem}
-                          </Link>
-                          {j < (serv.servrightList?.length ?? 0) - 1 && (
-                            <span className="about-sitem__sep" aria-hidden="true"> | </span>
-                          )}
-                        </span>
-                      ))}
+                      {(serv.servrightList ?? []).map(
+                        (item: any, j: number) => (
+                          <span key={j}>
+                            <Link
+                              href={item.itemLink || "#"}
+                              target={item.linkTarget || "_self"}
+                              className="about-sitem"
+                            >
+                              {item.listItem}
+                            </Link>
+                            {j < (serv.servrightList?.length ?? 0) - 1 && (
+                              <span
+                                className="about-sitem__sep"
+                                aria-hidden="true"
+                              >
+                                {" "}
+                                |{" "}
+                              </span>
+                            )}
+                          </span>
+                        ),
+                      )}
                     </p>
                   </div>
                 </div>
@@ -331,8 +414,15 @@ export default async function AboutUsPage() {
 
         {/* Wave: cream → dark */}
         <div className="about-wave-down" aria-hidden="true">
-          <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z" fill="#080808" />
+          <svg
+            viewBox="0 0 1440 90"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z"
+              fill="#080808"
+            />
           </svg>
         </div>
       </section>
@@ -374,18 +464,32 @@ export default async function AboutUsPage() {
           <div className="about-process__hint md:hidden" aria-hidden="true">
             <span>Swipe</span>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M2 7H12M8.5 3.5L12 7L8.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M2 7H12M8.5 3.5L12 7L8.5 10.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
 
           <SectionReveal className="about-process__track">
             {(ap.designType ?? []).map((item: any, i: number) => (
-              <div key={i} className="about-pstep" style={{ "--pi": i } as React.CSSProperties}>
-                <div className="about-pstep__ghost" aria-hidden="true">{(i + 1).toString().padStart(2, "0")}</div>
+              <div
+                key={i}
+                className="about-pstep"
+                style={{ "--pi": i } as React.CSSProperties}
+              >
+                <div className="about-pstep__ghost" aria-hidden="true">
+                  {(i + 1).toString().padStart(2, "0")}
+                </div>
                 <div className="about-pstep__dot" />
                 <div className="about-pstep__line" aria-hidden="true" />
                 <div className="about-pstep__body">
-                  <span className="about-pstep__num">{(i + 1).toString().padStart(2, "0")}</span>
+                  <span className="about-pstep__num">
+                    {(i + 1).toString().padStart(2, "0")}
+                  </span>
                   {/* WP-sourced HTML — trusted backend only */}
                   <h4
                     className="about-pstep__name"
@@ -421,7 +525,9 @@ export default async function AboutUsPage() {
               )}
             </FadeIn>
             <AboutImageCarousel
-              images={(ap.learnslider ?? []).map((s: any) => s.learnimage?.node?.sourceUrl ?? null)}
+              images={(ap.learnslider ?? []).map(
+                (s: any) => s.learnimage?.node?.sourceUrl ?? null,
+              )}
             />
           </div>
         </section>
@@ -434,12 +540,22 @@ export default async function AboutUsPage() {
             <h2 className="about-clients__title">Our Clients</h2>
           </FadeIn>
           <div className="about-marquee">
-            <div className="about-marquee__fade about-marquee__fade--l" aria-hidden="true" />
-            <div className="about-marquee__fade about-marquee__fade--r" aria-hidden="true" />
+            <div
+              className="about-marquee__fade about-marquee__fade--l"
+              aria-hidden="true"
+            />
+            <div
+              className="about-marquee__fade about-marquee__fade--r"
+              aria-hidden="true"
+            />
             <div className="about-marquee__track">
               {[...clientLogos, ...clientLogos].map((logo, i) => (
                 <div key={i} className="about-logo-card">
-                  <img src={logo.sourceUrl} alt={logo.name || "Client logo"} className="about-logo-card__img" />
+                  <img
+                    src={logo.sourceUrl}
+                    alt={logo.name || "Client logo"}
+                    className="about-logo-card__img"
+                  />
                 </div>
               ))}
             </div>

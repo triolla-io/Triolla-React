@@ -301,3 +301,85 @@ export const GET_ABOUT_PAGE = `
     }
   }
 `;
+
+export const GET_TECHNOLOGY_PAGE = `
+  query GetTechnologyPage {
+    page(id: "technology", idType: URI) {
+      template {
+        ... on Template_TechnologyPage {
+          technologyPage {
+            headerTitle
+            headerSubText
+            buttonText
+            headerBgColor
+            headerBgOverlayLayer { node { sourceUrl } }
+
+            companyList {
+              companyName
+            }
+
+            midImageRightTitle
+            midImageOne { node { sourceUrl } }
+            midImageTwo { node { sourceUrl } }
+            midImageTwoTitle
+            midImageThree { node { sourceUrl } }
+            midImageThreeTitle
+            midImageFour { node { sourceUrl } }
+            midImageFourTitle
+            midImageFive { node { sourceUrl } }
+            midImageFiveTitle
+            midImageSix { node { sourceUrl } }
+            midImageSixTitle
+            midImageSeven { node { sourceUrl } }
+            midImageSevenTitle
+            midImageEight { node { sourceUrl } }
+            midImageEightTitle
+
+            fourmidTitle
+            fourtitleone
+            fourtitletwo
+            fourtext
+
+            threeConent {
+              lftimage { node { sourceUrl } }
+              threincontent {
+                threintitle
+                threincontent
+                tagList
+              }
+            }
+            threbottomText
+            threbottomLinkText
+            threbottomButtonLink
+
+            fourtitleone
+            fourtitletwo
+            fourtext
+            fourmidTitle
+
+            fivetitle
+            fivetext
+            fivebottomTextOne
+            fivebottomTextTwo
+            fivebottomTextThree
+            fivebottomTextFour
+            fivebottomTextFive
+            fivebottomTextSix
+
+            numberList {
+              number
+              numtitle
+            }
+
+            qatitle
+            qatext
+            qaList {
+              question
+              answer
+            }
+          }
+        }
+      }
+    }
+  }
+`;
