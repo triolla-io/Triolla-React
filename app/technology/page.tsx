@@ -165,7 +165,7 @@ export default async function TechnologyPage() {
   ].filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
-    <main className="overflow-hidden bg-[#080808] text-white">
+    <main className="overflow-x-clip bg-[#080808] text-white">
       <style>{`
         /* ─── Grain overlay ─────────────────────────────── */
         .tech-grain {
@@ -322,12 +322,38 @@ export default async function TechnologyPage() {
           100% { transform: translateX(-50%); }
         }
         .tech-marquee-track {
-          display: flex;
+          display: inline-flex;
+          align-items: center;
           white-space: nowrap;
-          animation: techMarquee 40s linear infinite;
+          animation: techMarquee 55s linear infinite;
           will-change: transform;
         }
         .tech-marquee-track:hover { animation-play-state: paused; }
+        .tech-marquee-item {
+          display: inline-flex;
+          align-items: center;
+          gap: clamp(22px, 2.8vw, 56px);
+          padding-right: clamp(22px, 2.8vw, 56px);
+          flex-shrink: 0;
+        }
+        .tech-marquee-name {
+          font-size: clamp(22px, 2.8vw, 44px);
+          font-weight: 900;
+          letter-spacing: -0.015em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.28);
+          transition: color 0.3s ease;
+          line-height: 1;
+        }
+        .tech-marquee-item:hover .tech-marquee-name {
+          color: rgba(255,255,255,0.95);
+        }
+        .tech-marquee-sep {
+          font-size: 16px;
+          display: inline-block;
+          transform: translateY(-0.1em);
+          letter-spacing: 0;
+        }
 
         /* ─── Tech grid ─────────────────────────────────── */
         @keyframes techCardFloat {
@@ -368,143 +394,267 @@ export default async function TechnologyPage() {
         }
         .tech-featured-card:hover img { transform: scale(1.03); }
 
-        /* ─── Steps ─────────────────────────────────────── */
+        /* ─── Steps section ─────────────────────────── */
+        .tech-steps {
+          position: relative;
+          padding: 96px 0 88px;
+          border-top: 1px solid rgba(255,255,255,0.07);
+          overflow: hidden;
+        }
+        .tech-steps__orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(110px);
+          pointer-events: none;
+        }
+        .tech-steps__orb--l {
+          top: 35%; left: -8%;
+          width: 460px; height: 460px;
+          background: radial-gradient(circle, ${accentColor}10 0%, transparent 65%);
+        }
+        .tech-steps__orb--r {
+          bottom: 6%; right: -6%;
+          width: 380px; height: 380px;
+          background: radial-gradient(circle, ${accentColor}0a 0%, transparent 65%);
+        }
+        .tech-steps__head {
+          position: relative; z-index: 2;
+          text-align: center;
+          max-width: 760px;
+          margin: 0 auto;
+          padding: 0 24px;
+          margin-bottom: clamp(40px, 5vw, 64px);
+        }
+        .tech-steps__eyebrow {
+          display: inline-flex; align-items: center; gap: 16px;
+          margin-bottom: 22px;
+        }
+        .tech-steps__eyebrow-line {
+          display: block; width: 56px; height: 1px;
+          background: linear-gradient(to right, transparent, ${accentColor});
+          opacity: 0.7;
+        }
+        .tech-steps__eyebrow-line--rev {
+          background: linear-gradient(to left, transparent, ${accentColor});
+        }
+        .tech-steps__eyebrow-mark {
+          color: ${accentColor};
+          font-size: 14px;
+          line-height: 1;
+        }
+        .tech-steps__title {
+          font-size: clamp(2rem, 5vw, 4rem);
+          font-weight: 900;
+          letter-spacing: -0.028em;
+          line-height: 1.04;
+          margin-bottom: 18px;
+          color: #fff;
+        }
+        .tech-steps__sub {
+          color: rgba(255,255,255,0.5);
+          font-size: 17px;
+          line-height: 1.78;
+        }
+        .tech-steps__sub p { margin-bottom: 6px; }
+        .tech-steps__sub p:last-child { margin-bottom: 0; }
+        .tech-steps__hint {
+          align-items: center; gap: 8px;
+          color: ${accentColor}aa;
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 0.22em; text-transform: uppercase;
+          max-width: 1600px;
+          margin: 0 auto 12px;
+          padding: 0 32px;
+          animation: techSwipeHint 2s ease-in-out infinite;
+        }
+        @keyframes techSwipeHint {
+          0%,100% { opacity: 0.5; transform: translateX(0); }
+          50%      { opacity: 1; transform: translateX(6px); }
+        }
+        .tech-steps__track {
+          display: flex;
+          overflow-x: auto;
+          gap: 28px;
+          padding: 24px 32px 52px;
+          max-width: 1600px;
+          margin: 0 auto;
+          scrollbar-width: none; -ms-overflow-style: none;
+          scroll-snap-type: x mandatory;
+          position: relative; z-index: 2;
+        }
+        .tech-steps__track::-webkit-scrollbar { display: none; }
+
+        /* ─── Step card ─────────────────────────────── */
         .tech-step {
           position: relative;
-          padding-top: 32px;
+          flex-shrink: 0;
+          min-width: 280px;
+          scroll-snap-align: start;
+          padding-top: 56px;
+          padding-right: 16px;
         }
         .tech-step__bg-num {
           position: absolute;
-          top: -16px;
-          left: -16px;
-          font-size: 120px;
+          top: -22px;
+          left: -12px;
+          font-size: 140px;
           font-weight: 900;
-          color: rgba(255,255,255,0.025);
+          color: rgba(255,255,255,0.03);
           line-height: 1;
           pointer-events: none;
           user-select: none;
+          letter-spacing: -0.04em;
         }
         .tech-step__dot {
-          width: 14px;
-          height: 14px;
+          width: 14px; height: 14px;
           background: ${accentColor};
           border-radius: 50%;
-          box-shadow: 0 0 0 4px ${accentColor}26, 0 0 20px ${accentColor}4d;
+          box-shadow: 0 0 0 4px ${accentColor}26, 0 0 22px ${accentColor}55;
+          position: relative;
+          z-index: 2;
         }
         .tech-step__line {
           position: absolute;
-          top: 38px;
-          left: 14px;
-          height: 1px;
-          right: -32px;
-          background: linear-gradient(to right, ${accentColor}4d, rgba(255,255,255,0.05));
+          top: calc(56px + 7px); left: 7px;
+          height: 1px; right: -28px;
+          background: linear-gradient(to right, ${accentColor}55, rgba(255,255,255,0.05) 75%, transparent);
+          pointer-events: none;
         }
-        .tech-hide-scrollbar::-webkit-scrollbar { display: none; }
-        .tech-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .tech-step__body { margin-top: 22px; }
+        .tech-step__num {
+          display: block;
+          font-size: 11px; font-weight: 700;
+          color: ${accentColor};
+          letter-spacing: 0.22em;
+          margin-bottom: 10px;
+        }
+        .tech-step__name {
+          font-size: 1.15rem;
+          font-weight: 700;
+          color: #fff;
+          line-height: 1.4;
+          letter-spacing: -0.005em;
+        }
+        @media (max-width: 768px) {
+          .tech-steps { padding: 72px 0 64px; }
+          .tech-steps__track { padding: 20px 20px 44px; gap: 24px; }
+          .tech-step { min-width: 240px; }
+        }
 
         /* ─── Clients section ────────────────────────────── */
-        .tech-clients-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(100px);
-          pointer-events: none;
+        .tc-clients {
+          position: relative;
+          padding: 72px 0 88px;
+          overflow: hidden;
+          border-top: 1px solid rgba(255,255,255,0.07);
         }
-        .tech-clients-orb--left {
-          top: 50%; left: -10%;
-          transform: translateY(-50%);
-          width: 500px; height: 500px;
-          background: radial-gradient(circle, ${accentColor}12 0%, transparent 65%);
+        .tc-clients__orb {
+          position: absolute; border-radius: 50%;
+          filter: blur(110px); pointer-events: none;
         }
-        .tech-clients-orb--right {
-          top: 50%; right: -10%;
-          transform: translateY(-50%);
-          width: 400px; height: 400px;
-          background: radial-gradient(circle, ${accentColor}0d 0%, transparent 65%);
+        .tc-clients__orb--l {
+          top: 50%; left: -8%; transform: translateY(-50%);
+          width: 520px; height: 520px;
+          background: radial-gradient(circle, ${accentColor}10 0%, transparent 65%);
         }
-        .tech-clients-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 16px;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
+        .tc-clients__orb--r {
+          top: 50%; right: -8%; transform: translateY(-50%);
+          width: 420px; height: 420px;
+          background: radial-gradient(circle, ${accentColor}0c 0%, transparent 65%);
+        }
+        .tc-clients__head {
+          text-align: center;
+          margin-bottom: clamp(36px,4.5vw,64px);
+          position: relative; z-index: 10;
+          padding: 0 24px;
+        }
+        .tc-clients__eyebrow {
+          display: inline-flex; align-items: center; gap: 18px;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.32em; text-transform: uppercase;
           color: ${accentColor};
+          margin-bottom: 20px;
         }
-        .tech-clients-eyebrow__line {
-          display: block;
-          width: 40px;
-          height: 1px;
+        .tc-clients__eyebrow-line {
+          display: block; width: 48px; height: 1px;
           background: linear-gradient(to right, transparent, ${accentColor});
+          opacity: 0.7;
         }
-        .tech-clients-eyebrow__line:last-child {
+        .tc-clients__eyebrow-line--rev {
           background: linear-gradient(to left, transparent, ${accentColor});
         }
+        .tc-clients__title {
+          font-size: clamp(2rem, 6vw, 5.5rem);
+          font-weight: 900; letter-spacing: -0.03em;
+          line-height: 0.95; max-width: 800px;
+          margin: 0 auto; color: white;
+        }
+        .tc-clients__cta {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-weight: 700; font-size: 14px;
+          padding: 14px 32px; border-radius: 999px;
+          color: #000; letter-spacing: 0.04em;
+          transition: opacity 0.2s, transform 0.2s;
+        }
+        .tc-clients__cta:hover { opacity: 0.85; transform: translateY(-2px); }
 
         /* ─── Logo marquee ───────────────────────────────── */
-        .tech-marquee-wrapper {
-          position: relative;
-          overflow: hidden;
-          padding: 8px 0;
+        .tc-mq {
+          position: relative; overflow: hidden; padding: 10px 0;
         }
-        .tech-marquee-fade {
-          position: absolute;
-          top: 0; bottom: 0;
-          width: 200px;
-          z-index: 2;
-          pointer-events: none;
+        .tc-mq__fade {
+          position: absolute; top: 0; bottom: 0;
+          width: 220px; z-index: 2; pointer-events: none;
         }
-        .tech-marquee-fade--left {
+        .tc-mq__fade--l {
           left: 0;
           background: linear-gradient(to right, #080808 0%, transparent 100%);
         }
-        .tech-marquee-fade--right {
+        .tc-mq__fade--r {
           right: 0;
           background: linear-gradient(to left, #080808 0%, transparent 100%);
         }
-        .tech-logo-track {
-          display: flex;
-          gap: 16px;
-          animation: techLogoLeft 35s linear infinite;
+        .tc-mq__track {
+          display: flex; gap: 20px;
           width: max-content;
+          animation: tcMarqL 32s linear infinite;
+          will-change: transform;
         }
-        .tech-logo-track--reverse {
-          animation-name: techLogoRight;
-          animation-duration: 28s;
+        .tc-mq__track--rev {
+          animation-name: tcMarqR;
+          animation-duration: 26s;
         }
-        .tech-marquee-wrapper:hover .tech-logo-track { animation-play-state: paused; }
-        @keyframes techLogoLeft {
+        .tc-mq:hover .tc-mq__track { animation-play-state: paused; }
+        @keyframes tcMarqL {
           0%   { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
-        @keyframes techLogoRight {
+        @keyframes tcMarqR {
           0%   { transform: translateX(-50%); }
           100% { transform: translateX(0); }
         }
-        .tech-logo-card {
+        .tc-logo-card {
           flex-shrink: 0;
-          width: 160px; height: 100px;
-          border-radius: 20px;
-          border: 1px solid rgba(255,255,255,0.06);
-          background: rgba(255,255,255,0.02);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 10px;
-          transition: border-color 0.4s, background 0.4s, transform 0.4s;
+          width: 176px; height: 112px;
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,0.07);
+          background: rgba(255,255,255,0.025);
+          display: flex; align-items: center; justify-content: center;
+          padding: 14px;
+          transition: border-color 0.4s, background 0.4s, transform 0.4s, box-shadow 0.4s;
           overflow: hidden;
+          backdrop-filter: blur(2px);
         }
-        .tech-logo-card:hover {
-          border-color: ${accentColor}2e;
+        .tc-logo-card:hover {
+          border-color: ${accentColor}30;
           background: ${accentColor}08;
-          transform: translateY(-4px) scale(1.03);
+          transform: translateY(-5px) scale(1.04);
+          box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 24px ${accentColor}12;
         }
-        .tech-logo-card__img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          object-position: center;
-          border-radius: 12px;
+        .tc-logo-img {
+          width: 100%; height: 100%;
+          object-fit: contain; object-position: center;
+          border-radius: 10px;
         }
       `}</style>
 
@@ -514,7 +664,7 @@ export default async function TechnologyPage() {
       {/* ════════════════════════════════════════════
           HERO
       ════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex flex-col justify-end pb-20 pt-32 overflow-hidden">
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden pt-28 pb-32">
         {/* Background */}
         {tp.headerBgOverlayLayer?.node?.sourceUrl ? (
           <>
@@ -537,6 +687,60 @@ export default async function TechnologyPage() {
           aria-hidden="true"
         />
 
+        {/* Editorial frame — corner indices */}
+        <div className="absolute top-8 left-6 lg:left-12 z-10 hidden sm:flex items-center gap-4">
+          <span
+            className="text-[11px] font-black tabular-nums tracking-[0.36em]"
+            style={{ color: accentColor }}
+          >
+            01
+          </span>
+          <span
+            aria-hidden="true"
+            className="block h-px w-20"
+            style={{
+              background: `linear-gradient(to right, ${accentColor}66, transparent)`,
+            }}
+          />
+        </div>
+        <div className="absolute top-8 right-6 lg:right-12 z-10 hidden sm:flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="block h-px w-14 bg-white/25"
+          />
+          <span
+            className="block w-1.5 h-1.5 rounded-full"
+            style={{ background: accentColor }}
+          />
+        </div>
+        <div className="absolute bottom-8 left-6 lg:left-12 z-10 hidden sm:flex items-center gap-3">
+          <span className="relative inline-flex w-1.5 h-1.5">
+            <span
+              className="absolute inset-0 rounded-full"
+              style={{ background: accentColor }}
+            />
+            <span
+              className="absolute inset-0 rounded-full animate-ping"
+              style={{ background: accentColor }}
+            />
+          </span>
+          <span
+            aria-hidden="true"
+            className="block h-px w-16 bg-white/20"
+          />
+        </div>
+        <div className="absolute bottom-8 right-6 lg:right-12 z-10 hidden sm:flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="block h-px w-12 bg-white/20"
+          />
+          <span
+            aria-hidden="true"
+            className="block w-1.5 h-1.5 rotate-45 border-l border-t"
+            style={{ borderColor: `${accentColor}aa` }}
+          />
+        </div>
+
         {/* Content */}
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-10 w-full flex flex-col items-center text-center">
           {tp.headerSubText && (
@@ -555,14 +759,19 @@ export default async function TechnologyPage() {
           )}
 
           <FadeIn delay={0.12} yOffset={30}>
-            <h1 className="text-[clamp(68px,11vw,180px)] font-black tracking-[-0.03em] leading-[0.88] mb-12 tech-shimmer-heading mx-auto">
+            <h1 className="text-[clamp(60px,10.5vw,168px)] font-black tracking-[-0.035em] leading-[0.86] mb-10 tech-shimmer-heading mx-auto">
               {tp.headerTitle}
             </h1>
           </FadeIn>
 
           {tp.buttonText && (
             <FadeIn delay={0.22} yOffset={20}>
-              <div className="flex justify-center border-t border-white/10 pt-8 w-full max-w-md mx-auto">
+              <div className="flex items-center justify-center gap-5 border-t border-white/10 pt-7 w-full max-w-md mx-auto">
+                <span
+                  aria-hidden="true"
+                  className="hidden sm:block h-px w-10"
+                  style={{ background: `${accentColor}88` }}
+                />
                 <a
                   href="#contact"
                   className="tech-cta-pill"
@@ -585,6 +794,11 @@ export default async function TechnologyPage() {
                     />
                   </svg>
                 </a>
+                <span
+                  aria-hidden="true"
+                  className="hidden sm:block h-px w-10"
+                  style={{ background: `${accentColor}88` }}
+                />
               </div>
             </FadeIn>
           )}
@@ -601,18 +815,31 @@ export default async function TechnologyPage() {
           MARQUEE BANNER
       ════════════════════════════════════════════ */}
       {companies.length > 0 && (
-        <div className="overflow-hidden border-t border-b border-white/[0.07] py-5">
+        <div className="relative overflow-hidden border-t border-b border-white/[0.07] py-7">
+          <div
+            aria-hidden="true"
+            className="absolute inset-y-0 left-0 w-40 z-10 pointer-events-none"
+            style={{
+              background: "linear-gradient(to right, #080808, transparent)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-y-0 right-0 w-40 z-10 pointer-events-none"
+            style={{
+              background: "linear-gradient(to left, #080808, transparent)",
+            }}
+          />
           <div className="tech-marquee-track">
             {marqueeItems.map((c: any, i: number) => (
-              <span
-                key={i}
-                className="text-[15px] font-bold tracking-[0.08em] uppercase text-gray-600 mx-8 shrink-0 transition-colors duration-200 hover:text-yellow-400"
-                style={{ color: undefined }}
-              >
-                {c.companyName}
-                <span className="ml-8 text-yellow-500" aria-hidden="true">
-                  {" "}
-                  ·{" "}
+              <span key={i} className="tech-marquee-item">
+                <span className="tech-marquee-name">{c.companyName}</span>
+                <span
+                  className="tech-marquee-sep"
+                  style={{ color: accentColor }}
+                  aria-hidden="true"
+                >
+                  ✦
                 </span>
               </span>
             ))}
@@ -651,96 +878,61 @@ export default async function TechnologyPage() {
           OUR CLIENTS
       ════════════════════════════════════════════ */}
       {clientLogos.length > 0 && (
-        <section className="py-16 md:py-28 relative overflow-hidden border-t border-white/[0.07]">
-          <div
-            className="tech-clients-orb tech-clients-orb--left"
-            aria-hidden="true"
-          />
-          <div
-            className="tech-clients-orb tech-clients-orb--right"
-            aria-hidden="true"
-          />
+        <section className="tc-clients">
+          {/* Ambient orbs */}
+          <div className="tc-clients__orb tc-clients__orb--l" aria-hidden="true" />
+          <div className="tc-clients__orb tc-clients__orb--r" aria-hidden="true" />
 
-          <div className="text-center mb-12 md:mb-20 relative z-10 px-4">
+          {/* Heading */}
+          <div className="tc-clients__head">
             {ts?.ourClientsHeading && (
-              <div className="tech-clients-eyebrow justify-center mb-6">
-                <span className="tech-clients-eyebrow__line" />
+              <div className="tc-clients__eyebrow">
+                <span className="tc-clients__eyebrow-line" aria-hidden="true" />
                 {ts.ourClientsHeading}
-                <span className="tech-clients-eyebrow__line" />
+                <span className="tc-clients__eyebrow-line tc-clients__eyebrow-line--rev" aria-hidden="true" />
               </div>
             )}
             {ts?.ourClientBigText && (
-              <h3 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter max-w-3xl mx-auto leading-[0.95]">
-                {ts.ourClientBigText}
-              </h3>
+              <h3 className="tc-clients__title">{ts.ourClientBigText}</h3>
             )}
           </div>
 
-          <div className="tech-marquee-wrapper mb-4 relative z-10">
-            <div
-              className="tech-marquee-fade tech-marquee-fade--left"
-              aria-hidden="true"
-            />
-            <div
-              className="tech-marquee-fade tech-marquee-fade--right"
-              aria-hidden="true"
-            />
-            <div className="tech-logo-track">
-              {[...logoRow1, ...logoRow1].map((logo, i) => (
-                <div key={i} className="tech-logo-card">
-                  <img
-                    src={logo.url}
-                    alt={logo.alt || "Client logo"}
-                    className="tech-logo-card__img"
-                  />
+          {/* Row 1 — forward */}
+          <div className="tc-mq mb-5">
+            <div className="tc-mq__fade tc-mq__fade--l" aria-hidden="true" />
+            <div className="tc-mq__fade tc-mq__fade--r" aria-hidden="true" />
+            <div className="tc-mq__track">
+              {[...clientLogos, ...clientLogos].map((logo, i) => (
+                <div key={i} className="tc-logo-card">
+                  <img src={logo.url} alt={logo.alt || "Client logo"} className="tc-logo-img" />
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="tech-marquee-wrapper relative z-10">
-            <div
-              className="tech-marquee-fade tech-marquee-fade--left"
-              aria-hidden="true"
-            />
-            <div
-              className="tech-marquee-fade tech-marquee-fade--right"
-              aria-hidden="true"
-            />
-            <div className="tech-logo-track tech-logo-track--reverse">
-              {[...logoRow2, ...logoRow2].map((logo, i) => (
-                <div key={i} className="tech-logo-card">
-                  <img
-                    src={logo.url}
-                    alt={logo.alt || "Client logo"}
-                    className="tech-logo-card__img"
-                  />
+          {/* Row 2 — reverse */}
+          <div className="tc-mq">
+            <div className="tc-mq__fade tc-mq__fade--l" aria-hidden="true" />
+            <div className="tc-mq__fade tc-mq__fade--r" aria-hidden="true" />
+            <div className="tc-mq__track tc-mq__track--rev">
+              {[...clientLogos, ...clientLogos].map((logo, i) => (
+                <div key={i} className="tc-logo-card">
+                  <img src={logo.url} alt={logo.alt || "Client logo"} className="tc-logo-img" />
                 </div>
               ))}
             </div>
           </div>
 
           {ts?.cButton && (
-            <div className="text-center mt-16 relative z-10">
+            <div className="text-center mt-12 relative z-10">
               <Link
                 href="/contact-us"
-                className="inline-flex items-center gap-2 font-bold text-[15px] px-7 py-3.5 rounded-full transition-colors hover:opacity-80"
-                style={{ background: accentColor, color: "#000" }}
+                className="tc-clients__cta"
+                style={{ background: accentColor }}
               >
                 {ts.cButton}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M2 8H14M10.5 4L14 8L10.5 12"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M2 8H14M10.5 4L14 8L10.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </Link>
             </div>
@@ -752,38 +944,58 @@ export default async function TechnologyPage() {
           STEPS — ANIMATED NUMBER TICKER
       ════════════════════════════════════════════ */}
       {steps.length > 0 && (
-        <section className="py-24 max-w-[1600px] mx-auto overflow-hidden px-4 border-t border-white/[0.07]">
+        <section className="tech-steps">
+          <div className="tech-steps__orb tech-steps__orb--l" aria-hidden="true" />
+          <div className="tech-steps__orb tech-steps__orb--r" aria-hidden="true" />
+
           {(tp.fivetitle || tp.fivetext) && (
-            <div className="mb-16 px-10 max-w-3xl">
+            <FadeIn className="tech-steps__head">
+              <div className="tech-steps__eyebrow" aria-hidden="true">
+                <span className="tech-steps__eyebrow-line" />
+                <span className="tech-steps__eyebrow-mark">✦</span>
+                <span className="tech-steps__eyebrow-line tech-steps__eyebrow-line--rev" />
+              </div>
               {tp.fivetitle && (
-                <h2 className="text-[clamp(32px,4vw,56px)] font-black tracking-[-0.02em] leading-tight mb-6">
-                  {tp.fivetitle}
-                </h2>
+                <h2 className="tech-steps__title">{tp.fivetitle}</h2>
               )}
               {tp.fivetext && (
+                /* WP-sourced HTML — trusted backend only */
                 <div
-                  className="text-gray-400 text-lg leading-relaxed [&>p]:mb-4"
+                  className="tech-steps__sub"
                   dangerouslySetInnerHTML={{ __html: tp.fivetext }}
                 />
               )}
-            </div>
+            </FadeIn>
           )}
-          <SectionReveal className="flex overflow-x-auto pb-12 tech-hide-scrollbar gap-8 px-10 snap-x">
+
+          <div className="tech-steps__hint md:hidden" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M2 7H12M8.5 3.5L12 7L8.5 10.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          <SectionReveal className="tech-steps__track">
             {steps.map((step: any, i: number) => (
-              <div
-                key={i}
-                className="tech-step min-w-[260px] shrink-0 snap-center"
-              >
+              <div key={i} className="tech-step">
                 <div className="tech-step__bg-num" aria-hidden="true">
                   <CountUpNumber
                     target={parseInt(step.number ?? "0") || 0}
                     duration={1600}
                   />
                 </div>
-                <div className="relative z-10">
-                  <div className="tech-step__dot" />
-                  <div className="tech-step__line" />
-                  <h4 className="text-xl font-bold mt-8">
+                <div className="tech-step__dot" />
+                <div className="tech-step__line" aria-hidden="true" />
+                <div className="tech-step__body">
+                  <span className="tech-step__num">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h4 className="tech-step__name">
                     {htmlToLines(step.numtitle ?? "").map((line, li) => (
                       <span key={li} className="block">
                         {line}
@@ -810,7 +1022,7 @@ export default async function TechnologyPage() {
           BOTTOM PORTFOLIO GRID IMAGE
       ════════════════════════════════════════════ */}
       {bottomGridImage && (
-        <section className="py-8 md:py-16 max-w-[1600px] mx-auto px-6 lg:px-10">
+        <section className="py-6 md:py-12 max-w-[1600px] mx-auto px-6 lg:px-10">
           <FadeIn>
             <div
               className="relative rounded-[28px] overflow-hidden"
