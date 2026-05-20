@@ -57,7 +57,9 @@ async function getThemeSettings() {
 export default async function TechnologyPage() {
   const [tp, ts] = await Promise.all([getTechData(), getThemeSettings()]);
 
-  const accentColor: string = tp.headerBgColor ?? "#facc15";
+  /* Brand yellow — CMS headerBgColor resolved dark, making accent elements
+     (eyebrow lines, hover labels, CTA pill) invisible. Hardcode brand color. */
+  const accentColor: string = "#facc15";
 
   const companies: any[] = tp.companyList ?? [];
   const marqueeItems = [...companies, ...companies];
@@ -492,41 +494,185 @@ export default async function TechnologyPage() {
           scroll-snap-align: start;
           padding-top: 56px;
           padding-right: 16px;
+          animation: techStepFloat calc(6.5s + (var(--si, 0) * 0.45s)) ease-in-out infinite;
+          animation-delay: calc(var(--si, 0) * 0.35s);
+          transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
+        .tech-step:hover {
+          animation-play-state: paused;
+          transform: translateY(-10px);
+        }
+        @keyframes techStepFloat {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-8px); }
+        }
+
         .tech-step__bg-num {
           position: absolute;
           top: -22px;
           left: -12px;
-          font-size: 140px;
+          font-size: 148px;
           font-weight: 900;
-          color: rgba(255,255,255,0.03);
+          color: rgba(255,255,255,0.07);
           line-height: 1;
           pointer-events: none;
           user-select: none;
           letter-spacing: -0.04em;
+          transition: color 0.4s ease, transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+          animation: techBgNumBreathe 5.5s ease-in-out infinite;
+          animation-delay: calc(var(--si, 0) * 0.45s);
         }
+        @keyframes techBgNumBreathe {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50%      { opacity: 1;   transform: scale(1.04); }
+        }
+        .tech-step:hover .tech-step__bg-num {
+          color: ${accentColor}26;
+          transform: translateY(-4px) scale(1.06);
+          animation-play-state: paused;
+        }
+
+        /* Floating sparkles around the steps strip */
+        .tech-steps__sparkle {
+          position: absolute;
+          width: 4px; height: 4px;
+          border-radius: 50%;
+          background: ${accentColor};
+          box-shadow: 0 0 12px ${accentColor}, 0 0 24px ${accentColor}66;
+          opacity: 0;
+          pointer-events: none;
+          z-index: 1;
+          top: calc(12% + (var(--spi, 0) * 7.5%));
+          left: calc(5% + (var(--spi, 0) * 9.2%));
+          animation: techStepSparkle 5s ease-in-out infinite;
+          animation-delay: calc(var(--spi, 0) * 0.52s);
+        }
+        @keyframes techStepSparkle {
+          0%, 100% { opacity: 0;   transform: scale(0)   translateY(0); }
+          25%       { opacity: 0.9; transform: scale(1.5) translateY(-8px); }
+          55%       { opacity: 0.35; transform: scale(0.9) translateY(-18px); }
+          80%       { opacity: 0;   transform: scale(0)   translateY(-24px); }
+        }
+
+        /* Diagonal scan-line that traverses the section */
+        .tech-steps__scan {
+          position: absolute; inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 1;
+        }
+        .tech-steps__scan-beam {
+          position: absolute;
+          top: -20%; left: -30%;
+          width: 160%; height: 2px;
+          background: linear-gradient(
+            to right,
+            transparent 0%,
+            ${accentColor}66 40%,
+            ${accentColor} 50%,
+            ${accentColor}66 60%,
+            transparent 100%
+          );
+          filter: blur(2px);
+          transform: rotate(-8deg);
+          animation: techStepScan 9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+        }
+        @keyframes techStepScan {
+          0%   { transform: rotate(-8deg) translateY(0); opacity: 0; }
+          15%  { opacity: 0.7; }
+          85%  { opacity: 0.7; }
+          100% { transform: rotate(-8deg) translateY(640px); opacity: 0; }
+        }
+
+        /* Pulsing dot with expanding rings */
         .tech-step__dot {
+          position: relative;
+          z-index: 2;
+          display: inline-block;
           width: 14px; height: 14px;
           background: ${accentColor};
           border-radius: 50%;
-          box-shadow: 0 0 0 4px ${accentColor}26, 0 0 22px ${accentColor}55;
-          position: relative;
-          z-index: 2;
+          box-shadow:
+            0 0 0 4px ${accentColor}26,
+            0 0 22px ${accentColor}55,
+            inset 0 0 6px rgba(255,255,255,0.4);
+          transition: box-shadow 0.35s ease, transform 0.35s ease;
         }
-        .tech-step__line {
+        .tech-step:hover .tech-step__dot {
+          transform: scale(1.18);
+          box-shadow:
+            0 0 0 5px ${accentColor}40,
+            0 0 36px ${accentColor}aa,
+            inset 0 0 8px rgba(255,255,255,0.55);
+        }
+        .tech-step__dot-ring {
           position: absolute;
-          top: calc(56px + 7px); left: 7px;
-          height: 1px; right: -28px;
-          background: linear-gradient(to right, ${accentColor}55, rgba(255,255,255,0.05) 75%, transparent);
+          inset: 0;
+          border-radius: 50%;
+          border: 1.5px solid ${accentColor};
+          opacity: 0;
+          animation: techDotRing 2.6s cubic-bezier(0.32, 0, 0.18, 1) infinite;
+          animation-delay: calc(var(--si, 0) * 0.4s);
           pointer-events: none;
         }
-        .tech-step__body { margin-top: 22px; }
+        .tech-step__dot-ring--delay {
+          animation-delay: calc(var(--si, 0) * 0.4s + 1.3s);
+        }
+        @keyframes techDotRing {
+          0%   { transform: scale(1);   opacity: 0.85; }
+          70%  { opacity: 0.05; }
+          100% { transform: scale(4.2); opacity: 0; }
+        }
+
+        /* Connector line with traveling shimmer */
+        .tech-step__line {
+          position: absolute;
+          top: calc(56px + 7px); left: 14px;
+          height: 1px; right: -28px;
+          background: linear-gradient(
+            to right,
+            ${accentColor}66 0%,
+            ${accentColor}33 30%,
+            rgba(255,255,255,0.05) 75%,
+            transparent 100%
+          );
+          pointer-events: none;
+          overflow: visible;
+        }
+        .tech-step__line-shimmer {
+          position: absolute;
+          top: -2px; bottom: -2px;
+          left: 0;
+          width: 56px;
+          background: linear-gradient(
+            to right,
+            transparent 0%,
+            ${accentColor}ee 50%,
+            transparent 100%
+          );
+          filter: blur(2px);
+          opacity: 0;
+          animation: techLineShimmer 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+          animation-delay: calc(var(--si, 0) * 0.55s + 0.4s);
+        }
+        @keyframes techLineShimmer {
+          0%   { left: 0;                opacity: 0; }
+          8%   { opacity: 1; }
+          92%  { opacity: 1; }
+          100% { left: calc(100% - 56px); opacity: 0; }
+        }
+
+        .tech-step__body { margin-top: 22px; position: relative; z-index: 1; }
         .tech-step__num {
           display: block;
           font-size: 11px; font-weight: 700;
           color: ${accentColor};
           letter-spacing: 0.22em;
           margin-bottom: 10px;
+          transition: letter-spacing 0.35s ease, color 0.35s ease;
+        }
+        .tech-step:hover .tech-step__num {
+          letter-spacing: 0.32em;
         }
         .tech-step__name {
           font-size: 1.15rem;
@@ -534,7 +680,24 @@ export default async function TechnologyPage() {
           color: #fff;
           line-height: 1.4;
           letter-spacing: -0.005em;
+          transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
+        .tech-step:hover .tech-step__name {
+          transform: translateX(4px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .tech-step,
+          .tech-step__dot-ring,
+          .tech-step__line-shimmer,
+          .tech-step__bg-num,
+          .tech-steps__sparkle,
+          .tech-steps__scan-beam {
+            animation: none !important;
+          }
+          .tech-steps__sparkle { opacity: 0.4; }
+        }
+
         @media (max-width: 768px) {
           .tech-steps { padding: 72px 0 64px; }
           .tech-steps__track { padding: 20px 20px 44px; gap: 24px; }
@@ -704,10 +867,7 @@ export default async function TechnologyPage() {
           />
         </div>
         <div className="absolute top-8 right-6 lg:right-12 z-10 hidden sm:flex items-center gap-3">
-          <span
-            aria-hidden="true"
-            className="block h-px w-14 bg-white/25"
-          />
+          <span aria-hidden="true" className="block h-px w-14 bg-white/25" />
           <span
             className="block w-1.5 h-1.5 rounded-full"
             style={{ background: accentColor }}
@@ -724,16 +884,10 @@ export default async function TechnologyPage() {
               style={{ background: accentColor }}
             />
           </span>
-          <span
-            aria-hidden="true"
-            className="block h-px w-16 bg-white/20"
-          />
+          <span aria-hidden="true" className="block h-px w-16 bg-white/20" />
         </div>
         <div className="absolute bottom-8 right-6 lg:right-12 z-10 hidden sm:flex items-center gap-3">
-          <span
-            aria-hidden="true"
-            className="block h-px w-12 bg-white/20"
-          />
+          <span aria-hidden="true" className="block h-px w-12 bg-white/20" />
           <span
             aria-hidden="true"
             className="block w-1.5 h-1.5 rotate-45 border-l border-t"
@@ -880,8 +1034,14 @@ export default async function TechnologyPage() {
       {clientLogos.length > 0 && (
         <section className="tc-clients">
           {/* Ambient orbs */}
-          <div className="tc-clients__orb tc-clients__orb--l" aria-hidden="true" />
-          <div className="tc-clients__orb tc-clients__orb--r" aria-hidden="true" />
+          <div
+            className="tc-clients__orb tc-clients__orb--l"
+            aria-hidden="true"
+          />
+          <div
+            className="tc-clients__orb tc-clients__orb--r"
+            aria-hidden="true"
+          />
 
           {/* Heading */}
           <div className="tc-clients__head">
@@ -889,7 +1049,10 @@ export default async function TechnologyPage() {
               <div className="tc-clients__eyebrow">
                 <span className="tc-clients__eyebrow-line" aria-hidden="true" />
                 {ts.ourClientsHeading}
-                <span className="tc-clients__eyebrow-line tc-clients__eyebrow-line--rev" aria-hidden="true" />
+                <span
+                  className="tc-clients__eyebrow-line tc-clients__eyebrow-line--rev"
+                  aria-hidden="true"
+                />
               </div>
             )}
             {ts?.ourClientBigText && (
@@ -904,7 +1067,11 @@ export default async function TechnologyPage() {
             <div className="tc-mq__track">
               {[...clientLogos, ...clientLogos].map((logo, i) => (
                 <div key={i} className="tc-logo-card">
-                  <img src={logo.url} alt={logo.alt || "Client logo"} className="tc-logo-img" />
+                  <img
+                    src={logo.url}
+                    alt={logo.alt || "Client logo"}
+                    className="tc-logo-img"
+                  />
                 </div>
               ))}
             </div>
@@ -917,7 +1084,11 @@ export default async function TechnologyPage() {
             <div className="tc-mq__track tc-mq__track--rev">
               {[...clientLogos, ...clientLogos].map((logo, i) => (
                 <div key={i} className="tc-logo-card">
-                  <img src={logo.url} alt={logo.alt || "Client logo"} className="tc-logo-img" />
+                  <img
+                    src={logo.url}
+                    alt={logo.alt || "Client logo"}
+                    className="tc-logo-img"
+                  />
                 </div>
               ))}
             </div>
@@ -931,8 +1102,19 @@ export default async function TechnologyPage() {
                 style={{ background: accentColor }}
               >
                 {ts.cButton}
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M2 8H14M10.5 4L14 8L10.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 8H14M10.5 4L14 8L10.5 12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </Link>
             </div>
@@ -945,8 +1127,29 @@ export default async function TechnologyPage() {
       ════════════════════════════════════════════ */}
       {steps.length > 0 && (
         <section className="tech-steps">
-          <div className="tech-steps__orb tech-steps__orb--l" aria-hidden="true" />
-          <div className="tech-steps__orb tech-steps__orb--r" aria-hidden="true" />
+          <div
+            className="tech-steps__orb tech-steps__orb--l"
+            aria-hidden="true"
+          />
+          <div
+            className="tech-steps__orb tech-steps__orb--r"
+            aria-hidden="true"
+          />
+
+          {/* Floating sparkles — inspired by home Winners section */}
+          {[...Array(10)].map((_, i) => (
+            <span
+              key={`sp-${i}`}
+              className="tech-steps__sparkle"
+              style={{ "--spi": i } as React.CSSProperties}
+              aria-hidden="true"
+            />
+          ))}
+
+          {/* Diagonal scan-line that sweeps slowly across */}
+          <div className="tech-steps__scan" aria-hidden="true">
+            <span className="tech-steps__scan-beam" />
+          </div>
 
           {(tp.fivetitle || tp.fivetext) && (
             <FadeIn className="tech-steps__head">
@@ -982,15 +1185,26 @@ export default async function TechnologyPage() {
 
           <SectionReveal className="tech-steps__track">
             {steps.map((step: any, i: number) => (
-              <div key={i} className="tech-step">
+              <div
+                key={i}
+                className="tech-step"
+                style={{ "--si": i } as React.CSSProperties}
+              >
                 <div className="tech-step__bg-num" aria-hidden="true">
                   <CountUpNumber
                     target={parseInt(step.number ?? "0") || 0}
                     duration={1600}
                   />
                 </div>
-                <div className="tech-step__dot" />
-                <div className="tech-step__line" aria-hidden="true" />
+                <span className="tech-step__dot" aria-hidden="true">
+                  <span className="tech-step__dot-ring" />
+                  <span className="tech-step__dot-ring tech-step__dot-ring--delay" />
+                </span>
+                {i < steps.length - 1 && (
+                  <div className="tech-step__line" aria-hidden="true">
+                    <span className="tech-step__line-shimmer" />
+                  </div>
+                )}
                 <div className="tech-step__body">
                   <span className="tech-step__num">
                     {String(i + 1).padStart(2, "0")}
