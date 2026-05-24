@@ -9,6 +9,7 @@ import { FAQSection } from "@/components/FAQSection";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { TechStickyFeature } from "@/components/TechStickyFeature";
 import { TechStackSection } from "@/components/TechStackSection";
+import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -19,6 +20,16 @@ function stripHtml(html: string): string {
     .replace(/&nbsp;/g, " ")
     .replace(/&#8217;/g, "'")
     .trim();
+}
+
+function decodeHtml(html: string): string {
+  return (html ?? "")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#8217;/g, "'");
 }
 
 function htmlToLines(html: string): string[] {
@@ -961,7 +972,7 @@ export default async function TechnologyPage() {
         {/* Scroll cue */}
         <div className="tech-scroll-cue" aria-hidden="true">
           <div className="tech-scroll-cue__line" />
-          <span className="tech-scroll-cue__label">Scroll</span>
+          <span className="tech-scroll-cue__label">{"Scroll"}</span>
         </div>
       </section>
 
@@ -1056,7 +1067,9 @@ export default async function TechnologyPage() {
               </div>
             )}
             {ts?.ourClientBigText && (
-              <h3 className="tc-clients__title">{ts.ourClientBigText}</h3>
+              <h3 className="tc-clients__title">
+                {parse(decodeHtml(ts.ourClientBigText))}
+              </h3>
             )}
           </div>
 
@@ -1159,14 +1172,15 @@ export default async function TechnologyPage() {
                 <span className="tech-steps__eyebrow-line tech-steps__eyebrow-line--rev" />
               </div>
               {tp.fivetitle && (
-                <h2 className="tech-steps__title">{tp.fivetitle}</h2>
+                <div className="tech-steps__title">
+                  {parse(decodeHtml(tp.fivetitle))}
+                </div>
               )}
               {tp.fivetext && (
                 /* WP-sourced HTML — trusted backend only */
-                <div
-                  className="tech-steps__sub"
-                  dangerouslySetInnerHTML={{ __html: tp.fivetext }}
-                />
+                <div className="tech-steps__sub">
+                  {parse(decodeHtml(tp.fivetext))}
+                </div>
               )}
             </FadeIn>
           )}
@@ -1209,13 +1223,9 @@ export default async function TechnologyPage() {
                   <span className="tech-step__num">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h4 className="tech-step__name">
-                    {htmlToLines(step.numtitle ?? "").map((line, li) => (
-                      <span key={li} className="block">
-                        {line}
-                      </span>
-                    ))}
-                  </h4>
+                  <div className="tech-step__name">
+                    {parse(decodeHtml(step.numtitle ?? ""))}
+                  </div>
                 </div>
               </div>
             ))}

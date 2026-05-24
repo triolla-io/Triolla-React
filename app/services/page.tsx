@@ -6,6 +6,7 @@ import { SectionReveal } from "@/components/SectionReveal";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
 import { HeroHeadline } from "@/components/HeroHeadline";
+import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -159,7 +160,7 @@ export default async function ServicesPage() {
               {sp.moreText && (
                 <FadeIn yOffset={14} delay={0.46}>
                   {/* WP-sourced HTML — trusted backend only */}
-                  <div className="svc-hero__more" dangerouslySetInnerHTML={{ __html: sp.moreText }} />
+                  <div className="svc-hero__more">{parse(sp.moreText)}</div>
                 </FadeIn>
               )}
               {sp.buttonText && (
@@ -210,7 +211,7 @@ export default async function ServicesPage() {
               <h2 className="svc-section-title">{stripHtml(sp.prodtitle)}</h2>
             )}
             {/* WP-sourced HTML — trusted backend only */}
-            {sp.proddtxt && <div className="svc-section-sub" dangerouslySetInnerHTML={{ __html: sp.proddtxt }} />}
+            {sp.proddtxt && <div className="svc-section-sub">{parse(sp.proddtxt)}</div>}
           </FadeIn>
 
           <div className="svc-prod__body">
@@ -303,7 +304,7 @@ export default async function ServicesPage() {
               <h2 className="svc-section-title svc-section-title--dark">{stripHtml(sp.brandtitle)}</h2>
             )}
             {/* WP-sourced HTML — trusted backend only */}
-            {sp.brandtext && <div className="svc-section-sub svc-section-sub--dark" dangerouslySetInnerHTML={{ __html: sp.brandtext }} />}
+            {sp.brandtext && <div className="svc-section-sub svc-section-sub--dark">{parse(sp.brandtext)}</div>}
           </FadeIn>
 
           <div className="svc-brand__body">
@@ -360,7 +361,7 @@ export default async function ServicesPage() {
               <h2 className="svc-section-title">{stripHtml(sp.devtitle)}</h2>
             )}
             {/* WP-sourced HTML — trusted backend only */}
-            {sp.devtext && <div className="svc-section-sub" dangerouslySetInnerHTML={{ __html: sp.devtext }} />}
+            {sp.devtext && <div className="svc-section-sub">{parse(sp.devtext)}</div>}
           </FadeIn>
 
           <div className="svc-dev__body">

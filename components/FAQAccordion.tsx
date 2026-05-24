@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import parse from "html-react-parser";
+
 
 interface FAQItem {
   faqQuestion: string;
@@ -53,10 +55,9 @@ export function FAQAccordion({ items, className = "" }: FAQAccordionProps) {
                 style={{ overflow: "hidden" }}
               >
                 {/* Content is from trusted WP backend only — same pattern as moreText, toprightext, devtext throughout this codebase */}
-                <div
-                  className="text-gray-400 text-[18px] leading-relaxed pb-6"
-                  dangerouslySetInnerHTML={{ __html: item.faqAnswer }}
-                />
+                <div className="text-gray-400 text-[18px] leading-relaxed pb-6">
+                  {parse(item.faqAnswer)}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

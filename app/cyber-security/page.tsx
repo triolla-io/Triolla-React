@@ -5,6 +5,9 @@ import { FadeIn } from "@/components/FadeIn";
 import { SectionReveal } from "@/components/SectionReveal";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { CountUpNumber } from "@/components/CountUpNumber";
+import parse from "html-react-parser";
+
+
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -371,10 +374,9 @@ const accentColor: string = pf.headerBgColor ?? "#fed125";
         </FadeIn>
         <FadeIn delay={0.18}>
           {/* WP-sourced HTML — trusted backend only */}
-          <div
-            className="text-[16px] leading-[1.85] text-gray-400 max-w-3xl"
-            dangerouslySetInnerHTML={{ __html: pf.moreText ?? "" }}
-          />
+          <div className="text-[16px] leading-[1.85] text-gray-400 max-w-3xl">
+            {parse(pf.moreText ?? "")}
+          </div>
         </FadeIn>
       </section>
 
@@ -439,10 +441,9 @@ const accentColor: string = pf.headerBgColor ?? "#fed125";
                     {item.pTitle}
                   </h3>
                   {/* WP-sourced HTML — trusted backend only */}
-                  <div
-                    className="text-[15px] text-gray-400 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: item.sortText ?? "" }}
-                  />
+                  <div className="text-[15px] text-gray-400 leading-relaxed">
+                    {parse(item.sortText ?? "")}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {(item.pTags ?? []).map((tag: any, ti: number) => (
                       <span key={ti} className="cs-tag">{tag.tagName}</span>
@@ -527,10 +528,9 @@ const accentColor: string = pf.headerBgColor ?? "#fed125";
       <section className="py-28 max-w-[1400px] mx-auto px-6 lg:px-10 border-t border-white/[0.07]">
         <FadeIn className="mb-16">
           {/* WP-sourced HTML — trusted backend only */}
-          <h2
-            className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight"
-            dangerouslySetInnerHTML={{ __html: pf.whyDoHeading ?? "" }}
-          />
+          <h2 className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight">
+            {parse(pf.whyDoHeading ?? "")}
+          </h2>
         </FadeIn>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -543,7 +543,7 @@ const accentColor: string = pf.headerBgColor ?? "#fed125";
               <div className="cs-why-card__bar" />
               <h3 className="text-[21px] font-bold mb-3 tracking-tight leading-snug text-white relative z-10">
                 {/* WP-sourced HTML — trusted backend only */}
-                <span dangerouslySetInnerHTML={{ __html: item.whyTitle ?? "" }} />
+                <span>{parse(item.whyTitle ?? "")}</span>
               </h3>
               <p className="text-[15px] text-gray-400 leading-relaxed relative z-10">
                 {item.whyShortText}

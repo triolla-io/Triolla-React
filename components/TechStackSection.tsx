@@ -1,6 +1,17 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import parse from "html-react-parser";
+
+function decodeHtml(html: string): string {
+  return (html ?? "")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#8217;/g, "'");
+}
 
 interface TechImage {
   url: string | null;
@@ -105,11 +116,11 @@ export function TechStackSection({
             {(titleOne || titleTwo) && (
               <h2 className="tss-title">
                 {titleOne && (
-                  <span className="tss-title__line">{titleOne}</span>
+                  <span className="tss-title__line">{parse(decodeHtml(titleOne))}</span>
                 )}
                 {titleTwo && (
                   <span className="tss-title__line tss-title__line--accent">
-                    {titleTwo}
+                    {parse(decodeHtml(titleTwo))}
                   </span>
                 )}
               </h2>

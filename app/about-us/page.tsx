@@ -7,6 +7,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { AboutImageCarousel } from "@/components/AboutImageCarousel";
 import { WhyUsSection } from "@/components/WhyUsSection";
+import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -148,12 +149,7 @@ export default async function AboutUsPage() {
             <div className="about-hero__meta-r">
               {ap.moreText && (
                 <FadeIn yOffset={14} delay={0.46}>
-                  {/* WP-sourced HTML — trusted backend only */}
-                  <p className="about-hero__more">{ap.moreText}</p>
-                  {/* <div
-                    className="about-hero__more"
-                    dangerouslySetInnerHTML={{ __html: ap.moreText }}
-                  /> */}
+                  <p className="about-hero__more">{parse(ap.moreText)}</p>
                 </FadeIn>
               )}
               {ap.buttonText && (
@@ -290,10 +286,7 @@ export default async function AboutUsPage() {
               )}
               {ap.toprightext && (
                 /* WP-sourced HTML — trusted backend only */
-                <div
-                  className="about-section-sub"
-                  dangerouslySetInnerHTML={{ __html: ap.toprightext }}
-                />
+                <div className="about-section-sub">{parse(ap.toprightext)}</div>
               )}
             </div>
           </FadeIn>
@@ -319,10 +312,9 @@ export default async function AboutUsPage() {
                     </div>
                     {item.topabtext && (
                       /* WP-sourced HTML — trusted backend only */
-                      <div
-                        className="about-partner__body"
-                        dangerouslySetInnerHTML={{ __html: item.topabtext }}
-                      />
+                      <div className="about-partner__body">
+                        {parse(item.topabtext)}
+                      </div>
                     )}
                   </div>
                 </FadeIn>
@@ -363,10 +355,9 @@ export default async function AboutUsPage() {
             )}
             {ap.servtext && (
               /* WP-sourced HTML — trusted backend only */
-              <div
-                className="about-section-sub about-section-sub--dark"
-                dangerouslySetInnerHTML={{ __html: ap.servtext }}
-              />
+              <div className="about-section-sub about-section-sub--dark">
+                {parse(ap.servtext)}
+              </div>
             )}
           </FadeIn>
 
@@ -447,17 +438,13 @@ export default async function AboutUsPage() {
             </div>
             {ap.uDesignHeading && (
               /* WP-sourced HTML — trusted backend only */
-              <h2
-                className="about-section-title"
-                dangerouslySetInnerHTML={{ __html: ap.uDesignHeading }}
-              />
+              <h2 className="about-section-title">
+                {parse(ap.uDesignHeading)}
+              </h2>
             )}
             {ap.uSortText && (
               /* WP-sourced HTML — trusted backend only */
-              <div
-                className="about-section-sub"
-                dangerouslySetInnerHTML={{ __html: ap.uSortText }}
-              />
+              <div className="about-section-sub">{parse(ap.uSortText)}</div>
             )}
           </FadeIn>
 
@@ -491,10 +478,7 @@ export default async function AboutUsPage() {
                     {(i + 1).toString().padStart(2, "0")}
                   </span>
                   {/* WP-sourced HTML — trusted backend only */}
-                  <h4
-                    className="about-pstep__name"
-                    dangerouslySetInnerHTML={{ __html: item.dName }}
-                  />
+                  <h4 className="about-pstep__name">{parse(item.dName)}</h4>
                 </div>
               </div>
             ))}
@@ -518,10 +502,7 @@ export default async function AboutUsPage() {
               )}
               {ap.learntext && (
                 /* WP-sourced HTML — trusted backend only */
-                <div
-                  className="about-section-sub"
-                  dangerouslySetInnerHTML={{ __html: ap.learntext }}
-                />
+                <div className="about-section-sub">{parse(ap.learntext)}</div>
               )}
             </FadeIn>
             <AboutImageCarousel

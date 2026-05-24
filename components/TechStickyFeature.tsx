@@ -1,6 +1,17 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import parse from "html-react-parser";
+
+function decodeHtml(html: string): string {
+  return (html ?? "")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#8217;/g, "'");
+}
 
 interface ContentItem {
   threintitle: string | null;
@@ -368,23 +379,23 @@ export function TechStickyFeature({
                         }}
                       >
                         {item.threintitle && (
-                          <h3
+                          <div
                             className="font-black tracking-[-0.03em] leading-[1.02] mb-6 text-white"
                             style={{ fontSize: "clamp(30px,4.3vw,60px)" }}
                           >
-                            {item.threintitle}
-                          </h3>
+                            {parse(decodeHtml(item.threintitle))}
+                          </div>
                         )}
                         {item.threincontent && (
-                          <p
+                          <div
                             className="leading-[1.85] mb-7"
                             style={{
                               fontSize: "18px",
                               color: "rgba(255,255,255,0.55)",
                             }}
                           >
-                            {item.threincontent}
-                          </p>
+                            {parse(decodeHtml(item.threincontent))}
+                          </div>
                         )}
                         {item.tagList && (
                           <div className="flex flex-wrap gap-2">

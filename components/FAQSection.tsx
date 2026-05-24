@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import parse from "html-react-parser";
+
 
 interface FAQItem {
   faqQuestion: string;
@@ -14,15 +16,6 @@ interface FAQSectionProps {
   items: FAQItem[];
 }
 
-/* Renders trusted WP HTML content via ref — same as dangerouslySetInnerHTML pattern
-   used in FAQAccordion.tsx; content originates solely from the WP backend. */
-function WPAnswer({ html, className }: { html: string; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (ref.current) ref.current.innerHTML = html;
-  }, [html]);
-  return <div ref={ref} className={className} />;
-}
 
 export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
   const [open, setOpen] = useState<number | null>(null);
@@ -85,7 +78,7 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
                           transition={{ duration: 0.38, ease: [0.23, 1, 0.32, 1] }}
                           style={{ overflow: "hidden" }}
                         >
-                          <WPAnswer html={item.faqAnswer} className="fq-item__ans" />
+                          <div className="fq-item__ans">{parse(item.faqAnswer)}</div>
                         </motion.div>
                       )}
                     </AnimatePresence>
