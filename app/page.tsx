@@ -8,6 +8,7 @@ import { FAQSection } from "@/components/FAQSection";
 import { GridImageSection } from "@/components/GridImageSection";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { WhyUsSection } from "@/components/WhyUsSection";
+import AnimatedSteps from "@/components/AnimatedSteps";
 import { client } from "@/lib/apollo-client";
 import { GET_HOME_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
@@ -36,33 +37,14 @@ function parseAward(wboxTitle: string): { rank: number; label: string } {
   return { rank, label };
 }
 
-// Splits WP heading HTML into plain/accented segments (uses split, not exec)
-function parseDesignHeading(html: string): { text: string; accent: boolean }[] {
-  const cleaned = html.replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ");
-  const segments = cleaned.split(/(<span[^>]*>[\s\S]*?<\/span>)/i);
-  return segments
-    .filter((s) => s.length > 0)
-    .map((seg) => {
-      const inner = seg.match(/^<span[^>]*>([\s\S]*?)<\/span>$/i);
-      return inner
-        ? { text: inner[1], accent: true }
-        : { text: seg, accent: false };
-    });
-}
-
-function htmlToLines(html: string): string[] {
-  return html
-    .split(/<br\s*\/?>/gi)
-    .map((s) => stripHtml(s).trim())
-    .filter(Boolean);
-}
-
 /* ── Data fetching ───────────────────────────────── */
 
 async function getHomeData() {
   try {
     const { data } = await client.query<any>({
-      query: gql`${GET_HOME_PAGE}`,
+      query: gql`
+        ${GET_HOME_PAGE}
+      `,
     });
     return data?.page?.template?.homePage ?? {};
   } catch {
@@ -73,7 +55,9 @@ async function getHomeData() {
 async function getThemeSettings() {
   try {
     const { data } = await client.query<any>({
-      query: gql`${GET_THEME_SETTINGS}`,
+      query: gql`
+        ${GET_THEME_SETTINGS}
+      `,
     });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
@@ -89,8 +73,9 @@ export default async function Home() {
   const heroHeadline = stripHtml(hp.topsectitle ?? "");
   const heroSubtext = stripHtml(hp.toptext ?? "");
 
-  const winTitle =
-    hp.winTitle ?? "Global winners in Product UX/UI Design 2025";
+  const winTitle = hp.winTitle ?? "";
+  const winSubtext = hp.winSubtitle ?? "";
+
   const awards = (hp.wboxes ?? []).map((b: any) => ({
     ...parseAward(b.wboxTitle ?? ""),
     imgUrl: b.winImg?.node?.sourceUrl ?? null,
@@ -110,12 +95,6 @@ export default async function Home() {
   const half = Math.ceil(clientLogos.length / 2);
   const logoRow1 = clientLogos.slice(0, half);
   const logoRow2 = clientLogos.slice(half);
-
-  const designSteps: any[] = hp.designType ?? [];
-  const designHeadingParts = parseDesignHeading(
-    hp.uDesignHeading ?? "Our unique Design Process"
-  );
-  const designSubtext = stripHtml(hp.uSortText ?? "");
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
@@ -153,7 +132,6 @@ export default async function Home() {
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
-
       {/* ── Grain noise overlay ── */}
       <div aria-hidden="true" className="grain-overlay" />
 
@@ -161,7 +139,6 @@ export default async function Home() {
           HERO
       ══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex flex-col items-center pt-24 md:pt-32 pb-14 md:pb-20 px-4 overflow-hidden">
-
         {/* Ambient orb cluster */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <div className="hero-orb hero-orb--gold" />
@@ -171,7 +148,6 @@ export default async function Home() {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center w-full">
-
           {/* Eyebrow */}
           <div className="eyebrow">
             <span className="eyebrow__dot" />
@@ -185,13 +161,12 @@ export default async function Home() {
             headlineClassName="text-[clamp(2.2rem,10vw,110px)] leading-[0.9] font-bold tracking-tighter mb-6 md:mb-8 max-w-[1200px] hero-headline"
             subtextClassName="text-base md:text-xl lg:text-2xl font-light text-gray-400 max-w-3xl mx-auto leading-relaxed"
           />
-
         </div>
 
         {/* Scroll cue */}
         <div className="scroll-cue" aria-hidden="true">
           <div className="scroll-cue__line" />
-          <span className="scroll-cue__label">Scroll</span>
+          <span className="scroll-cue__label">{`Scroll`}</span>
         </div>
       </section>
 
@@ -216,7 +191,10 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           AWARDS SECTION
       ══════════════════════════════════════════════ */}
-      <section id="winners-section" className="winners-section mb-16 md:mb-32 relative overflow-hidden">
+      <section
+        id="winners-section"
+        className="winners-section mb-16 md:mb-32 relative overflow-hidden"
+      >
         {/* Ambient light orbs */}
         <div className="winners-orb winners-orb--tl" aria-hidden="true" />
         <div className="winners-orb winners-orb--br" aria-hidden="true" />
@@ -224,38 +202,55 @@ export default async function Home() {
 
         {/* Floating sparkles */}
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="winners-sparkle" style={{ '--si': i } as React.CSSProperties} aria-hidden="true" />
+          <div
+            key={i}
+            className="winners-sparkle"
+            style={{ "--si": i } as React.CSSProperties}
+            aria-hidden="true"
+          />
         ))}
 
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <FadeIn className="text-center mb-20">
-            <p className="winners-eyebrow">Recognition &amp; Awards</p>
             <h3 className="winners-title">{winTitle}</h3>
-            <p className="winners-subtitle">Triolla has stood out among the industry&apos;s biggest players</p>
+            <p className="winners-subtitle">{winSubtext}</p>
           </FadeIn>
 
           <SectionReveal className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {awards.map((award: { rank: number; label: string; imgUrl: string | null }, i: number) => (
-              <div key={i} className="award-card group" style={{ '--ai': i } as React.CSSProperties}>
-                <div className="award-medal-wrap">
-                  {award.imgUrl ? (
-                    <img
-                      src={award.imgUrl}
-                      alt={award.label}
-                      className="award-medal-img"
-                    />
-                  ) : (
-                    <div className="award-medal-fallback">
-                      #<CountUpNumber target={award.rank} duration={900 + i * 200} />
-                    </div>
-                  )}
+            {awards.map(
+              (
+                award: { rank: number; label: string; imgUrl: string | null },
+                i: number,
+              ) => (
+                <div
+                  key={i}
+                  className="award-card group"
+                  style={{ "--ai": i } as React.CSSProperties}
+                >
+                  <div className="award-medal-wrap">
+                    {award.imgUrl ? (
+                      <img
+                        src={award.imgUrl}
+                        alt={award.label}
+                        className="award-medal-img"
+                      />
+                    ) : (
+                      <div className="award-medal-fallback">
+                        #
+                        <CountUpNumber
+                          target={award.rank}
+                          duration={900 + i * 200}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="award-label">
+                    <span className="award-label__rank">#{award.rank}</span>
+                    <span>{award.label}</span>
+                  </div>
                 </div>
-                <div className="award-label">
-                  <span className="award-label__rank">#{award.rank}</span>
-                  <span>{award.label}</span>
-                </div>
-              </div>
-            ))}
+              ),
+            )}
           </SectionReveal>
         </div>
       </section>
@@ -287,8 +282,14 @@ export default async function Home() {
 
           {/* Row 1 — scrolls left */}
           <div className="marquee-wrapper mb-4 relative z-10">
-            <div className="marquee-fade marquee-fade--left" aria-hidden="true" />
-            <div className="marquee-fade marquee-fade--right" aria-hidden="true" />
+            <div
+              className="marquee-fade marquee-fade--left"
+              aria-hidden="true"
+            />
+            <div
+              className="marquee-fade marquee-fade--right"
+              aria-hidden="true"
+            />
             <div className="marquee-track">
               {[...logoRow1, ...logoRow1].map((logo, i) => (
                 <div key={i} className="logo-card">
@@ -304,8 +305,14 @@ export default async function Home() {
 
           {/* Row 2 — scrolls right */}
           <div className="marquee-wrapper relative z-10">
-            <div className="marquee-fade marquee-fade--left" aria-hidden="true" />
-            <div className="marquee-fade marquee-fade--right" aria-hidden="true" />
+            <div
+              className="marquee-fade marquee-fade--left"
+              aria-hidden="true"
+            />
+            <div
+              className="marquee-fade marquee-fade--right"
+              aria-hidden="true"
+            />
             <div className="marquee-track marquee-track--reverse">
               {[...logoRow2, ...logoRow2].map((logo, i) => (
                 <div key={i} className="logo-card">
@@ -324,7 +331,13 @@ export default async function Home() {
             <div className="text-center mt-16 relative z-10">
               <Link href="/contact-us" className="btn-primary">
                 {ts.cButton}
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
                   <path
                     d="M2 8H14M10.5 4L14 8L10.5 12"
                     stroke="currentColor"
@@ -341,56 +354,14 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           DESIGN PROCESS TIMELINE
       ══════════════════════════════════════════════ */}
-      <section className="py-16 md:py-24 max-w-[1600px] mx-auto overflow-hidden px-4 md:px-4">
-        <div className="text-center mb-24">
-          <h3 className="text-[clamp(2rem,8vw,5rem)] md:text-7xl font-bold tracking-tighter">
-            {designHeadingParts.map((part, i) =>
-              part.accent ? (
-                <span key={i} className="text-yellow-400">
-                  {part.text}
-                </span>
-              ) : (
-                part.text
-              )
-            )}
-          </h3>
-          <p className="text-xl text-gray-400 mt-6 max-w-xl mx-auto">
-            {designSubtext}
-          </p>
-        </div>
-
-        {/* Mobile swipe hint */}
-        <div className="mobile-swipe-hint px-4 md:hidden">
-          <span>Swipe</span>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M2 7H12M8.5 3.5L12 7L8.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-
-        <SectionReveal className="flex overflow-x-auto pb-12 md:pb-16 hide-scrollbar gap-6 md:gap-8 px-4 md:px-10 snap-x">
-          {designSteps.map((item: any, i: number) => (
-            <div
-              key={i}
-              className="timeline-item min-w-[260px] shrink-0 snap-center"
-            >
-              <div className="timeline-item__bg-num" aria-hidden="true">
-                {(i + 1).toString().padStart(2, "0")}
-              </div>
-              <div className="relative z-10">
-                <div className="timeline-item__dot" />
-                <div className="timeline-item__line" />
-                <h4 className="text-xl font-bold mb-3 mt-8">
-                  {htmlToLines(item.dName ?? "").map((line, li) => (
-                    <span key={li} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </h4>
-              </div>
-            </div>
-          ))}
-        </SectionReveal>
-      </section>
+      <AnimatedSteps
+        steps={(hp.designType ?? []).map((item: any, i: number) => ({
+          number: String(i + 1),
+          numtitle: item.dName ?? "",
+        }))}
+        title={hp.uDesignHeading ?? null}
+        subtext={hp.uSortText ?? null}
+      />
 
       {/* ══════════════════════════════════════════════
           FAQ SECTION
@@ -414,10 +385,17 @@ export default async function Home() {
       ══════════════════════════════════════════════ */}
       <WannaChatSection
         contactItems={contactItems}
-        leftHeading={ts?.cLeftHeading
-          ? ts.cLeftHeading.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, "").trim()
-          : null}
-        formHeading={ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null}
+        leftHeading={
+          ts?.cLeftHeading
+            ? ts.cLeftHeading
+                .replace(/<br\s*\/?>/gi, "\n")
+                .replace(/<[^>]+>/g, "")
+                .trim()
+            : null
+        }
+        formHeading={
+          ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null
+        }
         submitLabel={ts?.cButton ?? null}
         callUsLabel={ts?.cCallUsLabel ?? null}
       />
@@ -946,37 +924,6 @@ export default async function Home() {
           border-radius: 12px;
         }
 
-        /* ─── Timeline ──────────────────────────── */
-        .timeline-item {
-          position: relative;
-          padding-top: 32px;
-        }
-        .timeline-item__bg-num {
-          position: absolute;
-          top: -16px;
-          left: -16px;
-          font-size: 120px;
-          font-weight: 900;
-          color: rgba(255,255,255,0.025);
-          line-height: 1;
-          pointer-events: none;
-          user-select: none;
-        }
-        .timeline-item__dot {
-          width: 14px; height: 14px;
-          background: #facc15;
-          border-radius: 50%;
-          box-shadow: 0 0 0 4px rgba(250,204,21,0.15), 0 0 20px rgba(250,204,21,0.3);
-        }
-        .timeline-item__line {
-          position: absolute;
-          top: 38px;
-          left: 14px;
-          height: 1px;
-          right: -32px;
-          background: linear-gradient(to right, rgba(250,204,21,0.3), rgba(255,255,255,0.05));
-        }
-
         /* ─── Scrollbar hide ────────────────────── */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -1038,40 +985,6 @@ export default async function Home() {
           .marquee-fade {
             width: 80px;
           }
-        }
-
-        /* ─── Timeline ─────────────────────────── */
-        @media (max-width: 768px) {
-          .timeline-item {
-            min-width: 200px;
-          }
-          .timeline-item__bg-num {
-            font-size: 76px;
-            top: -8px; left: -8px;
-          }
-        }
-
-        /* ─── Mobile swipe hint ────────────────── */
-        .mobile-swipe-hint {
-          display: none;
-        }
-        @media (max-width: 768px) {
-          .mobile-swipe-hint {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(250,204,21,0.55);
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            animation: swipeHintPulse 2s ease-in-out infinite;
-          }
-        }
-        @keyframes swipeHintPulse {
-          0%,100% { opacity: 0.5; transform: translateX(0); }
-          50%      { opacity: 1;   transform: translateX(6px); }
         }
 
         /* ─── Clients section ──────────────────── */
