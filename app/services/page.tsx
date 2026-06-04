@@ -1,5 +1,9 @@
 import { client } from "@/lib/apollo-client";
-import { GET_SERVICES_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
+import {
+  GET_SERVICES_PAGE,
+  GET_THEME_SETTINGS,
+  buildServiceDetailsQuery,
+} from "@/lib/queries";
 import { gql } from "@apollo/client";
 import Link from "next/link";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -7,6 +11,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
 import { HeroHeadline } from "@/components/HeroHeadline";
 import { ClientsSection } from "@/components/ClientsSection";
+import { ServiceModalMenu, type ServiceDetail } from "@/components/ServiceModalMenu";
 import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
@@ -41,8 +46,71 @@ async function getThemeSettings() {
   }
 }
 
+/** Turn a WP link ("https://triolla.io/services/x/" or "/services/x") into a
+ *  URI path ("services/x") suitable for `page(idType: URI)`. Returns null if
+ *  there's nothing usable. */
+function deriveUri(link: string): string | null {
+  if (!link) return null;
+  let path = link;
+  try {
+    path = new URL(link).pathname;
+  } catch {
+    // already a relative path
+  }
+  const trimmed = path.replace(/^\/+|\/+$/g, "");
+  return trimmed || null;
+}
+
+/** Prefetch all Product service detail pages in one batched request and merge
+ *  them onto the menu items by index. Any page that fails to resolve keeps
+ *  `hasDetail: false`, so the menu renders it as a plain link — never a modal
+ *  with fabricated content. The whole fetch is wrapped so a backend failure
+ *  degrades every item to a plain link rather than throwing the page. */
+async function getServiceDetails(
+  menu: Array<{ prodmtitle?: string | null; prodmlink?: string | null }>
+): Promise<ServiceDetail[]> {
+  const enriched: ServiceDetail[] = (menu ?? []).map((item) => ({
+    label: item?.prodmtitle ?? null,
+    link: item?.prodmlink ?? null,
+    title: null,
+    image: null,
+    altText: "",
+    boldText: null,
+    content: null,
+    hasDetail: false,
+  }));
+
+  const queryable = enriched
+    .map((e, index) => ({ e, index, uri: deriveUri(e.link ?? "") }))
+    .filter((q): q is { e: ServiceDetail; index: number; uri: string } => !!q.uri);
+
+  if (queryable.length === 0) return enriched;
+
+  try {
+    const { data } = await client.query<any>({
+      query: gql`${buildServiceDetailsQuery(queryable.map((q) => q.uri))}`,
+    });
+    queryable.forEach((q, i) => {
+      const page = data?.[`s${i}`];
+      if (!page) return; // unresolved → stays a plain link
+      const e = enriched[q.index];
+      e.title = page.title ?? null;
+      e.image = page.featuredImage?.node?.sourceUrl ?? null;
+      e.altText = page.featuredImage?.node?.altText ?? "";
+      e.boldText = page.template?.postFields?.topBoldText ?? null;
+      e.content = page.content ?? null;
+      e.hasDetail = true;
+    });
+  } catch {
+    return enriched; // backend failure → all plain links
+  }
+
+  return enriched;
+}
+
 export default async function ServicesPage() {
   const [sp, ts] = await Promise.all([getServicesData(), getThemeSettings()]);
+  const productServices = await getServiceDetails(sp.prodrightMenu ?? []);
 
   const prodImages = [
     sp.prodleftImageOne?.node?.sourceUrl,
@@ -258,22 +326,15 @@ export default async function ServicesPage() {
               )}
             </div>
 
-            {/* Right: sticky numbered menu */}
+            {/* Right: sticky numbered menu — each item opens a fullscreen
+                service-detail modal (falls back to a plain link if its detail
+                page didn't resolve). */}
             <div className="svc-prod__menu">
-              <ul className="svc-menu-list">
-                {(sp.prodrightMenu ?? []).map((item: any, i: number) => (
-                  <FadeIn key={i} delay={i * 0.09} yOffset={18}>
-                    <li className="svc-menu-item">
-                      <span className="svc-menu-item__num">{(i + 1).toString().padStart(2, "0")}</span>
-                      {item.prodmlink ? (
-                        <a href={item.prodmlink} className="svc-menu-item__title">{item.prodmtitle}</a>
-                      ) : (
-                        <span className="svc-menu-item__title">{item.prodmtitle}</span>
-                      )}
-                    </li>
-                  </FadeIn>
-                ))}
-              </ul>
+              <ServiceModalMenu
+                services={productServices}
+                ctaText={sp.buttonText ?? null}
+                ctaLink="/contact-us"
+              />
             </div>
           </div>
         </div>
@@ -659,7 +720,7 @@ export default async function ServicesPage() {
           transition: transform 0.7s cubic-bezier(.23,1,.32,1), box-shadow 0.7s;
         }
         .svc-img-card:hover { transform: translateY(-7px) scale(1.018); box-shadow: 0 32px 80px rgba(0,0,0,0.72), 0 0 0 1px rgba(250,204,21,0.1); }
-        .svc-img-card--featured { margin-bottom: 4px; }
+        .svc-img-card--featured { width: 58%; align-self: flex-start; margin-bottom: 4px; }
         .svc-img-card--offset { margin-top: 40px; }
         .svc-img-card--up { margin-top: -28px; }
         .svc-img-card__img { width: 100%; height: auto; object-fit: cover; display: block; transition: transform 0.75s cubic-bezier(.23,1,.32,1); }
@@ -804,6 +865,7 @@ export default async function ServicesPage() {
           .svc-prod__row { flex-direction: column; }
           .svc-prod__row > * { flex: 1 1 auto !important; }
           .svc-img-card--offset, .svc-img-card--up { margin-top: 0; }
+          .svc-img-card--featured { width: 100%; }
           .svc-dev__body { gap: 52px; }
         }
       `}</style>

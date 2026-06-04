@@ -69,6 +69,37 @@ export const GET_SERVICES_PAGE = `
   }
 `;
 
+/**
+ * Build a single batched query that fetches every service detail page in one
+ * round trip. Each URI gets its own aliased `page(idType: URI)` selection
+ * (s0, s1, …). We pull only the four clean fields the modal renders — the old
+ * site's form/grid/script chrome lives in `content` markup we re-typeset, not
+ * separate fields. Pages on the `page-servicedetail.php` template resolve as
+ * `Template_ServiceDetailPage` and expose ACF `topBoldText` via `postFields`.
+ *
+ * URIs must be the WP path only (e.g. "services/product-ux-ui-design"), no host.
+ */
+export function buildServiceDetailsQuery(uris: string[]): string {
+  const fields = `
+    title
+    featuredImage { node { sourceUrl altText } }
+    content
+    template {
+      ... on Template_ServiceDetailPage {
+        postFields { topBoldText }
+      }
+    }`;
+
+  const selections = uris
+    .map(
+      (uri, i) =>
+        `    s${i}: page(id: ${JSON.stringify(uri)}, idType: URI) {${fields}\n    }`
+    )
+    .join("\n");
+
+  return `query GetServiceDetails {\n${selections}\n}`;
+}
+
 export const GET_HOME_PAGE = `
   query GetHomePage {
     page(id: "/", idType: URI) {
