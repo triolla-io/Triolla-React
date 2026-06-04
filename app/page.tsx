@@ -9,6 +9,7 @@ import { GridImageSection } from "@/components/GridImageSection";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { WhyUsSection } from "@/components/WhyUsSection";
 import AnimatedSteps from "@/components/AnimatedSteps";
+import { ClientsSection } from "@/components/ClientsSection";
 import { client } from "@/lib/apollo-client";
 import { GET_HOME_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
@@ -91,10 +92,6 @@ export default async function Home() {
       alt: item.cLogo?.node?.altText ?? "",
     }))
     .filter((l: { url: string }) => l.url);
-
-  const half = Math.ceil(clientLogos.length / 2);
-  const logoRow1 = clientLogos.slice(0, half);
-  const logoRow2 = clientLogos.slice(half);
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
@@ -258,98 +255,12 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           CLIENTS SECTION
       ══════════════════════════════════════════════ */}
-      {clientLogos.length > 0 && (
-        <section className="clients-section py-16 md:py-28 mb-16 md:mb-32 relative overflow-hidden">
-          {/* Ambient atmosphere */}
-          <div className="clients-orb clients-orb--left" aria-hidden="true" />
-          <div className="clients-orb clients-orb--right" aria-hidden="true" />
-
-          {/* Heading */}
-          <div className="text-center mb-12 md:mb-20 relative z-10 px-4">
-            {ts?.ourClientsHeading && (
-              <div className="clients-eyebrow">
-                <span className="clients-eyebrow__line" />
-                {ts.ourClientsHeading}
-                <span className="clients-eyebrow__line" />
-              </div>
-            )}
-            {ts?.ourClientBigText && (
-              <h3 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mt-6 max-w-3xl mx-auto leading-[0.95]">
-                {ts.ourClientBigText}
-              </h3>
-            )}
-          </div>
-
-          {/* Row 1 — scrolls left */}
-          <div className="marquee-wrapper mb-4 relative z-10">
-            <div
-              className="marquee-fade marquee-fade--left"
-              aria-hidden="true"
-            />
-            <div
-              className="marquee-fade marquee-fade--right"
-              aria-hidden="true"
-            />
-            <div className="marquee-track">
-              {[...logoRow1, ...logoRow1].map((logo, i) => (
-                <div key={i} className="logo-card">
-                  <img
-                    src={logo.url}
-                    alt={logo.alt || "Client logo"}
-                    className="logo-card__img"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Row 2 — scrolls right */}
-          <div className="marquee-wrapper relative z-10">
-            <div
-              className="marquee-fade marquee-fade--left"
-              aria-hidden="true"
-            />
-            <div
-              className="marquee-fade marquee-fade--right"
-              aria-hidden="true"
-            />
-            <div className="marquee-track marquee-track--reverse">
-              {[...logoRow2, ...logoRow2].map((logo, i) => (
-                <div key={i} className="logo-card">
-                  <img
-                    src={logo.url}
-                    alt={logo.alt || "Client logo"}
-                    className="logo-card__img"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CTA */}
-          {ts?.cButton && (
-            <div className="text-center mt-16 relative z-10">
-              <Link href="/contact-us" className="btn-primary">
-                {ts.cButton}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M2 8H14M10.5 4L14 8L10.5 12"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </Link>
-            </div>
-          )}
-        </section>
-      )}
+      <ClientsSection
+        logos={clientLogos}
+        heading={ts?.ourClientsHeading ?? null}
+        bigText={ts?.ourClientBigText ?? null}
+        ctaText={ts?.cButton ?? null}
+      />
 
       {/* ══════════════════════════════════════════════
           DESIGN PROCESS TIMELINE
@@ -795,139 +706,6 @@ export default async function Home() {
           color: #111;
         }
 
-        /* ─── Clients section ───────────────────── */
-        .clients-section {
-          position: relative;
-        }
-        .clients-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(100px);
-          pointer-events: none;
-        }
-        .clients-orb--left {
-          top: 50%;
-          left: -10%;
-          transform: translateY(-50%);
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(250,204,21,0.07) 0%, transparent 65%);
-        }
-        .clients-orb--right {
-          top: 50%;
-          right: -10%;
-          transform: translateY(-50%);
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
-        }
-
-        /* Clients eyebrow */
-        .clients-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 16px;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-          color: #facc15;
-        }
-        .clients-eyebrow__line {
-          display: block;
-          width: 40px;
-          height: 1px;
-          background: linear-gradient(to right, transparent, #facc15);
-        }
-        .clients-eyebrow__line:last-child {
-          background: linear-gradient(to left, transparent, #facc15);
-        }
-
-        /* Clients italic gradient headline */
-        .clients-headline-em {
-          font-style: italic;
-          background: linear-gradient(90deg, #facc15 0%, #fb923c 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        /* ─── Logo marquee ───────────────────────── */
-        .marquee-wrapper {
-          position: relative;
-          overflow: hidden;
-          padding: 8px 0;
-        }
-        .marquee-fade {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          width: 200px;
-          z-index: 2;
-          pointer-events: none;
-        }
-        .marquee-fade--left {
-          left: 0;
-          background: linear-gradient(to right, #080808 0%, transparent 100%);
-        }
-        .marquee-fade--right {
-          right: 0;
-          background: linear-gradient(to left, #080808 0%, transparent 100%);
-        }
-        .marquee-track {
-          display: flex;
-          gap: 16px;
-          animation: marqueeLeft 35s linear infinite;
-          width: max-content;
-        }
-        .marquee-track--reverse {
-          animation-name: marqueeRight;
-          animation-duration: 28s;
-        }
-        .marquee-wrapper:hover .marquee-track {
-          animation-play-state: paused;
-        }
-        @keyframes marqueeLeft {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes marqueeRight {
-          0%   { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
-        }
-
-        /* Logo cards */
-        .logo-card {
-          flex-shrink: 0;
-          width: 160px;
-          height: 100px;
-          border-radius: 20px;
-          border: 1px solid rgba(255,255,255,0.06);
-          background: rgba(255,255,255,0.02);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 10px;
-          transition: border-color 0.4s, background 0.4s, transform 0.4s;
-          overflow: hidden;
-        }
-        .logo-card:hover {
-          border-color: rgba(250,204,21,0.18);
-          background: rgba(250,204,21,0.03);
-          transform: translateY(-4px) scale(1.03);
-        }
-        .logo-card__img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          object-position: center;
-          border-radius: 12px;
-        }
-
-        /* ─── Scrollbar hide ────────────────────── */
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
         /* ══════════════════════════════════════════
            MOBILE-ONLY STYLES (max-width: 768px)
         ══════════════════════════════════════════ */
@@ -967,31 +745,6 @@ export default async function Home() {
           }
           .award-label__rank {
             font-size: 1rem;
-          }
-        }
-
-        /* ─── Logo marquee ─────────────────────── */
-        @media (max-width: 768px) {
-          .logo-card {
-            width: 120px; height: 76px;
-            border-radius: 14px;
-          }
-          .marquee-track {
-            animation-duration: 25s;
-          }
-          .marquee-track--reverse {
-            animation-duration: 20s;
-          }
-          .marquee-fade {
-            width: 80px;
-          }
-        }
-
-        /* ─── Clients section ──────────────────── */
-        @media (max-width: 768px) {
-          .clients-section {
-            padding-top: 64px;
-            padding-bottom: 64px;
           }
         }
 

@@ -9,6 +9,7 @@ import { TechStickyFeature } from "@/components/TechStickyFeature";
 import { TechStackSection } from "@/components/TechStackSection";
 import AnimatedSteps from "@/components/AnimatedSteps";
 import parse from "html-react-parser";
+import { ClientsSection } from "@/components/ClientsSection";
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -29,13 +30,6 @@ function decodeHtml(html: string): string {
     .replace(/&quot;/gi, '"')
     .replace(/&#039;/g, "'")
     .replace(/&#8217;/g, "'");
-}
-
-function htmlToLines(html: string): string[] {
-  return (html ?? "")
-    .split(/<br\s*\/?>/gi)
-    .map((s) => stripHtml(s).trim())
-    .filter(Boolean);
 }
 
 async function getTechData() {
@@ -74,8 +68,6 @@ export default async function TechnologyPage() {
   const companies: any[] = tp.companyList ?? [];
   const marqueeItems = [...companies, ...companies];
 
-  const featuredImageUrl: string | null =
-    tp.midImageOne?.node?.sourceUrl ?? null;
   const gridImages = [
     {
       url: tp.midImageTwo?.node?.sourceUrl ?? null,
@@ -107,8 +99,6 @@ export default async function TechnologyPage() {
     },
   ].filter((item) => item.url);
 
-  const hasTechGrid = !!featuredImageUrl || gridImages.length > 0;
-
   const steps: any[] = tp.numberList ?? [];
 
   /* ── All 8 Tech Stack Images ── */
@@ -116,16 +106,6 @@ export default async function TechnologyPage() {
     { url: tp.midImageOne?.node?.sourceUrl ?? null, title: null },
     ...gridImages,
   ];
-
-  /* ── Tech-stack stepped bars ("five" section from WP) ── */
-  const techStackBars: string[] = [
-    tp.fivebottomTextOne,
-    tp.fivebottomTextTwo,
-    tp.fivebottomTextThree,
-    tp.fivebottomTextFour,
-    tp.fivebottomTextFive,
-    tp.fivebottomTextSix,
-  ].filter((v): v is string => !!v);
 
   /* ── Bottom portfolio grid image ── */
   const bottomGridImage: string | null =
@@ -144,10 +124,6 @@ export default async function TechnologyPage() {
       alt: item.cLogo?.node?.altText ?? "",
     }))
     .filter((l: { url: string }) => l.url);
-
-  const half = Math.ceil(clientLogos.length / 2);
-  const logoRow1 = clientLogos.slice(0, half);
-  const logoRow2 = clientLogos.slice(half);
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
@@ -405,122 +381,6 @@ export default async function TechnologyPage() {
           transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
         }
         .tech-featured-card:hover img { transform: scale(1.03); }
-
-        /* ─── Clients section ────────────────────────────── */
-        .tc-clients {
-          position: relative;
-          padding: 72px 0 88px;
-          overflow: hidden;
-          border-top: 1px solid rgba(255,255,255,0.07);
-        }
-        .tc-clients__orb {
-          position: absolute; border-radius: 50%;
-          filter: blur(110px); pointer-events: none;
-        }
-        .tc-clients__orb--l {
-          top: 50%; left: -8%; transform: translateY(-50%);
-          width: 520px; height: 520px;
-          background: radial-gradient(circle, ${accentColor}10 0%, transparent 65%);
-        }
-        .tc-clients__orb--r {
-          top: 50%; right: -8%; transform: translateY(-50%);
-          width: 420px; height: 420px;
-          background: radial-gradient(circle, ${accentColor}0c 0%, transparent 65%);
-        }
-        .tc-clients__head {
-          text-align: center;
-          margin-bottom: clamp(36px,4.5vw,64px);
-          position: relative; z-index: 10;
-          padding: 0 24px;
-        }
-        .tc-clients__eyebrow {
-          display: inline-flex; align-items: center; gap: 18px;
-          font-size: 11px; font-weight: 700;
-          letter-spacing: 0.32em; text-transform: uppercase;
-          color: ${accentColor};
-          margin-bottom: 20px;
-        }
-        .tc-clients__eyebrow-line {
-          display: block; width: 48px; height: 1px;
-          background: linear-gradient(to right, transparent, ${accentColor});
-          opacity: 0.7;
-        }
-        .tc-clients__eyebrow-line--rev {
-          background: linear-gradient(to left, transparent, ${accentColor});
-        }
-        .tc-clients__title {
-          font-size: clamp(2rem, 6vw, 5.5rem);
-          font-weight: 900; letter-spacing: -0.03em;
-          line-height: 0.95; max-width: 800px;
-          margin: 0 auto; color: white;
-        }
-        .tc-clients__cta {
-          display: inline-flex; align-items: center; gap: 8px;
-          font-weight: 700; font-size: 14px;
-          padding: 14px 32px; border-radius: 999px;
-          color: #000; letter-spacing: 0.04em;
-          transition: opacity 0.2s, transform 0.2s;
-        }
-        .tc-clients__cta:hover { opacity: 0.85; transform: translateY(-2px); }
-
-        /* ─── Logo marquee ───────────────────────────────── */
-        .tc-mq {
-          position: relative; overflow: hidden; padding: 10px 0;
-        }
-        .tc-mq__fade {
-          position: absolute; top: 0; bottom: 0;
-          width: 220px; z-index: 2; pointer-events: none;
-        }
-        .tc-mq__fade--l {
-          left: 0;
-          background: linear-gradient(to right, #080808 0%, transparent 100%);
-        }
-        .tc-mq__fade--r {
-          right: 0;
-          background: linear-gradient(to left, #080808 0%, transparent 100%);
-        }
-        .tc-mq__track {
-          display: flex; gap: 20px;
-          width: max-content;
-          animation: tcMarqL 32s linear infinite;
-          will-change: transform;
-        }
-        .tc-mq__track--rev {
-          animation-name: tcMarqR;
-          animation-duration: 26s;
-        }
-        .tc-mq:hover .tc-mq__track { animation-play-state: paused; }
-        @keyframes tcMarqL {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes tcMarqR {
-          0%   { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
-        }
-        .tc-logo-card {
-          flex-shrink: 0;
-          width: 176px; height: 112px;
-          border-radius: 24px;
-          border: 1px solid rgba(255,255,255,0.07);
-          background: rgba(255,255,255,0.025);
-          display: flex; align-items: center; justify-content: center;
-          padding: 14px;
-          transition: border-color 0.4s, background 0.4s, transform 0.4s, box-shadow 0.4s;
-          overflow: hidden;
-          backdrop-filter: blur(2px);
-        }
-        .tc-logo-card:hover {
-          border-color: ${accentColor}30;
-          background: ${accentColor}08;
-          transform: translateY(-5px) scale(1.04);
-          box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 24px ${accentColor}12;
-        }
-        .tc-logo-img {
-          width: 100%; height: 100%;
-          object-fit: contain; object-position: center;
-          border-radius: 10px;
-        }
       `}</style>
 
       {/* Grain overlay */}
@@ -733,98 +593,13 @@ export default async function TechnologyPage() {
       {/* ════════════════════════════════════════════
           OUR CLIENTS
       ════════════════════════════════════════════ */}
-      {clientLogos.length > 0 && (
-        <section className="tc-clients">
-          {/* Ambient orbs */}
-          <div
-            className="tc-clients__orb tc-clients__orb--l"
-            aria-hidden="true"
-          />
-          <div
-            className="tc-clients__orb tc-clients__orb--r"
-            aria-hidden="true"
-          />
-
-          {/* Heading */}
-          <div className="tc-clients__head">
-            {ts?.ourClientsHeading && (
-              <div className="tc-clients__eyebrow">
-                <span className="tc-clients__eyebrow-line" aria-hidden="true" />
-                {ts.ourClientsHeading}
-                <span
-                  className="tc-clients__eyebrow-line tc-clients__eyebrow-line--rev"
-                  aria-hidden="true"
-                />
-              </div>
-            )}
-            {ts?.ourClientBigText && (
-              <h3 className="tc-clients__title">
-                {parse(decodeHtml(ts.ourClientBigText))}
-              </h3>
-            )}
-          </div>
-
-          {/* Row 1 — forward */}
-          <div className="tc-mq mb-5">
-            <div className="tc-mq__fade tc-mq__fade--l" aria-hidden="true" />
-            <div className="tc-mq__fade tc-mq__fade--r" aria-hidden="true" />
-            <div className="tc-mq__track">
-              {[...clientLogos, ...clientLogos].map((logo, i) => (
-                <div key={i} className="tc-logo-card">
-                  <img
-                    src={logo.url}
-                    alt={logo.alt || "Client logo"}
-                    className="tc-logo-img"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Row 2 — reverse */}
-          <div className="tc-mq">
-            <div className="tc-mq__fade tc-mq__fade--l" aria-hidden="true" />
-            <div className="tc-mq__fade tc-mq__fade--r" aria-hidden="true" />
-            <div className="tc-mq__track tc-mq__track--rev">
-              {[...clientLogos, ...clientLogos].map((logo, i) => (
-                <div key={i} className="tc-logo-card">
-                  <img
-                    src={logo.url}
-                    alt={logo.alt || "Client logo"}
-                    className="tc-logo-img"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {ts?.cButton && (
-            <div className="text-center mt-12 relative z-10">
-              <Link
-                href="/contact-us"
-                className="tc-clients__cta"
-                style={{ background: accentColor }}
-              >
-                {ts.cButton}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M2 8H14M10.5 4L14 8L10.5 12"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </Link>
-            </div>
-          )}
-        </section>
-      )}
+      <ClientsSection
+        logos={clientLogos}
+        heading={ts?.ourClientsHeading ?? null}
+        bigText={ts?.ourClientBigText ?? null}
+        ctaText={ts?.cButton ?? null}
+        accentColor={accentColor}
+      />
 
       {/* ════════════════════════════════════════════
           STEPS — ANIMATED NUMBER TICKER

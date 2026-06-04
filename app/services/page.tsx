@@ -6,6 +6,7 @@ import { SectionReveal } from "@/components/SectionReveal";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
 import { HeroHeadline } from "@/components/HeroHeadline";
+import { ClientsSection } from "@/components/ClientsSection";
 import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
@@ -70,10 +71,6 @@ export default async function ServicesPage() {
       alt: item.cLogo?.node?.altText ?? "",
     }))
     .filter((l: { url: string }) => l.url);
-
-  const half = Math.ceil(clientLogos.length / 2);
-  const logoRow1 = clientLogos.slice(0, half);
-  const logoRow2 = clientLogos.slice(half);
 
   const faqItems = (ts?.questionAnswerList ?? [])
     .filter((q: any) => q?.fQuestion)
@@ -428,53 +425,12 @@ export default async function ServicesPage() {
       </section>
 
       {/* ══ CLIENTS ══ */}
-      {clientLogos.length > 0 && (
-        <section className="svc-clients">
-          <div className="svc-clients__orb-l" aria-hidden="true" />
-          <div className="svc-clients__orb-r" aria-hidden="true" />
-
-          <div className="svc-clients__head">
-            {ts?.ourClientsHeading && (
-              <FadeIn>
-                <div className="svc-eyebrow svc-eyebrow--gold svc-eyebrow--center">
-                  <span className="svc-eyebrow__line svc-eyebrow__line--gold" />
-                  {ts.ourClientsHeading}
-                  <span className="svc-eyebrow__line svc-eyebrow__line--gold" />
-                </div>
-              </FadeIn>
-            )}
-            {ts?.ourClientBigText && (
-              <FadeIn delay={0.1}>
-                <h3 className="svc-clients__title">{ts.ourClientBigText}</h3>
-              </FadeIn>
-            )}
-          </div>
-
-          <div className="svc-marquee svc-marquee--mb">
-            <div className="svc-marquee__fade svc-marquee__fade--l" aria-hidden="true" />
-            <div className="svc-marquee__fade svc-marquee__fade--r" aria-hidden="true" />
-            <div className="svc-marquee__track">
-              {[...logoRow1, ...logoRow1].map((logo, i) => (
-                <div key={i} className="svc-logo-card">
-                  <img src={logo.url} alt={logo.alt || "Client logo"} className="svc-logo-card__img" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="svc-marquee">
-            <div className="svc-marquee__fade svc-marquee__fade--l" aria-hidden="true" />
-            <div className="svc-marquee__fade svc-marquee__fade--r" aria-hidden="true" />
-            <div className="svc-marquee__track svc-marquee__track--rev">
-              {[...logoRow2, ...logoRow2].map((logo, i) => (
-                <div key={i} className="svc-logo-card">
-                  <img src={logo.url} alt={logo.alt || "Client logo"} className="svc-logo-card__img" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      <ClientsSection
+        logos={clientLogos}
+        heading={ts?.ourClientsHeading ?? null}
+        bigText={ts?.ourClientBigText ?? null}
+        ctaText={ts?.cButton ?? null}
+      />
 
       {/* ══ FAQ ══ */}
       {faqItems.length > 0 && (
@@ -830,41 +786,6 @@ export default async function ServicesPage() {
           filter: blur(44px); pointer-events: none; z-index: -1;
         }
 
-        /* ─── Clients ────────────────────────────── */
-        .svc-clients { position: relative; padding: 96px 0 80px; }
-        .svc-clients__orb-l {
-          position: absolute; top: 50%; left: -10%; transform: translateY(-50%);
-          width: 500px; height: 500px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(250,204,21,0.07) 0%, transparent 65%);
-          filter: blur(100px); pointer-events: none;
-        }
-        .svc-clients__orb-r {
-          position: absolute; top: 50%; right: -10%; transform: translateY(-50%);
-          width: 400px; height: 400px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
-          filter: blur(80px); pointer-events: none;
-        }
-        .svc-clients__head { text-align: center; margin-bottom: 52px; position: relative; z-index: 2; padding: 0 24px; }
-        .svc-clients__title { font-size: clamp(2rem,6vw,5rem); font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-top: 16px; }
-        .svc-marquee { position: relative; overflow: hidden; padding: 8px 0; }
-        .svc-marquee--mb { margin-bottom: 12px; }
-        .svc-marquee__fade { position: absolute; top: 0; bottom: 0; width: 200px; z-index: 2; pointer-events: none; }
-        .svc-marquee__fade--l { left: 0; background: linear-gradient(to right, #080808, transparent); }
-        .svc-marquee__fade--r { right: 0; background: linear-gradient(to left, #080808, transparent); }
-        .svc-marquee__track { display: flex; gap: 16px; width: max-content; animation: svcMarqL 35s linear infinite; }
-        .svc-marquee__track--rev { animation-name: svcMarqR; animation-duration: 28s; }
-        .svc-marquee:hover .svc-marquee__track { animation-play-state: paused; }
-        @keyframes svcMarqL { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-        @keyframes svcMarqR { 0%{transform:translateX(-50%)} 100%{transform:translateX(0)} }
-        .svc-logo-card {
-          flex-shrink: 0; width: 160px; height: 100px; border-radius: 20px;
-          border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02);
-          display: flex; align-items: center; justify-content: center; padding: 12px;
-          transition: border-color 0.38s, background 0.38s, transform 0.38s;
-        }
-        .svc-logo-card:hover { border-color: rgba(250,204,21,0.18); background: rgba(250,204,21,0.03); transform: translateY(-4px) scale(1.03); }
-        .svc-logo-card__img { width: 100%; height: 100%; object-fit: contain; }
-
         /* ─── Responsive ─────────────────────────── */
         @media (max-width: 1100px) {
           .svc-prod__body, .svc-brand__body { grid-template-columns: 1fr; }
@@ -884,11 +805,6 @@ export default async function ServicesPage() {
           .svc-prod__row > * { flex: 1 1 auto !important; }
           .svc-img-card--offset, .svc-img-card--up { margin-top: 0; }
           .svc-dev__body { gap: 52px; }
-          .svc-logo-card { width: 120px; height: 76px; border-radius: 14px; }
-          .svc-marquee__track { animation-duration: 25s; }
-          .svc-marquee__track--rev { animation-duration: 20s; }
-          .svc-marquee__fade { width: 80px; }
-          .svc-clients { padding: 64px 0 56px; }
         }
       `}</style>
     </main>

@@ -1,12 +1,13 @@
 import { client } from "@/lib/apollo-client";
-import { GET_ABOUT_PAGE } from "@/lib/queries";
+import { GET_ABOUT_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
 import Link from "next/link";
-import { SectionReveal } from "@/components/SectionReveal";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { AboutImageCarousel } from "@/components/AboutImageCarousel";
 import { WhyUsSection } from "@/components/WhyUsSection";
+import AnimatedSteps from "@/components/AnimatedSteps";
+import { ClientsSection } from "@/components/ClientsSection";
 import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
@@ -32,19 +33,30 @@ async function getAboutData() {
   }
 }
 
+async function getThemeSettings() {
+  try {
+    const { data } = await client.query<any>({
+      query: gql`
+        ${GET_THEME_SETTINGS}
+      `,
+    });
+    return data?.themeSetting?.themeOptions ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function AboutUsPage() {
-  const ap = await getAboutData();
+  const [ap, ts] = await Promise.all([getAboutData(), getThemeSettings()]);
 
   const faqItems: { faqQuestion: string; faqAnswer: string }[] =
     ap.faqItems ?? [];
-  const clientLogos: { sourceUrl: string; name: string }[] = (
-    ap.clientLogos ?? []
-  )
+  const clientLogos: { url: string; alt: string }[] = (ap.clientLogos ?? [])
     .map((l: any) => ({
-      sourceUrl: l.logoImage?.node?.sourceUrl ?? "",
-      name: l.logoName ?? "",
+      url: l.logoImage?.node?.sourceUrl ?? "",
+      alt: l.logoName ?? "",
     }))
-    .filter((l: { sourceUrl: string }) => l.sourceUrl);
+    .filter((l: { url: string }) => l.url);
 
   const heroTitle = stripHtml(ap.headerTitle ?? "");
 
@@ -428,63 +440,14 @@ export default async function AboutUsPage() {
       />
 
       {/* ══ DESIGN PROCESS ══ */}
-      <section className="about-process">
-        <div className="about-process__inner">
-          <FadeIn className="about-section-head">
-            <div className="about-eyebrow about-eyebrow--center about-eyebrow--gold">
-              <span className="about-eyebrow__line about-eyebrow__line--gold" />
-              — 04 —
-              <span className="about-eyebrow__line about-eyebrow__line--gold" />
-            </div>
-            {ap.uDesignHeading && (
-              /* WP-sourced HTML — trusted backend only */
-              <h2 className="about-section-title">
-                {parse(ap.uDesignHeading)}
-              </h2>
-            )}
-            {ap.uSortText && (
-              /* WP-sourced HTML — trusted backend only */
-              <div className="about-section-sub">{parse(ap.uSortText)}</div>
-            )}
-          </FadeIn>
-
-          <div className="about-process__hint md:hidden" aria-hidden="true">
-            <span>Swipe</span>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M2 7H12M8.5 3.5L12 7L8.5 10.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-
-          <SectionReveal className="about-process__track">
-            {(ap.designType ?? []).map((item: any, i: number) => (
-              <div
-                key={i}
-                className="about-pstep"
-                style={{ "--pi": i } as React.CSSProperties}
-              >
-                <div className="about-pstep__ghost" aria-hidden="true">
-                  {(i + 1).toString().padStart(2, "0")}
-                </div>
-                <div className="about-pstep__dot" />
-                <div className="about-pstep__line" aria-hidden="true" />
-                <div className="about-pstep__body">
-                  <span className="about-pstep__num">
-                    {(i + 1).toString().padStart(2, "0")}
-                  </span>
-                  {/* WP-sourced HTML — trusted backend only */}
-                  <h4 className="about-pstep__name">{parse(item.dName)}</h4>
-                </div>
-              </div>
-            ))}
-          </SectionReveal>
-        </div>
-      </section>
+      <AnimatedSteps
+        steps={(ap.designType ?? []).map((item: any) => ({
+          numtitle: item.dName ?? "",
+        }))}
+        title={ap.uDesignHeading ?? null}
+        subtext={ap.uSortText ?? null}
+        accentColor="#facc15"
+      />
 
       {/* ══ LEARN ══ */}
       {(ap.learnslider ?? []).length > 0 && (
@@ -515,34 +478,12 @@ export default async function AboutUsPage() {
       )}
 
       {/* ══ CLIENTS ══ */}
-      {clientLogos.length > 0 && (
-        <section className="about-clients">
-          <FadeIn className="about-clients__head">
-            <h2 className="about-clients__title">Our Clients</h2>
-          </FadeIn>
-          <div className="about-marquee">
-            <div
-              className="about-marquee__fade about-marquee__fade--l"
-              aria-hidden="true"
-            />
-            <div
-              className="about-marquee__fade about-marquee__fade--r"
-              aria-hidden="true"
-            />
-            <div className="about-marquee__track">
-              {[...clientLogos, ...clientLogos].map((logo, i) => (
-                <div key={i} className="about-logo-card">
-                  <img
-                    src={logo.sourceUrl}
-                    alt={logo.name || "Client logo"}
-                    className="about-logo-card__img"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      <ClientsSection
+        logos={clientLogos}
+        heading={ts?.ourClientsHeading ?? null}
+        bigText={ts?.ourClientBigText ?? null}
+        ctaText={ts?.cButton ?? null}
+      />
 
       {/* ══ FAQ ══ */}
       {faqItems.length > 0 && (
@@ -1007,57 +948,6 @@ export default async function AboutUsPage() {
           user-select: none;
         }
 
-        /* ─── DESIGN PROCESS ─────────────────── */
-        .about-process { padding: 112px 0 96px; overflow: hidden; }
-        .about-process__inner { max-width: 1600px; margin: 0 auto; padding: 0 32px; }
-        .about-process__hint {
-          display: flex; align-items: center; gap: 8px;
-          color: rgba(250,204,21,0.55); font-size: 10px; font-weight: 700;
-          letter-spacing: 0.22em; text-transform: uppercase;
-          margin-bottom: 20px; padding: 0 16px;
-          animation: aboutSwipeHint 2s ease-in-out infinite;
-        }
-        @keyframes aboutSwipeHint {
-          0%,100%{opacity:0.5;transform:translateX(0)}
-          50%{opacity:1;transform:translateX(6px)}
-        }
-        .about-process__track {
-          display: flex; overflow-x: auto; gap: 28px;
-          padding: 20px 16px 52px;
-          scrollbar-width: none; -ms-overflow-style: none;
-          scroll-snap-type: x mandatory;
-        }
-        .about-process__track::-webkit-scrollbar { display: none; }
-        .about-pstep {
-          flex-shrink: 0; min-width: 280px; scroll-snap-align: start;
-          position: relative; padding-top: 56px; padding-right: 12px;
-        }
-        .about-pstep__ghost {
-          position: absolute; top: -22px; left: -10px;
-          font-size: 128px; font-weight: 900;
-          color: rgba(255,255,255,0.026); line-height: 1;
-          pointer-events: none; user-select: none;
-        }
-        .about-pstep__dot {
-          width: 14px; height: 14px; background: #facc15; border-radius: 50%;
-          box-shadow: 0 0 0 4px rgba(250,204,21,0.14), 0 0 22px rgba(250,204,21,0.32);
-          position: relative; z-index: 2;
-        }
-        .about-pstep__line {
-          position: absolute;
-          top: calc(56px + 7px); left: 7px; height: 1px; right: -28px;
-          background: linear-gradient(to right, rgba(250,204,21,0.32), rgba(255,255,255,0.05) 75%, transparent);
-        }
-        .about-pstep__body { margin-top: 22px; }
-        .about-pstep__num {
-          display: block; font-size: 11px; font-weight: 700;
-          color: #facc15; letter-spacing: 0.18em; margin-bottom: 8px;
-        }
-        .about-pstep__name {
-          font-size: 1.15rem;
-          font-weight: 700; color: #fff; line-height: 1.35;
-        }
-
         /* ─── LEARN ──────────────────────────── */
         .about-learn {
           position: relative; background: #0a0a0a;
@@ -1074,39 +964,6 @@ export default async function AboutUsPage() {
           max-width: 1600px; margin: 0 auto; padding: 0 32px;
           position: relative; z-index: 2;
         }
-
-        /* ─── CLIENTS ────────────────────────── */
-        .about-clients { padding: 96px 0; }
-        .about-clients__head { text-align: center; margin-bottom: 52px; }
-        .about-clients__title {
-          font-size: clamp(1.8rem, 4vw, 3rem);
-          font-weight: 800; letter-spacing: -0.03em;
-        }
-        .about-marquee { position: relative; overflow: hidden; padding: 8px 0; }
-        .about-marquee__fade {
-          position: absolute; top: 0; bottom: 0; width: 180px; z-index: 2; pointer-events: none;
-        }
-        .about-marquee__fade--l { left: 0; background: linear-gradient(to right, #080808, transparent); }
-        .about-marquee__fade--r { right: 0; background: linear-gradient(to left, #080808, transparent); }
-        .about-marquee__track {
-          display: flex; gap: 16px;
-          animation: aboutMarquee 32s linear infinite; width: max-content;
-        }
-        .about-marquee:hover .about-marquee__track { animation-play-state: paused; }
-        @keyframes aboutMarquee {
-          0%{transform:translateX(0)} 100%{transform:translateX(-50%)}
-        }
-        .about-logo-card {
-          flex-shrink: 0; width: 160px; height: 100px; border-radius: 20px;
-          border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02);
-          display: flex; align-items: center; justify-content: center; padding: 12px;
-          transition: border-color 0.35s, background 0.35s, transform 0.35s;
-        }
-        .about-logo-card:hover {
-          border-color: rgba(250,204,21,0.18); background: rgba(250,204,21,0.03);
-          transform: translateY(-4px) scale(1.03);
-        }
-        .about-logo-card__img { width: 100%; height: 100%; object-fit: contain; }
 
         /* ─── FAQ ────────────────────────────── */
         .about-faq {
@@ -1147,9 +1004,6 @@ export default async function AboutUsPage() {
           .about-services__inner { padding: 0 20px; }
           .about-srow { grid-template-columns: 1fr; gap: 8px; padding: 32px 0; }
           .about-srow__cat { font-size: 1.6rem; }
-          .about-process { padding: 80px 0 64px; }
-          .about-process__inner { padding: 0 20px; }
-          .about-pstep { min-width: 220px; }
           .about-learn { padding: 80px 0 64px; }
           .about-learn__inner { padding: 0 20px; }
           .about-faq { padding: 80px 0 64px; }
