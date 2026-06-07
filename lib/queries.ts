@@ -212,6 +212,7 @@ export const GET_THEME_SETTINGS = `
         }
         commonGridOneImage { node { sourceUrl } }
         commonGridOneMobile { node { sourceUrl } }
+        menuBackgroundImage { node { sourceUrl } }
       }
     }
   }
@@ -232,9 +233,22 @@ export const GET_PRIMARY_MENU = `
   }
 `;
 
-export const GET_CYBER_SECURITY_PAGE = `
-  query GetCyberSecurityPage {
-    page(id: "cyber-security", idType: URI) {
+export const GET_PORTFOLIO_SLUGS = `
+  query GetPortfolioSlugs {
+    pages(first: 100) {
+      nodes {
+        uri
+        template {
+          __typename
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PORTFOLIO_PAGE = `
+  query GetPortfolioPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
       template {
         ... on Template_PortfolioPage {
           portfolioFields {
