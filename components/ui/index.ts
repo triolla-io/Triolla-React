@@ -5,3 +5,4 @@ export { GradientText } from "./GradientText";
 export { Button } from "./Button";
 export { SectionHeading } from "./SectionHeading";
 export { Marquee } from "./Marquee";
+export { ShineImageCard } from "./ShineImageCard";

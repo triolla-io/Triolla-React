@@ -238,3 +238,55 @@ body {
 }
 .marquee__fade--l { left: 0;  background: linear-gradient(to right, var(--mq-fade-color, #080808) 0%, transparent 100%); }
 .marquee__fade--r { right: 0; background: linear-gradient(to left,  var(--mq-fade-color, #080808) 0%, transparent 100%); }
+
+.shine-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-radius: var(--sc-radius, 20px);
+  background: var(--sc-bg, #0f0f0f);
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
+  transition: transform 0.5s var(--ease-smooth), box-shadow 0.5s;
+}
+.shine-card:hover {
+  transform: translateY(var(--sc-lift, -5px)) scale(var(--sc-scale, 1.01));
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(250, 204, 21, 0.18);
+}
+.shine-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease-smooth);
+}
+.shine-card:hover .shine-card__img { transform: scale(var(--sc-img-scale, 1.07)); }
+.shine-card__shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(var(--sc-shine-angle, 105deg), transparent 40%, rgba(255, 255, 255, 0.045) 50%, transparent 60%);
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  transition: background-position 0.55s;
+}
+.shine-card:hover .shine-card__shine { background-position: -200% 0; }
+.shine-card__tag {
+  background: var(--accent);
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+.shine-card__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 24px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.1) 45%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.shine-card:hover .shine-card__overlay { opacity: 1; }
