@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -36,7 +36,6 @@ function toHref(url: string): string {
   return url.replace(/^https?:\/\/triolla\.io/, "") || "/";
 }
 
-// Wide promo mega-menu panel width (link grid + divider + promo pane + padding).
 const PROMO_PANEL_WIDTH = 900;
 
 function DropdownItem({
@@ -51,51 +50,30 @@ function DropdownItem({
   const [open, setOpen] = useState(false);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const href = toHref(item.url);
   const isActive = href !== "/" && pathname.startsWith(href);
 
-  // Content-driven: the promo pane shows only for the large (>6-child) dropdown,
-  // which today is Portfolio — no label string is hardcoded.
+  // Content-driven: promo pane shows only for the large (>6-child) dropdown.
   const showPromo = Boolean(menuPromoImage) && item.children.length > 6;
 
   const handleMouseEnter = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
     if (buttonRef.current) setRect(buttonRef.current.getBoundingClientRect());
     setOpen(true);
   };
 
-  // Positioning: link-only dropdowns stay centered on the trigger (unchanged).
-  // The wide promo panel is left-anchored and clamped to the viewport so it
-  // never overflows either edge. `rect` is only ever set on the client after
-  // mouse enter, so reading window dimensions here is safe.
-  let panelStyle: CSSProperties = {};
-  if (rect) {
-    if (showPromo) {
-      const desiredLeft = rect.left + rect.width / 2 - PROMO_PANEL_WIDTH / 2;
-      const clampedLeft = Math.max(
-        16,
-        Math.min(desiredLeft, window.innerWidth - PROMO_PANEL_WIDTH - 16),
-      );
-      panelStyle = {
-        top: rect.bottom + 12,
-        left: clampedLeft,
-        minWidth: PROMO_PANEL_WIDTH,
-      };
-    } else {
-      panelStyle = {
-        top: rect.bottom + 12,
-        left: rect.left + rect.width / 2,
-        transform: "translateX(-50%)",
-        minWidth: Math.min(item.children.length, 6) > 3 ? 460 : 240,
-      };
-    }
-  }
+  const handleMouseLeave = () => {
+    // 150ms grace period lets the cursor cross the gap between trigger and panel.
+    closeTimer.current = setTimeout(() => setOpen(false), 150);
+  };
 
   return (
     <div
       ref={buttonRef}
       className="relative"
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={() => setOpen(false)}
+      onMouseLeave={handleMouseLeave}
     >
       <button
         className={`flex items-center gap-1 text-[14px] font-medium transition-colors hover:text-yellow-400 ${
@@ -129,19 +107,44 @@ function DropdownItem({
               initial={{ opacity: 0, y: 6, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.98 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className={`fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6 z-9999 ${
-                showPromo ? "flex items-stretch gap-6" : ""
-              }`}
-              style={panelStyle}
-              onMouseEnter={() => setOpen(true)}
-              onMouseLeave={() => setOpen(false)}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6 z-[9999]"
+              style={
+                showPromo
+                  ? {
+                      top: rect.bottom + 12,
+                      left: Math.max(
+                        16,
+                        Math.min(
+                          rect.left + rect.width / 2 - PROMO_PANEL_WIDTH / 2,
+                          window.innerWidth - PROMO_PANEL_WIDTH - 16,
+                        ),
+                      ),
+                      minWidth: PROMO_PANEL_WIDTH,
+                      display: "flex",
+                      alignItems: "stretch",
+                      gap: "24px",
+                    }
+                  : {
+                      top: rect.bottom + 12,
+                      left: rect.left + rect.width / 2,
+                      transform: "translateX(-50%)",
+                      minWidth:
+                        Math.min(item.children.length, 6) > 3 ? 460 : 240,
+                    }
+              }
+              onMouseEnter={() => {
+                if (closeTimer.current) clearTimeout(closeTimer.current);
+                setOpen(true);
+              }}
+              onMouseLeave={handleMouseLeave}
             >
-              {/* Link grid (left) */}
+              {/* Link grid */}
               <div
                 className={`grid gap-x-10 gap-y-3.5 ${
                   item.children.length > 6 ? "grid-cols-2" : "grid-cols-1"
-                } ${showPromo ? "content-center" : ""}`}
+                }`}
+                style={showPromo ? { alignContent: "center" } : undefined}
               >
                 {item.children.map((child, idx) => (
                   <Link
@@ -155,40 +158,54 @@ function DropdownItem({
                 ))}
               </div>
 
-              {/* Promo pane (right) — decorative, WP-sourced, no click target */}
+              {/* Promo pane — decorative only, no click target */}
               {showPromo && menuPromoImage && (
                 <>
                   <div
                     aria-hidden="true"
-                    className="w-px self-stretch bg-linear-to-b from-transparent via-black/10 to-transparent"
+                    style={{
+                      width: "1px",
+                      alignSelf: "stretch",
+                      background:
+                        "linear-gradient(to bottom, transparent, rgba(0,0,0,0.1), transparent)",
+                    }}
                   />
                   <motion.div
                     initial={{ opacity: 0, x: 14 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.32,
-                      ease: [0.16, 1, 0.3, 1],
-                      delay: 0.06,
+                    transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
+                    style={{
+                      position: "relative",
+                      flexShrink: 0,
+                      width: "340px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
-                    className="relative shrink-0 w-[340px] flex items-center justify-center"
                   >
-                    {/* Soft gold glow bleeding behind the card */}
                     <div
                       aria-hidden="true"
-                      className="absolute inset-0 pointer-events-none"
                       style={{
+                        position: "absolute",
+                        inset: 0,
+                        pointerEvents: "none",
                         background:
                           "radial-gradient(circle at 50% 42%, rgba(250,204,21,0.28) 0%, transparent 68%)",
                         filter: "blur(18px)",
                         transform: "scale(1.15)",
                       }}
                     />
-                    {/* The promo image floats subtly and lifts on hover */}
                     <motion.img
                       src={menuPromoImage}
                       alt=""
                       aria-hidden="true"
-                      className="relative w-full h-auto rounded-2xl shadow-xl ring-1 ring-black/5"
+                      style={{
+                        position: "relative",
+                        width: "100%",
+                        height: "auto",
+                        borderRadius: "16px",
+                        boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+                      }}
                       animate={{ y: [0, -6, 0] }}
                       transition={{
                         duration: 4.5,
