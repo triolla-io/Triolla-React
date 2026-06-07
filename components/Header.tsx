@@ -83,6 +83,7 @@ export default async function Header() {
       ticker={ts?.newsTicker ?? null}
       navItems={nav}
       mobileNavItems={mobile}
+      menuPromoImage={ts?.menuBackgroundImage?.node?.sourceUrl ?? null}
       whatsappHref={whatsappHref}
       bookButtonText={ts?.bookButton ?? "Book a Call"}
       bookButtonHref={
