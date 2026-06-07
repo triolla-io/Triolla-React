@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
+import { BfcacheReloader } from "@/components/BfcacheReloader";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <main className="grow">{children}</main>
         <Footer />
         <CookieBanner />
+        <BfcacheReloader />
       </body>
     </html>
   );
