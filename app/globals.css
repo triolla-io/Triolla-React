@@ -217,3 +217,24 @@ body {
   margin: 0 auto;
   line-height: 1.74;
 }
+
+.marquee { position: relative; overflow: hidden; }
+.marquee__track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  animation: marquee var(--mq-dur, 40s) linear infinite;
+  will-change: transform;
+}
+.marquee__track--rev { animation-name: marqueeRev; }
+.marquee--pause:hover .marquee__track { animation-play-state: paused; }
+.marquee__fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--mq-fade-w, 220px);
+  z-index: 2;
+  pointer-events: none;
+}
+.marquee__fade--l { left: 0;  background: linear-gradient(to right, var(--mq-fade-color, #080808) 0%, transparent 100%); }
+.marquee__fade--r { right: 0; background: linear-gradient(to left,  var(--mq-fade-color, #080808) 0%, transparent 100%); }
