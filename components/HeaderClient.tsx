@@ -98,49 +98,44 @@ function DropdownItem({
         </svg>
       </button>
 
-      <AnimatePresence>
-        {open &&
-          item.children.length > 0 &&
-          rect &&
-          createPortal(
-            <motion.div
-              initial={{ opacity: 0, y: 6, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6, scale: 0.98 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6"
-              style={
-                showPromo
-                  ? {
-                      zIndex: 9999,
-                      top: rect.bottom + 12,
-                      left: Math.max(
-                        16,
-                        Math.min(
-                          rect.left + rect.width / 2 - PROMO_PANEL_WIDTH / 2,
-                          window.innerWidth - PROMO_PANEL_WIDTH - 16,
-                        ),
+      {open &&
+        item.children.length > 0 &&
+        rect &&
+        createPortal(
+          <div
+            className="fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6"
+            style={
+              showPromo
+                ? {
+                    zIndex: 9999,
+                    top: rect.bottom + 12,
+                    left: Math.max(
+                      16,
+                      Math.min(
+                        rect.left + rect.width / 2 - PROMO_PANEL_WIDTH / 2,
+                        window.innerWidth - PROMO_PANEL_WIDTH - 16,
                       ),
-                      minWidth: PROMO_PANEL_WIDTH,
-                      display: "flex",
-                      alignItems: "stretch",
-                      gap: "24px",
-                    }
-                  : {
-                      zIndex: 9999,
-                      top: rect.bottom + 12,
-                      left: rect.left + rect.width / 2,
-                      transform: "translateX(-50%)",
-                      minWidth:
-                        Math.min(item.children.length, 6) > 3 ? 460 : 240,
-                    }
-              }
-              onMouseEnter={() => {
-                if (closeTimer.current) clearTimeout(closeTimer.current);
-                setOpen(true);
-              }}
-              onMouseLeave={handleMouseLeave}
-            >
+                    ),
+                    minWidth: PROMO_PANEL_WIDTH,
+                    display: "flex",
+                    alignItems: "stretch",
+                    gap: "24px",
+                  }
+                : {
+                    zIndex: 9999,
+                    top: rect.bottom + 12,
+                    left: rect.left + rect.width / 2,
+                    transform: "translateX(-50%)",
+                    minWidth:
+                      Math.min(item.children.length, 6) > 3 ? 460 : 240,
+                  }
+            }
+            onMouseEnter={() => {
+              if (closeTimer.current) clearTimeout(closeTimer.current);
+              setOpen(true);
+            }}
+            onMouseLeave={handleMouseLeave}
+          >
               {/* Link grid */}
               <div
                 className={`grid gap-x-10 gap-y-3.5 ${
@@ -172,14 +167,7 @@ function DropdownItem({
                         "linear-gradient(to bottom, transparent, rgba(0,0,0,0.1), transparent)",
                     }}
                   />
-                  <motion.div
-                    initial={{ opacity: 0, x: 14 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.32,
-                      ease: [0.16, 1, 0.3, 1],
-                      delay: 0.06,
-                    }}
+                  <div
                     style={{
                       position: "relative",
                       flexShrink: 0,
@@ -220,13 +208,12 @@ function DropdownItem({
                       }}
                       whileHover={{ scale: 1.03 }}
                     />
-                  </motion.div>
+                  </div>
                 </>
               )}
-            </motion.div>,
-            document.body,
-          )}
-      </AnimatePresence>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
