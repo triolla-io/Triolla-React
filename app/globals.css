@@ -114,3 +114,35 @@ body {
 .glow-orb--pulse-rev  { animation: orbPulse var(--orb-dur, 9s) ease-in-out infinite reverse; }
 .glow-orb--drift      { animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate; }
 .glow-orb--drift-rev  { animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate-reverse; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--eb-gap, 12px);
+  font-size: var(--eb-size, 11px);
+  font-weight: var(--eb-weight, 700);
+  letter-spacing: var(--eb-spacing, 0.25em);
+  text-transform: uppercase;
+  color: var(--eb-color, var(--accent));
+  margin-bottom: var(--eb-mb, 24px);
+}
+.eyebrow--center { display: flex; justify-content: center; }
+.eyebrow--pill {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--eb-pill-bg, color-mix(in srgb, var(--accent) 9%, transparent));
+}
+.eyebrow__dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+  animation: dotBlink 2.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.eyebrow__line {
+  display: block;
+  width: var(--eb-line-w, 32px);
+  height: 1px;
+  background: var(--eb-line-bg, currentColor);
+  opacity: var(--eb-line-opacity, 0.55);
+}
+.eyebrow__mark { color: currentColor; font-size: 13px; line-height: 1; }
