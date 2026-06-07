@@ -6,3 +6,4 @@ export { Button } from "./Button";
 export { SectionHeading } from "./SectionHeading";
 export { Marquee } from "./Marquee";
 export { ShineImageCard } from "./ShineImageCard";
+export { WaveDivider } from "./WaveDivider";

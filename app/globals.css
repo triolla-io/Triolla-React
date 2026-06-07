@@ -290,3 +290,6 @@ body {
   transition: opacity 0.35s;
 }
 .shine-card:hover .shine-card__overlay { opacity: 1; }
+
+.wave-divider { position: relative; line-height: 0; z-index: 2; margin-top: var(--wave-mt, 64px); }
+.wave-divider svg { width: 100%; display: block; }
