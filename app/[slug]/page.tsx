@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { client } from "@/lib/apollo-client";
 import {
   GET_PORTFOLIO_PAGE,
@@ -20,6 +21,7 @@ export async function generateStaticParams() {
         ${GET_PORTFOLIO_SLUGS}
       `,
     });
+
     const nodes: any[] = data?.pages?.nodes ?? [];
     return nodes
       .filter((n) => n?.template?.__typename === "Template_PortfolioPage")

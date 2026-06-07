@@ -12,6 +12,7 @@ import { FAQSection } from "@/components/FAQSection";
 import { HeroHeadline } from "@/components/HeroHeadline";
 import { ClientsSection } from "@/components/ClientsSection";
 import { ServiceModalMenu, type ServiceDetail } from "@/components/ServiceModalMenu";
+import { ServiceTechGroups, type TechGroup } from "@/components/ServiceTechGroups";
 import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
@@ -67,11 +68,11 @@ function deriveUri(link: string): string | null {
  *  with fabricated content. The whole fetch is wrapped so a backend failure
  *  degrades every item to a plain link rather than throwing the page. */
 async function getServiceDetails(
-  menu: Array<{ prodmtitle?: string | null; prodmlink?: string | null }>
+  menu: Array<{ label?: string | null; link?: string | null }>
 ): Promise<ServiceDetail[]> {
   const enriched: ServiceDetail[] = (menu ?? []).map((item) => ({
-    label: item?.prodmtitle ?? null,
-    link: item?.prodmlink ?? null,
+    label: item?.label ?? null,
+    link: item?.link ?? null,
     title: null,
     image: null,
     altText: "",
@@ -110,7 +111,55 @@ async function getServiceDetails(
 
 export default async function ServicesPage() {
   const [sp, ts] = await Promise.all([getServicesData(), getThemeSettings()]);
-  const productServices = await getServiceDetails(sp.prodrightMenu ?? []);
+
+  // Each menu link is normalized to { label, link } and enriched from its WP
+  // detail page in parallel. Anything that doesn't resolve degrades to a plain
+  // link (or plain text) rather than a fabricated modal.
+  const [productServices, brandServices, engServices] = await Promise.all([
+    getServiceDetails(
+      (sp.prodrightMenu ?? []).map((i: any) => ({
+        label: i?.prodmtitle ?? null,
+        link: i?.prodmlink ?? null,
+      }))
+    ),
+    getServiceDetails(
+      (sp.brandrightMenu ?? []).map((i: any) => ({
+        label: i?.rightmetitle ?? null,
+        link: i?.rightmelink ?? null,
+      }))
+    ),
+    getServiceDetails([
+      { label: sp.devrightMenuToptitle ?? null, link: sp.devrightMenuToptitleLink ?? null },
+      { label: sp.devrightMenuBottitle ?? null, link: sp.devrightMenuBottitleLink ?? null },
+      { label: sp.rightMenuThreeTitle ?? null, link: sp.rightMenuThreeTitleLink ?? null },
+    ]),
+  ]);
+
+  // Engineering groups, aligned by index with `engServices`. Empty groups
+  // (no title) are dropped inside <ServiceTechGroups>.
+  const techGroups: TechGroup[] = [
+    {
+      detail: engServices[0],
+      copy: sp.devrightMenuToptitleCopy ?? null,
+      chips: (sp.rightMenuTopList ?? [])
+        .map((x: any) => x?.rightTopMenuItem)
+        .filter(Boolean),
+    },
+    {
+      detail: engServices[1],
+      copy: null,
+      chips: (sp.rightMenuBotList ?? [])
+        .map((x: any) => x?.rightBottomMenuItem)
+        .filter(Boolean),
+    },
+    {
+      detail: engServices[2],
+      copy: null,
+      chips: (sp.rightMenuThreeList ?? [])
+        .map((x: any) => x?.rightThreeMenuItem)
+        .filter(Boolean),
+    },
+  ];
 
   const prodImages = [
     sp.prodleftImageOne?.node?.sourceUrl,
@@ -377,22 +426,16 @@ export default async function ServicesPage() {
               ))}
             </SectionReveal>
 
-            {/* Right: sticky numbered menu */}
+            {/* Right: sticky numbered menu — each item opens the shared
+                service-detail modal (light variant); falls back to a plain link
+                if its detail page didn't resolve. */}
             <div className="svc-brand__menu">
-              <ul className="svc-menu-list">
-                {(sp.brandrightMenu ?? []).map((item: any, i: number) => (
-                  <FadeIn key={i} delay={i * 0.09} yOffset={18}>
-                    <li className="svc-menu-item svc-menu-item--light">
-                      <span className="svc-menu-item__num svc-menu-item__num--dark">{(i + 1).toString().padStart(2, "0")}</span>
-                      {item.rightmelink ? (
-                        <a href={item.rightmelink} className="svc-menu-item__title svc-menu-item__title--dark">{item.rightmetitle}</a>
-                      ) : (
-                        <span className="svc-menu-item__title svc-menu-item__title--dark">{item.rightmetitle}</span>
-                      )}
-                    </li>
-                  </FadeIn>
-                ))}
-              </ul>
+              <ServiceModalMenu
+                services={brandServices}
+                ctaText={sp.buttonText ?? null}
+                ctaLink="/contact-us"
+                variant="light"
+              />
             </div>
           </div>
         </div>
@@ -423,55 +466,11 @@ export default async function ServicesPage() {
           </FadeIn>
 
           <div className="svc-dev__body">
-            <SectionReveal className="svc-dev__lists">
-              {sp.devrightMenuToptitle && (
-                <div className="svc-tech-group">
-                  <h4 className="svc-tech-group__title">
-                    {sp.devrightMenuToptitleLink ? (
-                      <a href={sp.devrightMenuToptitleLink} className="svc-tech-link">{sp.devrightMenuToptitle}</a>
-                    ) : sp.devrightMenuToptitle}
-                  </h4>
-                  {sp.devrightMenuToptitleCopy && (
-                    <p className="svc-tech-group__sub">{sp.devrightMenuToptitleCopy}</p>
-                  )}
-                  <ul className="svc-tech-chips">
-                    {(sp.rightMenuTopList ?? []).map((item: any, i: number) => (
-                      <li key={i} className="svc-tech-chip">{item.rightTopMenuItem}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {sp.devrightMenuBottitle && (
-                <div className="svc-tech-group">
-                  <h4 className="svc-tech-group__title">
-                    {sp.devrightMenuBottitleLink ? (
-                      <a href={sp.devrightMenuBottitleLink} className="svc-tech-link">{sp.devrightMenuBottitle}</a>
-                    ) : sp.devrightMenuBottitle}
-                  </h4>
-                  <ul className="svc-tech-chips">
-                    {(sp.rightMenuBotList ?? []).map((item: any, i: number) => (
-                      <li key={i} className="svc-tech-chip">{item.rightBottomMenuItem}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {sp.rightMenuThreeTitle && (
-                <div className="svc-tech-group">
-                  <h4 className="svc-tech-group__title">
-                    {sp.rightMenuThreeTitleLink ? (
-                      <a href={sp.rightMenuThreeTitleLink} className="svc-tech-link">{sp.rightMenuThreeTitle}</a>
-                    ) : sp.rightMenuThreeTitle}
-                  </h4>
-                  <ul className="svc-tech-chips">
-                    {(sp.rightMenuThreeList ?? []).map((item: any, i: number) => (
-                      <li key={i} className="svc-tech-chip">{item.rightThreeMenuItem}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </SectionReveal>
+            <ServiceTechGroups
+              groups={techGroups}
+              ctaText={sp.buttonText ?? null}
+              ctaLink="/contact-us"
+            />
 
             {sp.devleftimage?.node?.sourceUrl && (
               <FadeIn delay={0.18} yOffset={32} className="svc-dev__img-wrap">

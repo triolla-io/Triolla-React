@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FadeIn } from "@/components/FadeIn";
 import { SectionReveal } from "@/components/SectionReveal";
 import { WannaChatSection } from "@/components/WannaChatSection";
