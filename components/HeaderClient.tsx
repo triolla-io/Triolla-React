@@ -102,7 +102,10 @@ function DropdownItem({
         item.children.length > 0 &&
         rect &&
         createPortal(
-          <div
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             className="fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6"
             style={
               showPromo
@@ -167,7 +170,10 @@ function DropdownItem({
                         "linear-gradient(to bottom, transparent, rgba(0,0,0,0.1), transparent)",
                     }}
                   />
-                  <div
+                  <motion.div
+                    initial={{ opacity: 0, x: 12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.25, ease: "easeOut", delay: 0.08 }}
                     style={{
                       position: "relative",
                       flexShrink: 0,
@@ -208,10 +214,10 @@ function DropdownItem({
                       }}
                       whileHover={{ scale: 1.03 }}
                     />
-                  </div>
+                  </motion.div>
                 </>
               )}
-          </div>,
+          </motion.div>,
           document.body,
         )}
     </div>
