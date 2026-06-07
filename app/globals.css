@@ -158,3 +158,45 @@ body {
 .gradient-text--animate {
   animation: textShimmer var(--gt-dur, 6s) linear infinite;
 }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  font-size: var(--btn-size, 15px);
+  padding: var(--btn-pad, 14px 28px);
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.btn--primary {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 0 0 0 rgba(250, 204, 21, 0);
+}
+.btn--primary:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(250, 204, 21, 0.3);
+}
+.btn--ghost {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  padding: var(--btn-pad, 14px 20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.btn--ghost:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.btn--outline {
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+  padding: var(--btn-pad, 14px 32px);
+}
+.btn--outline:hover {
+  background: var(--accent);
+  color: #000;
+  transform: translateY(-2px);
+}
