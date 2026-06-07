@@ -146,3 +146,15 @@ body {
   opacity: var(--eb-line-opacity, 0.55);
 }
 .eyebrow__mark { color: currentColor; font-size: 13px; line-height: 1; }
+
+.gradient-text {
+  background: var(--gt-gradient, linear-gradient(135deg, #fff 40%, var(--accent) 55%, #fff 70%));
+  background-size: var(--gt-size, 200% auto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.gradient-text--animate {
+  animation: textShimmer var(--gt-dur, 6s) linear infinite;
+}
