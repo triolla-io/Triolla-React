@@ -103,15 +103,24 @@ function DropdownItem({
         rect &&
         createPortal(
           <motion.div
-            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+            initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6"
-            style={
-              showPromo
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed"
+            style={{
+              zIndex: 9999,
+              top: rect.bottom + 14,
+              overflow: "hidden",
+              borderRadius: "26px",
+              padding: "22px",
+              background: "rgba(11,11,11,0.82)",
+              backdropFilter: "blur(30px) saturate(150%)",
+              WebkitBackdropFilter: "blur(30px) saturate(150%)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow:
+                "0 30px 80px -16px rgba(0,0,0,0.8), inset 0 1px 0 0 rgba(255,255,255,0.06)",
+              ...(showPromo
                 ? {
-                    zIndex: 9999,
-                    top: rect.bottom + 12,
                     left: Math.max(
                       16,
                       Math.min(
@@ -120,42 +129,130 @@ function DropdownItem({
                       ),
                     ),
                     minWidth: PROMO_PANEL_WIDTH,
-                    display: "flex",
-                    alignItems: "stretch",
-                    gap: "24px",
                   }
                 : {
-                    zIndex: 9999,
-                    top: rect.bottom + 12,
                     left: rect.left + rect.width / 2,
                     transform: "translateX(-50%)",
                     minWidth:
-                      Math.min(item.children.length, 6) > 3 ? 460 : 240,
-                  }
-            }
+                      Math.min(item.children.length, 6) > 3 ? 480 : 280,
+                  }),
+            }}
             onMouseEnter={() => {
               if (closeTimer.current) clearTimeout(closeTimer.current);
               setOpen(true);
             }}
             onMouseLeave={handleMouseLeave}
           >
-              {/* Link grid */}
+            {/* Gold top hairline */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: "10%",
+                right: "10%",
+                height: "1px",
+                background:
+                  "linear-gradient(to right, transparent, rgba(250,204,21,0.6), transparent)",
+              }}
+            />
+            {/* Ambient gold glow */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: "-90px",
+                left: showPromo ? "auto" : "50%",
+                right: showPromo ? "-60px" : "auto",
+                transform: showPromo ? "none" : "translateX(-50%)",
+                width: "320px",
+                height: "320px",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, rgba(250,204,21,0.10) 0%, transparent 65%)",
+                filter: "blur(50px)",
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Content row */}
+            <div
+              className="relative"
+              style={{
+                zIndex: 1,
+                display: "flex",
+                alignItems: "stretch",
+                gap: "28px",
+              }}
+            >
+              {/* Links column */}
               <div
-                className={`grid gap-x-10 gap-y-3.5 ${
-                  item.children.length > 6 ? "grid-cols-2" : "grid-cols-1"
-                }`}
-                style={showPromo ? { alignContent: "center" } : undefined}
+                style={
+                  showPromo
+                    ? { display: "flex", flexDirection: "column", justifyContent: "center" }
+                    : undefined
+                }
               >
-                {item.children.map((child, idx) => (
-                  <Link
-                    key={idx}
-                    href={toHref(child.url)}
-                    className="text-[14px] text-gray-700 font-medium hover:text-black transition-colors whitespace-nowrap"
-                    onClick={() => setOpen(false)}
-                  >
-                    {child.label}
-                  </Link>
-                ))}
+                {/* Eyebrow — section name from WP */}
+                <div className="flex items-center gap-2 px-3 mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.8)]" />
+                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-white/35">
+                    {item.label}
+                  </span>
+                </div>
+
+                <div
+                  className={`grid gap-x-6 gap-y-0.5 ${
+                    item.children.length > 6 ? "grid-cols-2" : "grid-cols-1"
+                  }`}
+                >
+                  {item.children.map((child, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        delay: 0.06 + idx * 0.03,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                    >
+                      <Link
+                        href={toHref(child.url)}
+                        onClick={() => setOpen(false)}
+                        className="group relative flex items-center gap-3 rounded-xl pl-4 pr-3 py-2.5 transition-colors duration-200 hover:bg-white/5 whitespace-nowrap"
+                      >
+                        {/* Sliding gold rail */}
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-0 rounded-full bg-yellow-400 transition-all duration-300 ease-out group-hover:h-6 group-hover:shadow-[0_0_10px_rgba(250,204,21,0.7)]" />
+                        {/* Decorative index */}
+                        <span className="text-[10.5px] font-mono tabular-nums text-white/25 group-hover:text-yellow-400 transition-colors duration-200 w-4 shrink-0">
+                          {String(idx + 1).padStart(2, "0")}
+                        </span>
+                        {/* Label */}
+                        <span className="flex-1 text-[14px] font-medium text-white/70 group-hover:text-white transition-all duration-200 group-hover:translate-x-0.5">
+                          {child.label}
+                        </span>
+                        {/* Reveal arrow */}
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          aria-hidden="true"
+                          className="text-yellow-400 opacity-0 -translate-x-1.5 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 shrink-0"
+                        >
+                          <path
+                            d="M3 11L11 3M11 3H5M11 3V9"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
 
               {/* Promo pane — decorative only, no click target */}
@@ -167,17 +264,17 @@ function DropdownItem({
                       width: "1px",
                       alignSelf: "stretch",
                       background:
-                        "linear-gradient(to bottom, transparent, rgba(0,0,0,0.1), transparent)",
+                        "linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent)",
                     }}
                   />
                   <motion.div
-                    initial={{ opacity: 0, x: 12 }}
+                    initial={{ opacity: 0, x: 16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.25, ease: "easeOut", delay: 0.08 }}
+                    transition={{ duration: 0.35, ease: "easeOut", delay: 0.1 }}
                     style={{
                       position: "relative",
                       flexShrink: 0,
-                      width: "340px",
+                      width: "360px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -190,9 +287,9 @@ function DropdownItem({
                         inset: 0,
                         pointerEvents: "none",
                         background:
-                          "radial-gradient(circle at 50% 42%, rgba(250,204,21,0.28) 0%, transparent 68%)",
-                        filter: "blur(18px)",
-                        transform: "scale(1.15)",
+                          "radial-gradient(circle at 50% 45%, rgba(250,204,21,0.35) 0%, transparent 65%)",
+                        filter: "blur(26px)",
+                        transform: "scale(1.2)",
                       }}
                     />
                     <motion.img
@@ -203,10 +300,12 @@ function DropdownItem({
                         position: "relative",
                         width: "100%",
                         height: "auto",
-                        borderRadius: "16px",
-                        boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+                        borderRadius: "18px",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        boxShadow:
+                          "0 28px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12)",
                       }}
-                      animate={{ y: [0, -6, 0] }}
+                      animate={{ y: [0, -7, 0] }}
                       transition={{
                         duration: 4.5,
                         ease: "easeInOut",
@@ -217,6 +316,7 @@ function DropdownItem({
                   </motion.div>
                 </>
               )}
+            </div>
           </motion.div>,
           document.body,
         )}

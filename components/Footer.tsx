@@ -3,6 +3,9 @@ import { client } from "@/lib/apollo-client";
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
 import { SectionReveal } from "@/components/SectionReveal";
+import { FooterModalProvider } from "@/components/FooterServiceModal";
+import { FooterNavLink } from "@/components/FooterNavLink";
+import { getAllServices, deriveUri } from "@/lib/service-details";
 
 /* ── Types ──────────────────────────────────────────────── */
 
@@ -71,31 +74,6 @@ async function getThemeSettings() {
   } catch {
     return null;
   }
-}
-
-/* ── Helpers ────────────────────────────────────────────── */
-
-function isExternal(url: string): boolean {
-  return url.startsWith("http") && !url.includes("triolla.io");
-}
-
-function toHref(url: string): string {
-  if (isExternal(url)) return url;
-  return url.replace(/^https?:\/\/triolla\.io/, "") || "/";
-}
-
-function NavLink({ label, url }: { label: string; url: string }) {
-  const href = toHref(url);
-  const cls = "footer-nav-link";
-  return isExternal(url) ? (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
-      {label}
-    </a>
-  ) : (
-    <Link href={href} className={cls}>
-      {label}
-    </Link>
-  );
 }
 
 /* ── Social icon SVGs ───────────────────────────────────── */
@@ -181,10 +159,22 @@ function GlobeIcon() {
 /* ── Component ──────────────────────────────────────────── */
 
 export default async function Footer() {
-  const [ts, wpMenus] = await Promise.all([
+  const [ts, wpMenus, services] = await Promise.all([
     getThemeSettings(),
     getFooterMenus(),
+    getAllServices(),
   ]);
+
+  // Map each resolved service detail page (URI path → index) so footer links
+  // that point at one render as a modal trigger instead of a dead link.
+  // Unresolved services (hasDetail: false) are skipped → those links stay
+  // plain links.
+  const serviceByUri = new Map<string, number>();
+  services.forEach((s, i) => {
+    if (!s.hasDetail || !s.link) return;
+    const uri = deriveUri(s.link);
+    if (uri) serviceByUri.set(uri, i);
+  });
 
   const colHeadings: (string | null)[] = COL_HEADING_FIELDS.map(
     (field) => ts?.[field] ?? null,
@@ -197,7 +187,11 @@ export default async function Footer() {
         m.slug === `footer-${col.slug}` ||
         m.name.toLowerCase().replace(/\s+/g, "-") === col.slug,
     );
-    const items = wpMenu?.menuItems?.nodes ?? [];
+    const items = (wpMenu?.menuItems?.nodes ?? []).map((item) => {
+      const uri = deriveUri(item.url);
+      const serviceIndex = uri ? serviceByUri.get(uri) ?? null : null;
+      return { label: item.label, url: item.url, serviceIndex };
+    });
     const heading = colHeadings[i] ?? null;
     return { heading, items };
   });
@@ -252,7 +246,7 @@ export default async function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="footer-mention"
-                      style={{ '--mi': i } as React.CSSProperties}
+                      style={{ "--mi": i } as React.CSSProperties}
                     >
                       <img
                         src={src}
@@ -272,7 +266,15 @@ export default async function Footer() {
 
       {/* ══════════════════════════════════════════
           MAIN NAV GRID
+          Wrapped in FooterModalProvider so service links (e.g. Product
+          Design) open the shared service-detail modal instead of navigating
+          to pages that no longer exist on the new site.
       ══════════════════════════════════════════ */}
+      <FooterModalProvider
+        services={services}
+        ctaText={ts?.cButton ?? null}
+        ctaLink="/contact-us"
+      >
       <div className="w-[90%] mx-auto py-10 md:py-16">
         <SectionReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-5 md:gap-x-8 gap-y-10 md:gap-y-12">
           {[
@@ -286,7 +288,11 @@ export default async function Footer() {
                   <ul className="space-y-3">
                     {col.items.map((item) => (
                       <li key={item.label}>
-                        <NavLink label={item.label} url={item.url} />
+                        <FooterNavLink
+                          label={item.label}
+                          url={item.url}
+                          serviceIndex={item.serviceIndex}
+                        />
                       </li>
                     ))}
                   </ul>
@@ -360,6 +366,7 @@ export default async function Footer() {
           ]}
         </SectionReveal>
       </div>
+      </FooterModalProvider>
 
       {/* ══════════════════════════════════════════
           BOTTOM BAR
@@ -641,6 +648,12 @@ export default async function Footer() {
         }
         .footer-nav-link:hover { color: #e5e7eb; }
         .footer-nav-link:hover::after { width: 100%; }
+        /* Service links rendered as modal triggers — strip native button
+           chrome so they read identically to the surrounding link list. */
+        button.footer-nav-link--btn {
+          background: none; border: 0; padding: 0; margin: 0;
+          text-align: left; cursor: pointer; font: inherit; appearance: none;
+        }
 
         /* ── Contact labels ────────────────────── */
         .footer-contact-label {

@@ -128,6 +128,42 @@ export const GET_HOME_PAGE = `
   }
 `;
 
+export const GET_CONTACT_PAGE = `
+  query GetContactPage {
+    page(id: "contact-us", idType: URI) {
+      title
+      template {
+        ... on Template_ContactPage {
+          contactFields {
+            contactTitle
+            officeTitle
+            officeTitleCopy
+            addressTitle
+            address
+            addressTitleCopy
+            addressCopy
+            contactNumber
+            contactNumberCopy
+            headerBgOverlayLayer { node { sourceUrl } }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Generic fetch for simple/legal content pages (privacy-policy, terms-of-use,
+// accessibility-statement, …). These render the WP page title + post content
+// HTML — no bespoke ACF layout. URI is the WP path, e.g. "privacy-policy".
+export const GET_CONTENT_PAGE = `
+  query GetContentPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
+      title
+      content
+    }
+  }
+`;
+
 export const GET_FOOTER_DATA = `
   query GetFooterData {
     menus {

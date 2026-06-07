@@ -665,6 +665,7 @@ export default async function TechnologyPage() {
           }
           submitLabel={ts?.cButton ?? null}
           callUsLabel={ts?.cCallUsLabel ?? null}
+          fallbackEmail={ts?.cEmailAddress ?? null}
         />
       </div>
     </main>

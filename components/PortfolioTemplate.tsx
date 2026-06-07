@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { FadeIn } from "@/components/FadeIn";
-import { SectionReveal } from "@/components/SectionReveal";
+import AnimatedSteps from "@/components/AnimatedSteps";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { CountUpNumber } from "@/components/CountUpNumber";
 import parse from "html-react-parser";
@@ -14,28 +14,6 @@ function stripHtml(html: string): string {
     .replace(/&nbsp;/g, " ")
     .replace(/&#8217;/g, "'")
     .trim();
-}
-
-function htmlToLines(html: string): string[] {
-  return (html ?? "")
-    .split(/<br\s*\/?>/gi)
-    .map((s) => stripHtml(s).trim())
-    .filter(Boolean);
-}
-
-function parseAccentHeading(html: string): { text: string; accent: boolean }[] {
-  const cleaned = (html ?? "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/\s+/g, " ");
-  const segments = cleaned.split(/(<span[^>]*>[\s\S]*?<\/span>)/i);
-  return segments
-    .filter((s) => s.length > 0)
-    .map((seg) => {
-      const inner = seg.match(/^<span[^>]*>([\s\S]*?)<\/span>$/i);
-      return inner
-        ? { text: inner[1], accent: true }
-        : { text: seg, accent: false };
-    });
 }
 
 export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
@@ -71,7 +49,6 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
   const whyItems: any[] = pf.whyDoList ?? [];
   const companies: any[] = pf.companyList ?? [];
   const accentColor: string = pf.headerBgColor ?? "#fed125";
-  const designHeadingParts = parseAccentHeading(pf.uDesignHeading ?? "");
   const marqueeItems = [...companies, ...companies];
 
   return (
@@ -122,28 +99,6 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         }
         .cs-tag:hover {
           background: rgba(250,204,21,0.1);
-        }
-
-        /* ─── Design process ─────────────────────── */
-        .cs-step {
-          border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 16px;
-          padding: 28px 24px 32px;
-          background: #0d0d0d;
-          transition: border-color 0.25s, background 0.25s, transform 0.25s;
-        }
-        .cs-step:hover {
-          border-color: ${accentColor}55;
-          background: #111;
-          transform: translateY(-3px);
-        }
-        .cs-step-num {
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.12em;
-          color: ${accentColor};
-          margin-bottom: 14px;
-          display: block;
         }
 
         /* ─── Why cards ──────────────────────────── */
@@ -259,39 +214,6 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         .cs-grid-img:hover img {
           transform: scale(1.06);
         }
-
-        /* ─── Timeline (design process) ─────────── */
-        .cs-timeline-item {
-          position: relative;
-          padding-top: 32px;
-        }
-        .cs-timeline-item__bg-num {
-          position: absolute;
-          top: -16px;
-          left: -16px;
-          font-size: 120px;
-          font-weight: 900;
-          color: rgba(255,255,255,0.025);
-          line-height: 1;
-          pointer-events: none;
-          user-select: none;
-        }
-        .cs-timeline-item__dot {
-          width: 14px; height: 14px;
-          background: ${accentColor};
-          border-radius: 50%;
-          box-shadow: 0 0 0 4px ${accentColor}26, 0 0 20px ${accentColor}4d;
-        }
-        .cs-timeline-item__line {
-          position: absolute;
-          top: 38px;
-          left: 14px;
-          height: 1px;
-          right: -32px;
-          background: linear-gradient(to right, ${accentColor}4d, rgba(255,255,255,0.05));
-        }
-        .cs-hide-scrollbar::-webkit-scrollbar { display: none; }
-        .cs-hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* ─── CTA strip ──────────────────────────── */
         .cs-cta-strip {
@@ -472,56 +394,15 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       {/* ════════════════════════════════════════════
           DESIGN PROCESS
       ════════════════════════════════════════════ */}
-      <section className="py-28 bg-[#0a0a0a] border-t border-white/[0.07]">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-          <SectionReveal className="mb-5">
-            {[
-              <h2
-                key="h"
-                className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight"
-              >
-                {designHeadingParts.map((seg, i) =>
-                  seg.accent ? (
-                    <span key={i} style={{ color: accentColor }}>
-                      {seg.text}
-                    </span>
-                  ) : (
-                    <span key={i}>{seg.text}</span>
-                  ),
-                )}
-              </h2>,
-            ]}
-          </SectionReveal>
-
-          <p className="text-[17px] text-gray-400 max-w-2xl mb-16 leading-relaxed">
-            {pf.uSortText}
-          </p>
-
-          <SectionReveal className="flex overflow-x-auto pb-16 cs-hide-scrollbar gap-8 px-10 snap-x">
-            {designSteps.map((step: any, i: number) => (
-              <div
-                key={i}
-                className="cs-timeline-item min-w-[260px] shrink-0 snap-center"
-              >
-                <div className="cs-timeline-item__bg-num" aria-hidden="true">
-                  {(i + 1).toString().padStart(2, "0")}
-                </div>
-                <div className="relative z-10">
-                  <div className="cs-timeline-item__dot" />
-                  <div className="cs-timeline-item__line" />
-                  <h4 className="text-xl font-bold mb-3 mt-8">
-                    {htmlToLines(step.dName ?? "").map((line, li) => (
-                      <span key={li} className="block">
-                        {line}
-                      </span>
-                    ))}
-                  </h4>
-                </div>
-              </div>
-            ))}
-          </SectionReveal>
-        </div>
-      </section>
+      <AnimatedSteps
+        steps={designSteps.map((step: any, i: number) => ({
+          number: String(i + 1),
+          numtitle: step.dName ?? "",
+        }))}
+        title={pf.uDesignHeading ?? null}
+        subtext={pf.uSortText ?? null}
+        accentColor={accentColor}
+      />
 
       {/* ════════════════════════════════════════════
           WHY CHOOSE US

@@ -309,6 +309,7 @@ export default async function Home() {
         }
         submitLabel={ts?.cButton ?? null}
         callUsLabel={ts?.cCallUsLabel ?? null}
+        fallbackEmail={ts?.cEmailAddress ?? null}
       />
 
       {/* ══════════════════════════════════════════════

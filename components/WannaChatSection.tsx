@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
+import { submitContactForm } from "@/app/actions/contact";
+import {
+  initialContactState,
+  type ContactFormState,
+} from "@/lib/contact-form";
 
 interface ContactItem {
   label: string;
@@ -14,6 +19,9 @@ interface WannaChatSectionProps {
   formHeading?: string | null;
   submitLabel?: string | null;
   callUsLabel?: string | null;
+  /** Address used for the direct-email fallback shown when no delivery
+   *  provider is configured yet. From WP theme settings (cEmailAddress). */
+  fallbackEmail?: string | null;
 }
 
 const FORM_FIELDS = [
@@ -22,21 +30,33 @@ const FORM_FIELDS = [
   { key: "email", type: "email", label: "Email",        required: true  },
 ] as const;
 
-export function WannaChatSection({ contactItems, leftHeading, formHeading, submitLabel, callUsLabel }: WannaChatSectionProps) {
+export function WannaChatSection({ contactItems, leftHeading, formHeading, submitLabel, callUsLabel, fallbackEmail }: WannaChatSectionProps) {
+  const [state, setState] = useState<ContactFormState>(initialContactState);
+  const [pending, setPending] = useState(false);
   const [fields, setFields] = useState({ name: "", phone: "", email: "" });
   const [focused, setFocused] = useState<string | null>(null);
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = () => {
-    if (status !== "idle") return;
-    setStatus("sending");
-    setTimeout(() => {
-      setStatus("sent");
-      setFields({ name: "", phone: "", email: "" });
-      setTimeout(() => setStatus("idle"), 3500);
-    }, 1600);
-  };
+  // Server Action invoked from the client: dispatch, store the typed result,
+  // and clear inputs only on a confirmed send. setState lives in this async
+  // handler (an event), not an effect — values survive validation errors.
+  async function handleAction(formData: FormData) {
+    setPending(true);
+    const result = await submitContactForm(state, formData);
+    setState(result);
+    if (result.status === "sent") setFields({ name: "", phone: "", email: "" });
+    setPending(false);
+  }
+
+  // Direct-email fallback (mailto) prefilled with whatever the visitor typed —
+  // used when delivery isn't wired up yet, so the lead is never lost.
+  const mailtoHref = fallbackEmail
+    ? `mailto:${fallbackEmail}?subject=${encodeURIComponent(
+        `Website enquiry — ${fields.name}`.trim(),
+      )}&body=${encodeURIComponent(
+        `Name: ${fields.name}\nEmail: ${fields.email}\nPhone: ${fields.phone}`,
+      )}`
+    : null;
 
   /* 3-D tilt on the form card */
   const onCardMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -126,55 +146,98 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
 
                 {formHeading && <h3 className="wc-form__kicker">{formHeading}</h3>}
 
-                <div className="wc-fields">
-                  {FORM_FIELDS.map((f) => {
-                    const val = fields[f.key];
-                    const up  = focused === f.key || val.length > 0;
-                    return (
-                      <div key={f.key} className={`wc-field${up ? " wc-field--up" : ""}`}>
-                        <label className="wc-field__lbl" htmlFor={`wc-${f.key}`}>
-                          {f.label}{f.required && <i className="wc-req">*</i>}
-                        </label>
-                        <input
-                          id={`wc-${f.key}`}
-                          type={f.type}
-                          className="wc-field__inp"
-                          value={val}
-                          onChange={e => setFields(p => ({ ...p, [f.key]: e.target.value }))}
-                          onFocus={() => setFocused(f.key)}
-                          onBlur={() => setFocused(null)}
-                          autoComplete={f.key}
-                        />
-                        <span className="wc-field__bar" />
-                      </div>
-                    );
-                  })}
+                <form action={handleAction} noValidate>
+                  {/* Honeypot — hidden from users, catches bots. */}
+                  <input
+                    type="text"
+                    name="company"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="wc-honeypot"
+                  />
 
-                </div>
+                  <div className="wc-fields">
+                    {FORM_FIELDS.map((f) => {
+                      const val = fields[f.key];
+                      const up  = focused === f.key || val.length > 0;
+                      const err = state.errors[f.key as keyof typeof state.errors];
+                      return (
+                        <div key={f.key} className={`wc-field${up ? " wc-field--up" : ""}`}>
+                          <label className="wc-field__lbl" htmlFor={`wc-${f.key}`}>
+                            {f.label}{f.required && <i className="wc-req">*</i>}
+                          </label>
+                          <input
+                            id={`wc-${f.key}`}
+                            name={f.key}
+                            type={f.type}
+                            className="wc-field__inp"
+                            value={val}
+                            onChange={e => setFields(p => ({ ...p, [f.key]: e.target.value }))}
+                            onFocus={() => setFocused(f.key)}
+                            onBlur={() => setFocused(null)}
+                            autoComplete={f.key}
+                            aria-invalid={err ? true : undefined}
+                            aria-describedby={err ? `wc-${f.key}-err` : undefined}
+                          />
+                          <span className="wc-field__bar" />
+                          {err && (
+                            <span id={`wc-${f.key}-err`} className="wc-field__err">
+                              {err}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
 
-                <button
-                  type="button"
-                  className={`wc-btn${status === "sending" ? " wc-btn--busy" : ""}${status === "sent" ? " wc-btn--done" : ""}`}
-                  onClick={handleSubmit}
-                  disabled={status !== "idle"}
-                  aria-live="polite"
-                >
-                  <span className="wc-btn__sweep" />
-                  <span className="wc-btn__txt">
-                    {status === "sent" ? "✓" : status === "sending" ? "…" : (submitLabel ?? "")}
-                  </span>
-                  {status === "idle" && (
-                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
-                      <path d="M2 8.5H15M11 4L15.5 8.5L11 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                  {status === "sent" && (
-                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
-                      <path d="M2.5 9L7 13.5L14.5 4.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                  {status === "sending" && <span className="wc-btn__spin" />}
-                </button>
+                  <button
+                    type="submit"
+                    className={`wc-btn${pending ? " wc-btn--busy" : ""}${state.status === "sent" ? " wc-btn--done" : ""}`}
+                    disabled={pending || state.status === "sent"}
+                  >
+                    <span className="wc-btn__sweep" />
+                    <span className="wc-btn__txt">
+                      {state.status === "sent" ? "✓" : pending ? "…" : (submitLabel ?? "")}
+                    </span>
+                    {!pending && state.status !== "sent" && (
+                      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+                        <path d="M2 8.5H15M11 4L15.5 8.5L11 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                    {state.status === "sent" && (
+                      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+                        <path d="M2.5 9L7 13.5L14.5 4.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                    {pending && <span className="wc-btn__spin" />}
+                  </button>
+
+                  {/* Status / fallback region */}
+                  <div className="wc-status" role="status" aria-live="polite">
+                    {state.status === "sent" && (
+                      <p className="wc-status__ok">Thanks — we’ll be in touch shortly.</p>
+                    )}
+                    {state.status === "error" && state.message && (
+                      <p className="wc-status__err">{state.message}</p>
+                    )}
+                    {state.status === "unconfigured" && (
+                      <p className="wc-status__err">
+                        {mailtoHref ? (
+                          <>
+                            We couldn’t send that automatically yet. Please{" "}
+                            <a href={mailtoHref} className="wc-status__link">
+                              email us directly
+                            </a>{" "}
+                            and we’ll get right back to you.
+                          </>
+                        ) : (
+                          "We couldn’t send that automatically yet. Please reach us using the contact details on this page."
+                        )}
+                      </p>
+                    )}
+                  </div>
+                </form>
               </div>
             </div>
 
@@ -523,6 +586,43 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
           transition: transform 0.36s cubic-bezier(.23,1,.32,1);
         }
         .wc-field:focus-within .wc-field__bar { transform: scaleX(1); }
+
+        /* honeypot — visually hidden, off-screen, not announced */
+        .wc-honeypot {
+          position: absolute;
+          left: -9999px;
+          width: 1px; height: 1px;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        /* inline field error */
+        .wc-field__err {
+          display: block;
+          margin-top: 8px;
+          font-size: 12.5px;
+          color: #f87171;
+          letter-spacing: 0.01em;
+        }
+
+        /* status / fallback region */
+        .wc-status { margin-top: 18px; min-height: 1px; }
+        .wc-status__ok {
+          font-size: 14px;
+          color: #4ade80;
+          font-weight: 500;
+        }
+        .wc-status__err {
+          font-size: 14px;
+          line-height: 1.6;
+          color: rgba(255,255,255,0.62);
+        }
+        .wc-status__link {
+          color: #facc15;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+        }
+        .wc-status__link:hover { color: #fbbf24; }
 
         /* ── submit button ── */
         .wc-btn {

@@ -1,9 +1,6 @@
 import { client } from "@/lib/apollo-client";
-import {
-  GET_SERVICES_PAGE,
-  GET_THEME_SETTINGS,
-  buildServiceDetailsQuery,
-} from "@/lib/queries";
+import { GET_SERVICES_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
+import { enrichServiceDetails } from "@/lib/service-details";
 import { gql } from "@apollo/client";
 import Link from "next/link";
 import { SectionReveal } from "@/components/SectionReveal";
@@ -11,7 +8,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
 import { HeroHeadline } from "@/components/HeroHeadline";
 import { ClientsSection } from "@/components/ClientsSection";
-import { ServiceModalMenu, type ServiceDetail } from "@/components/ServiceModalMenu";
+import { ServiceModalMenu } from "@/components/ServiceModalMenu";
 import { ServiceTechGroups, type TechGroup } from "@/components/ServiceTechGroups";
 import parse from "html-react-parser";
 
@@ -47,68 +44,6 @@ async function getThemeSettings() {
   }
 }
 
-/** Turn a WP link ("https://triolla.io/services/x/" or "/services/x") into a
- *  URI path ("services/x") suitable for `page(idType: URI)`. Returns null if
- *  there's nothing usable. */
-function deriveUri(link: string): string | null {
-  if (!link) return null;
-  let path = link;
-  try {
-    path = new URL(link).pathname;
-  } catch {
-    // already a relative path
-  }
-  const trimmed = path.replace(/^\/+|\/+$/g, "");
-  return trimmed || null;
-}
-
-/** Prefetch all Product service detail pages in one batched request and merge
- *  them onto the menu items by index. Any page that fails to resolve keeps
- *  `hasDetail: false`, so the menu renders it as a plain link — never a modal
- *  with fabricated content. The whole fetch is wrapped so a backend failure
- *  degrades every item to a plain link rather than throwing the page. */
-async function getServiceDetails(
-  menu: Array<{ label?: string | null; link?: string | null }>
-): Promise<ServiceDetail[]> {
-  const enriched: ServiceDetail[] = (menu ?? []).map((item) => ({
-    label: item?.label ?? null,
-    link: item?.link ?? null,
-    title: null,
-    image: null,
-    altText: "",
-    boldText: null,
-    content: null,
-    hasDetail: false,
-  }));
-
-  const queryable = enriched
-    .map((e, index) => ({ e, index, uri: deriveUri(e.link ?? "") }))
-    .filter((q): q is { e: ServiceDetail; index: number; uri: string } => !!q.uri);
-
-  if (queryable.length === 0) return enriched;
-
-  try {
-    const { data } = await client.query<any>({
-      query: gql`${buildServiceDetailsQuery(queryable.map((q) => q.uri))}`,
-    });
-    queryable.forEach((q, i) => {
-      const page = data?.[`s${i}`];
-      if (!page) return; // unresolved → stays a plain link
-      const e = enriched[q.index];
-      e.title = page.title ?? null;
-      e.image = page.featuredImage?.node?.sourceUrl ?? null;
-      e.altText = page.featuredImage?.node?.altText ?? "";
-      e.boldText = page.template?.postFields?.topBoldText ?? null;
-      e.content = page.content ?? null;
-      e.hasDetail = true;
-    });
-  } catch {
-    return enriched; // backend failure → all plain links
-  }
-
-  return enriched;
-}
-
 export default async function ServicesPage() {
   const [sp, ts] = await Promise.all([getServicesData(), getThemeSettings()]);
 
@@ -116,19 +51,19 @@ export default async function ServicesPage() {
   // detail page in parallel. Anything that doesn't resolve degrades to a plain
   // link (or plain text) rather than a fabricated modal.
   const [productServices, brandServices, engServices] = await Promise.all([
-    getServiceDetails(
+    enrichServiceDetails(
       (sp.prodrightMenu ?? []).map((i: any) => ({
         label: i?.prodmtitle ?? null,
         link: i?.prodmlink ?? null,
       }))
     ),
-    getServiceDetails(
+    enrichServiceDetails(
       (sp.brandrightMenu ?? []).map((i: any) => ({
         label: i?.rightmetitle ?? null,
         link: i?.rightmelink ?? null,
       }))
     ),
-    getServiceDetails([
+    enrichServiceDetails([
       { label: sp.devrightMenuToptitle ?? null, link: sp.devrightMenuToptitleLink ?? null },
       { label: sp.devrightMenuBottitle ?? null, link: sp.devrightMenuBottitleLink ?? null },
       { label: sp.rightMenuThreeTitle ?? null, link: sp.rightMenuThreeTitleLink ?? null },
