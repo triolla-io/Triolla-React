@@ -10,6 +10,7 @@ import { WannaChatSection } from "@/components/WannaChatSection";
 import { WhyUsSection } from "@/components/WhyUsSection";
 import AnimatedSteps from "@/components/AnimatedSteps";
 import { ClientsSection } from "@/components/ClientsSection";
+import { GrainOverlay, GlowOrb, Eyebrow } from "@/components/ui";
 import { client } from "@/lib/apollo-client";
 import { GET_HOME_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
@@ -130,7 +131,7 @@ export default async function Home() {
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
       {/* ── Grain noise overlay ── */}
-      <div aria-hidden="true" className="grain-overlay" />
+      <GrainOverlay />
 
       {/* ══════════════════════════════════════════════
           HERO
@@ -138,24 +139,38 @@ export default async function Home() {
       <section className="relative min-h-screen flex flex-col items-center pt-24 md:pt-32 pb-14 md:pb-20 px-4 overflow-hidden">
         {/* Ambient orb cluster */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          <div className="hero-orb hero-orb--gold" />
-          <div className="hero-orb hero-orb--amber" />
-          <div className="hero-orb hero-orb--dim" />
+          <GlowOrb
+            size={900} height={500} shape="ellipse" fade="70%" blur={80}
+            color="rgba(250,204,21,0.14)" animation="pulse" duration={8}
+            className="bottom-[-10%] left-1/2 -translate-x-1/2 max-md:w-[560px] max-md:h-[320px]"
+          />
+          <GlowOrb
+            size={600} fade="65%" blur={80}
+            color="rgba(251,146,60,0.06)" animation="pulse-rev" duration={11}
+            className="top-[-5%] left-[-10%] max-md:w-[400px] max-md:h-[400px] max-md:top-0 max-md:left-[-20%]"
+          />
+          <GlowOrb
+            size={500} fade="65%" blur={80}
+            color="rgba(250,204,21,0.05)" animation="pulse" duration={14}
+            className="top-[10%] right-[-8%] max-md:w-[320px] max-md:h-[320px]"
+          />
           <div className="hero-grid" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center w-full">
           {/* Eyebrow */}
-          <div className="eyebrow">
-            <span className="eyebrow__dot" />
+          <Eyebrow
+            ornament="dot"
+            align="center"
+            style={{ "--eb-spacing": "0.25em", "--eb-mb": "28px", "--eb-weight": "600" } as React.CSSProperties}
+          >
             Product UX/UI design for
-            <span className="eyebrow__dot" />
-          </div>
+          </Eyebrow>
 
           <HeroHeadline
             headline={heroHeadline}
             subtext={heroSubtext}
-            headlineClassName="text-[clamp(2.2rem,10vw,110px)] leading-[0.9] font-bold tracking-tighter mb-6 md:mb-8 max-w-[1200px] hero-headline"
+            headlineClassName="text-[clamp(2.2rem,10vw,110px)] leading-[0.9] font-bold tracking-tighter mb-6 md:mb-8 max-w-[1200px] gradient-text gradient-text--animate"
             subtextClassName="text-base md:text-xl lg:text-2xl font-light text-gray-400 max-w-3xl mx-auto leading-relaxed"
           />
         </div>
@@ -319,70 +334,6 @@ export default async function Home() {
         /* ─── Fonts ─────────────────────────────── */
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
 
-        /* ─── Grain overlay ─────────────────────── */
-        .grain-overlay {
-          position: fixed;
-          inset: -50%;
-          width: 200%;
-          height: 200%;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-          background-size: 200px 200px;
-          opacity: 0.04;
-          pointer-events: none;
-          z-index: 9999;
-          animation: grain 8s steps(10) infinite;
-        }
-        @keyframes grain {
-          0%   { transform: translate(0,0); }
-          10%  { transform: translate(-5%,-10%); }
-          20%  { transform: translate(-15%, 5%); }
-          30%  { transform: translate( 7%,-25%); }
-          40%  { transform: translate(-5%, 25%); }
-          50%  { transform: translate(-15%, 10%); }
-          60%  { transform: translate(15%, 0%); }
-          70%  { transform: translate( 0%, 15%); }
-          80%  { transform: translate( 3%,  35%); }
-          90%  { transform: translate(-10%, 10%); }
-          100% { transform: translate(0, 0); }
-        }
-
-        /* ─── Hero ambient orbs ─────────────────── */
-        .hero-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          pointer-events: none;
-        }
-        .hero-orb--gold {
-          bottom: -10%;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 900px;
-          height: 500px;
-          background: radial-gradient(ellipse at center, rgba(250,204,21,0.14) 0%, transparent 70%);
-          animation: orbPulse 8s ease-in-out infinite;
-        }
-        .hero-orb--amber {
-          top: -5%;
-          left: -10%;
-          width: 600px;
-          height: 600px;
-          background: radial-gradient(circle, rgba(251,146,60,0.06) 0%, transparent 65%);
-          animation: orbPulse 11s ease-in-out infinite reverse;
-        }
-        .hero-orb--dim {
-          top: 10%;
-          right: -8%;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
-          animation: orbPulse 14s ease-in-out infinite;
-        }
-        @keyframes orbPulse {
-          0%,100% { opacity: 1; transform: scale(1) translateX(var(--tx,0)); }
-          50%      { opacity: 0.7; transform: scale(1.08) translateX(var(--tx,0)); }
-        }
-
         /* ─── Hero grid lines ───────────────────── */
         .hero-grid {
           position: absolute;
@@ -394,91 +345,6 @@ export default async function Home() {
           mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
         }
 
-        /* ─── Hero headline golden shimmer ──────── */
-        .hero-headline {
-          background: linear-gradient(135deg, #fff 40%, #facc15 55%, #fff 70%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: textShimmer 6s linear infinite;
-        }
-        @keyframes textShimmer {
-          0%   { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
-
-        /* ─── Eyebrow label ─────────────────────── */
-        .eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          color: #facc15;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          margin-bottom: 28px;
-        }
-        .eyebrow__dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #facc15;
-          animation: dotBlink 2s ease-in-out infinite;
-        }
-        @keyframes dotBlink {
-          0%,100% { opacity: 1; }
-          50%      { opacity: 0.3; }
-        }
-
-        .section-eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: #6b7280;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          margin-bottom: 0;
-        }
-
-        /* ─── Buttons ───────────────────────────── */
-        .btn-primary {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: #facc15;
-          color: #000;
-          font-weight: 700;
-          font-size: 15px;
-          padding: 14px 28px;
-          border-radius: 999px;
-          transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-          box-shadow: 0 0 0 0 rgba(250,204,21,0);
-        }
-        .btn-primary:hover {
-          background: #fff;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(250,204,21,0.3);
-        }
-        .btn-ghost {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          color: rgba(255,255,255,0.6);
-          font-size: 15px;
-          font-weight: 500;
-          padding: 14px 20px;
-          border-radius: 999px;
-          border: 1px solid rgba(255,255,255,0.1);
-          transition: color 0.2s, border-color 0.2s;
-        }
-        .btn-ghost:hover {
-          color: #fff;
-          border-color: rgba(255,255,255,0.3);
-        }
         /* ─── Scroll cue ────────────────────────── */
         .scroll-cue {
           position: absolute;
@@ -501,10 +367,6 @@ export default async function Home() {
           letter-spacing: 0.2em;
           text-transform: uppercase;
           color: rgba(255,255,255,0.3);
-        }
-        @keyframes scrollPulse {
-          0%,100% { opacity: 0.4; transform: scaleY(1); }
-          50%      { opacity: 1;   transform: scaleY(1.1); }
         }
 
         /* ─── Portfolio cards ───────────────────── */
@@ -710,19 +572,6 @@ export default async function Home() {
         /* ══════════════════════════════════════════
            MOBILE-ONLY STYLES (max-width: 768px)
         ══════════════════════════════════════════ */
-
-        /* ─── Hero orbs — feel bigger on mobile ── */
-        @media (max-width: 768px) {
-          .hero-orb--gold {
-            width: 560px; height: 320px;
-          }
-          .hero-orb--amber {
-            width: 400px; height: 400px; top: 0; left: -20%;
-          }
-          .hero-orb--dim {
-            width: 320px; height: 320px;
-          }
-        }
 
         /* ─── Winners section ──────────────────── */
         @media (max-width: 768px) {

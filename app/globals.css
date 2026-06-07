@@ -87,6 +87,10 @@ body {
 }
 
 /* ───────────────────────── Shared component classes ───────────────────── */
+/* In @layer components so plain Tailwind utility classes (passed via the
+   primitives' `className` prop) always win over these base styles. */
+
+@layer components {
 
 .grain {
   position: fixed;
@@ -293,3 +297,5 @@ body {
 
 .wave-divider { position: relative; line-height: 0; z-index: 2; margin-top: var(--wave-mt, 64px); }
 .wave-divider svg { width: 100%; display: block; }
+
+}
