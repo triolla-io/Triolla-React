@@ -100,3 +100,17 @@ body {
   z-index: 9999;
   animation: grain 8s steps(10) infinite;
 }
+
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  width: var(--orb-w);
+  height: var(--orb-h, var(--orb-w));
+  background: radial-gradient(var(--orb-shape, circle) at center, var(--orb-color) 0%, transparent var(--orb-fade, 65%));
+  filter: blur(var(--orb-blur, 0px));
+}
+.glow-orb--pulse      { animation: orbPulse var(--orb-dur, 9s) ease-in-out infinite; }
+.glow-orb--pulse-rev  { animation: orbPulse var(--orb-dur, 9s) ease-in-out infinite reverse; }
+.glow-orb--drift      { animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate; }
+.glow-orb--drift-rev  { animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate-reverse; }
