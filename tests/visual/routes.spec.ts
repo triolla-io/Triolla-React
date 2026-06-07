@@ -14,14 +14,14 @@ const ROUTES = [
 ];
 
 for (const route of ROUTES) {
-  test(`full-page screenshot ${route}`, async ({ page }) => {
+  const name = route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "");
+  test(`full-page screenshot ${name} (${route})`, async ({ page }) => {
     await page.goto(route, { waitUntil: "networkidle" });
     // Settle lazy/in-view content and webfont swap before snapshotting.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(800);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(400);
-    const name = route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "");
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true });
   });
 }
