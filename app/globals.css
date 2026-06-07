@@ -200,3 +200,20 @@ body {
   color: #000;
   transform: translateY(-2px);
 }
+
+.section-head { text-align: center; margin-bottom: var(--sh-mb, 72px); max-width: var(--sh-max, none); margin-left: auto; margin-right: auto; }
+.section-head__title {
+  font-size: var(--sh-title-size, clamp(2.2rem, 5.5vw, 4.8rem));
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 18px;
+  color: var(--sh-title-color, #fff);
+}
+.section-head__sub {
+  font-size: var(--sh-sub-size, 1.05rem);
+  color: var(--sh-sub-color, #6b7280);
+  max-width: var(--sh-sub-max, 600px);
+  margin: 0 auto;
+  line-height: 1.74;
+}
