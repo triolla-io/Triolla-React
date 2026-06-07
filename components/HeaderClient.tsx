@@ -108,10 +108,11 @@ function DropdownItem({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.98 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6 z-[9999]"
+              className="fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6"
               style={
                 showPromo
                   ? {
+                      zIndex: 9999,
                       top: rect.bottom + 12,
                       left: Math.max(
                         16,
@@ -126,6 +127,7 @@ function DropdownItem({
                       gap: "24px",
                     }
                   : {
+                      zIndex: 9999,
                       top: rect.bottom + 12,
                       left: rect.left + rect.width / 2,
                       transform: "translateX(-50%)",
@@ -173,7 +175,11 @@ function DropdownItem({
                   <motion.div
                     initial={{ opacity: 0, x: 14 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
+                    transition={{
+                      duration: 0.32,
+                      ease: [0.16, 1, 0.3, 1],
+                      delay: 0.06,
+                    }}
                     style={{
                       position: "relative",
                       flexShrink: 0,
