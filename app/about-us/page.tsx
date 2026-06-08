@@ -343,14 +343,14 @@ export default async function AboutUsPage() {
       <section className="about-services">
         <div className="about-services__dots" aria-hidden="true" />
         <div className="about-services__inner">
-          <FadeIn className="section-head" style={{ "--sh-title-color": "#0a0a0a", "--sh-sub-color": "#4b5563" } as React.CSSProperties}>
+          <FadeIn className="section-head">
             <Eyebrow ornament="line" align="center" color="rgba(0,0,0,0.45)" style={{ "--eb-line-bg": "rgba(0,0,0,0.35)", "--eb-line-opacity": "1", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
               — 03 —
             </Eyebrow>
-            {ap.servtitle && <h2 className="section-head__title">{ap.servtitle}</h2>}
+            {ap.servtitle && <h2 className="section-head__title" style={{ color: "#0a0a0a" }}>{ap.servtitle}</h2>}
             {ap.servtext && (
               /* WP-sourced HTML — trusted backend only */
-              <div className="section-head__sub" style={{ "--sh-sub-max": "620px" } as React.CSSProperties}>{parse(ap.servtext)}</div>
+              <div className="section-head__sub" style={{ "--sh-sub-max": "620px", color: "#4b5563" } as React.CSSProperties}>{parse(ap.servtext)}</div>
             )}
           </FadeIn>
 

@@ -60,21 +60,35 @@ export function ClientsSection({
           background: rgba(255,255,255,0.025);
           display: flex; align-items: center; justify-content: center;
           padding: 14px;
-          transition: border-color 0.4s, background 0.4s, transform 0.4s, box-shadow 0.4s;
+          position: relative;
+          transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
           overflow: hidden;
           backdrop-filter: blur(2px);
         }
-        .cs-logo-card:hover {
-          border-color: color-mix(in srgb, var(--accent) 19%, transparent);
-          background: color-mix(in srgb, var(--accent) 3.1%, transparent);
-          transform: translateY(-5px) scale(1.04);
-          box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 24px color-mix(in srgb, var(--accent) 7%, transparent);
+        /* Inset radial glow — revealed on hover via pseudo-element, zero overflow */
+        .cs-logo-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 70%);
+          opacity: 0;
+          transition: opacity 0.35s ease;
+          pointer-events: none;
         }
+        .cs-logo-card:hover {
+          border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+          background: color-mix(in srgb, var(--accent) 3.5%, transparent);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent);
+        }
+        .cs-logo-card:hover::after { opacity: 1; }
         .cs-logo-img {
           width: 100%; height: 100%;
           object-fit: contain; object-position: center;
           border-radius: 10px;
+          transition: opacity 0.35s ease;
         }
+        .cs-logo-card:hover .cs-logo-img { opacity: 0.9; }
         @media (max-width: 768px) {
           .cs-clients { padding: 52px 0 64px; }
           .cs-logo-card { width: 136px; height: 88px; border-radius: 18px; }
