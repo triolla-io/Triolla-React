@@ -137,7 +137,7 @@ body {
   background: var(--eb-pill-bg, color-mix(in srgb, var(--accent) 9%, transparent));
 }
 .eyebrow__dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: var(--eb-dot, 6px); height: var(--eb-dot, 6px); border-radius: 50%;
   background: currentColor;
   animation: dotBlink 2.2s ease-in-out infinite;
   flex-shrink: 0;
@@ -166,7 +166,7 @@ body {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--btn-gap, 8px);
   border-radius: 999px;
   font-size: var(--btn-size, 15px);
   padding: var(--btn-pad, 14px 28px);

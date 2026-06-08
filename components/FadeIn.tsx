@@ -10,6 +10,7 @@ interface FadeInProps {
   yOffset?: number;
   xOffset?: number;
   className?: string;
+  style?: React.CSSProperties;
   viewportMargin?: string;
   viewportOnce?: boolean;
 }
@@ -21,6 +22,7 @@ export function FadeIn({
   yOffset = 40,
   xOffset = 0,
   className = "",
+  style,
   viewportMargin = "-100px",
   viewportOnce = true,
 }: FadeInProps) {
@@ -31,6 +33,7 @@ export function FadeIn({
       viewport={{ once: viewportOnce, margin: viewportMargin }}
       transition={{ duration, delay, ease: "easeOut" }}
       className={className}
+      style={style}
     >
       {children}
     </motion.div>
