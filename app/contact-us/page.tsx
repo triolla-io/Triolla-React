@@ -1,9 +1,11 @@
+import React from "react";
 import type { Metadata } from "next";
 import { client } from "@/lib/apollo-client";
 import { GET_CONTACT_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
 import { FadeIn } from "@/components/FadeIn";
 import { WannaChatSection } from "@/components/WannaChatSection";
+import { GlowOrb, Eyebrow } from "@/components/ui";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -109,16 +111,12 @@ export default async function ContactUsPage() {
     <main className="bg-[#080808] text-white overflow-x-clip relative pb-32">
       {/* ══ HERO ══ */}
       <section className="cu-hero">
-        <div className="cu-hero__orb" aria-hidden="true" />
+        <GlowOrb size={900} height={480} shape="ellipse" fade="70%" blur={60} color="rgba(250,204,21,0.1)" className="top-[-10%] left-1/2 -translate-x-1/2 z-0" />
         <div className="cu-hero__grid" aria-hidden="true" />
 
         <div className="cu-hero__content">
           <FadeIn yOffset={20} duration={0.7}>
-            <div className="cu-eyebrow">
-              <span className="cu-eyebrow__dot" />
-              Contact
-              <span className="cu-eyebrow__dot" />
-            </div>
+            <Eyebrow ornament="dot" style={{ "--eb-weight": "600", "--eb-mb": "26px" } as React.CSSProperties}>Contact</Eyebrow>
           </FadeIn>
 
           {heroTitle && (
@@ -179,12 +177,6 @@ export default async function ContactUsPage() {
           padding: 160px 24px 40px;
           display: flex; justify-content: center;
         }
-        .cu-hero__orb {
-          position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
-          width: 900px; height: 480px; pointer-events: none; z-index: 0;
-          background: radial-gradient(ellipse at center, rgba(250,204,21,0.1) 0%, transparent 70%);
-          filter: blur(60px);
-        }
         .cu-hero__grid {
           position: absolute; inset: 0; pointer-events: none; z-index: 0;
           background-image:
@@ -198,12 +190,6 @@ export default async function ContactUsPage() {
           max-width: 900px; width: 100%; text-align: center;
           display: flex; flex-direction: column; align-items: center;
         }
-        .cu-eyebrow {
-          display: inline-flex; align-items: center; gap: 12px;
-          color: #facc15; font-size: 11px; font-weight: 600;
-          letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 26px;
-        }
-        .cu-eyebrow__dot { width: 6px; height: 6px; border-radius: 50%; background: #facc15; }
         .cu-hero__title {
           font-size: clamp(2.6rem, 9vw, 6rem);
           font-weight: 900; letter-spacing: -0.045em; line-height: 0.96;

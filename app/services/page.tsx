@@ -2,7 +2,6 @@ import { client } from "@/lib/apollo-client";
 import { GET_SERVICES_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { enrichServiceDetails } from "@/lib/service-details";
 import { gql } from "@apollo/client";
-import Link from "next/link";
 import { SectionReveal } from "@/components/SectionReveal";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
@@ -10,6 +9,7 @@ import { HeroHeadline } from "@/components/HeroHeadline";
 import { ClientsSection } from "@/components/ClientsSection";
 import { ServiceModalMenu } from "@/components/ServiceModalMenu";
 import { ServiceTechGroups, type TechGroup } from "@/components/ServiceTechGroups";
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from "@/components/ui";
 import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
@@ -146,12 +146,22 @@ export default async function ServicesPage() {
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
 
       {/* Grain overlay */}
-      <div aria-hidden="true" className="svc-grain" />
+      <GrainOverlay />
 
       {/* ══ HERO ══ */}
       <section className="svc-hero">
-        <div className="svc-hero__orb svc-hero__orb--gold" aria-hidden="true" />
-        <div className="svc-hero__orb svc-hero__orb--amber" aria-hidden="true" />
+        {/* animation="none" preserves base CSS transform (-translate-x-1/2) and matches
+            frame-0 opacity of the original svcOrbGold (0.85) / svcOrbAmber (0.6) keyframes */}
+        <GlowOrb
+          size={900} height={480} shape="ellipse" fade="70%" blur={80}
+          color="rgba(250,204,21,0.13)"
+          className="bottom-[-12%] left-1/2 -translate-x-1/2 z-0 opacity-85"
+        />
+        <GlowOrb
+          size={640} fade="65%" blur={80}
+          color="rgba(251,146,60,0.055)"
+          className="top-[-8%] left-[-12%] z-0 opacity-60"
+        />
         <div className="svc-hero__grid" aria-hidden="true" />
 
         {/* Corner frame brackets */}
@@ -175,17 +185,20 @@ export default async function ServicesPage() {
         <div className="svc-hero__content">
           {sp.headerSubText && (
             <FadeIn yOffset={20} duration={0.7}>
-              <div className="svc-eyebrow svc-eyebrow--gold">
-                <span className="svc-eyebrow__dot" />
+              <Eyebrow
+                ornament="dot"
+                align="center"
+                style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em", "--eb-dot": "5px" } as React.CSSProperties}
+              >
                 {sp.headerSubText}
-                <span className="svc-eyebrow__dot" />
-              </div>
+              </Eyebrow>
             </FadeIn>
           )}
 
           <HeroHeadline
             headline={heroTitle}
-            headlineClassName="svc-hero__title"
+            headlineClassName="gradient-text gradient-text--animate text-[clamp(3.6rem,11vw,128px)] font-black leading-[0.88] tracking-[-0.055em] mb-12 [word-break:break-word]"
+            headlineStyle={{ "--gt-gradient": "linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)" } as React.CSSProperties}
           />
 
           <FadeIn delay={0.22} duration={0.8}>
@@ -214,12 +227,16 @@ export default async function ServicesPage() {
               )}
               {sp.buttonText && (
                 <FadeIn yOffset={20} delay={0.56}>
-                  <Link href="/contact-us" className="svc-hero__cta">
+                  <Button
+                    href="/contact-us"
+                    variant="primary"
+                    style={{ "--btn-pad": "16px 34px", "--btn-gap": "10px", boxShadow: "0 4px 28px rgba(250,204,21,0.24)" } as React.CSSProperties}
+                  >
                     {sp.buttonText}
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                       <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                  </Link>
+                  </Button>
                 </FadeIn>
               )}
             </div>
@@ -235,14 +252,17 @@ export default async function ServicesPage() {
         {/* Scrolling category strip */}
         {svcCategories.length > 0 && (
           <div className="svc-hero__strip" aria-hidden="true">
-            <div className="svc-hero__strip-track">
-              {[...svcCategories, ...svcCategories, ...svcCategories, ...svcCategories].map((cat, i) => (
+            <Marquee
+              items={svcCategories}
+              repeat={4}
+              speed={44}
+              renderItem={(cat, i) => (
                 <span key={i} className="svc-hero__strip-item">
                   {cat}
                   <span className="svc-hero__strip-dot">✦</span>
                 </span>
-              ))}
-            </div>
+              )}
+            />
           </div>
         )}
       </section>
@@ -250,17 +270,20 @@ export default async function ServicesPage() {
       {/* ══ PRODUCT DESIGN ══ */}
       <section className="svc-prod">
         <div className="svc-prod__inner">
-          <FadeIn className="svc-section-head">
-            <div className="svc-eyebrow svc-eyebrow--center">
-              <span className="svc-eyebrow__line" />
+          <FadeIn className="section-head">
+            <Eyebrow
+              ornament="line"
+              align="center"
+              color="rgba(255,255,255,0.3)"
+              style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}
+            >
               — 01 —
-              <span className="svc-eyebrow__line" />
-            </div>
+            </Eyebrow>
             {sp.prodtitle && (
-              <h2 className="svc-section-title">{stripHtml(sp.prodtitle)}</h2>
+              <h2 className="section-head__title">{stripHtml(sp.prodtitle)}</h2>
             )}
             {/* WP-sourced HTML — trusted backend only */}
-            {sp.proddtxt && <div className="svc-section-sub">{parse(sp.proddtxt)}</div>}
+            {sp.proddtxt && <div className="section-head__sub">{parse(sp.proddtxt)}</div>}
           </FadeIn>
 
           <div className="svc-prod__body">
@@ -324,11 +347,7 @@ export default async function ServicesPage() {
         </div>
 
         {/* Wave: dark → cream */}
-        <div className="svc-wave-down" aria-hidden="true">
-          <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z" fill="#f0eeea" />
-          </svg>
-        </div>
+        <WaveDivider to="#f0eeea" />
       </section>
 
       {/* ══ BRANDING ══ */}
@@ -336,17 +355,20 @@ export default async function ServicesPage() {
         <div className="svc-brand__dots" aria-hidden="true" />
 
         <div className="svc-brand__inner">
-          <FadeIn className="svc-section-head">
-            <div className="svc-eyebrow svc-eyebrow--center svc-eyebrow--dark-text">
-              <span className="svc-eyebrow__line svc-eyebrow__line--dark" />
+          <FadeIn className="section-head" style={{ "--sh-title-color": "#0a0a0a", "--sh-sub-color": "#4b5563" } as React.CSSProperties}>
+            <Eyebrow
+              ornament="line"
+              align="center"
+              color="rgba(0,0,0,0.45)"
+              style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em", "--eb-line-bg": "rgba(0,0,0,0.35)", "--eb-line-opacity": "1" } as React.CSSProperties}
+            >
               — 02 —
-              <span className="svc-eyebrow__line svc-eyebrow__line--dark" />
-            </div>
+            </Eyebrow>
             {sp.brandtitle && (
-              <h2 className="svc-section-title svc-section-title--dark">{stripHtml(sp.brandtitle)}</h2>
+              <h2 className="section-head__title">{stripHtml(sp.brandtitle)}</h2>
             )}
             {/* WP-sourced HTML — trusted backend only */}
-            {sp.brandtext && <div className="svc-section-sub svc-section-sub--dark">{parse(sp.brandtext)}</div>}
+            {sp.brandtext && <div className="section-head__sub">{parse(sp.brandtext)}</div>}
           </FadeIn>
 
           <div className="svc-brand__body">
@@ -376,28 +398,27 @@ export default async function ServicesPage() {
         </div>
 
         {/* Wave: cream → dark */}
-        <div className="svc-wave-down" aria-hidden="true">
-          <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z" fill="#080808" />
-          </svg>
-        </div>
+        <WaveDivider to="#080808" />
       </section>
 
       {/* ══ ENGINEERING ══ */}
       <section className="svc-dev">
         <div className="svc-dev__orb" aria-hidden="true" />
         <div className="svc-dev__inner">
-          <FadeIn className="svc-section-head">
-            <div className="svc-eyebrow svc-eyebrow--center">
-              <span className="svc-eyebrow__line" />
+          <FadeIn className="section-head">
+            <Eyebrow
+              ornament="line"
+              align="center"
+              color="rgba(255,255,255,0.3)"
+              style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}
+            >
               — 03 —
-              <span className="svc-eyebrow__line" />
-            </div>
+            </Eyebrow>
             {sp.devtitle && (
-              <h2 className="svc-section-title">{stripHtml(sp.devtitle)}</h2>
+              <h2 className="section-head__title">{stripHtml(sp.devtitle)}</h2>
             )}
             {/* WP-sourced HTML — trusted backend only */}
-            {sp.devtext && <div className="svc-section-sub">{parse(sp.devtext)}</div>}
+            {sp.devtext && <div className="section-head__sub">{parse(sp.devtext)}</div>}
           </FadeIn>
 
           <div className="svc-dev__body">
@@ -442,53 +463,6 @@ export default async function ServicesPage() {
         ::selection { background: #fed125; color: #000; }
         .svc-brand ::selection { background: #0a0a0a; color: #fff; }
 
-        /* ─── Grain overlay ─────────────────────── */
-        .svc-grain {
-          position: fixed; inset: -50%;
-          width: 200%; height: 200%;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-          background-size: 200px 200px;
-          opacity: 0.04; pointer-events: none; z-index: 9999;
-          animation: svcGrain 8s steps(10) infinite;
-        }
-        @keyframes svcGrain {
-          0%   { transform: translate(0,0); }
-          10%  { transform: translate(-5%,-10%); }
-          20%  { transform: translate(-15%,5%); }
-          30%  { transform: translate(7%,-25%); }
-          40%  { transform: translate(-5%,25%); }
-          50%  { transform: translate(-15%,10%); }
-          60%  { transform: translate(15%,0%); }
-          70%  { transform: translate(0%,15%); }
-          80%  { transform: translate(3%,35%); }
-          90%  { transform: translate(-10%,10%); }
-          100% { transform: translate(0,0); }
-        }
-
-        /* ─── Eyebrow ────────────────────────────── */
-        .svc-eyebrow {
-          display: inline-flex; align-items: center; gap: 14px;
-          color: rgba(255,255,255,0.3);
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.32em; text-transform: uppercase;
-          margin-bottom: 24px;
-        }
-        .svc-eyebrow--center { display: flex; justify-content: center; }
-        .svc-eyebrow--gold { color: #facc15; }
-        .svc-eyebrow--dark-text { color: rgba(0,0,0,0.45); }
-        .svc-eyebrow__dot {
-          width: 5px; height: 5px; border-radius: 50%;
-          background: currentColor;
-          animation: svcDot 2.2s ease-in-out infinite;
-        }
-        @keyframes svcDot { 0%,100%{opacity:1} 50%{opacity:0.22} }
-        .svc-eyebrow__line {
-          display: block; width: 32px; height: 1px;
-          background: currentColor; opacity: 0.55;
-        }
-        .svc-eyebrow__line--dark { background: rgba(0,0,0,0.35); opacity: 1; }
-        .svc-eyebrow__line--gold { background: #facc15; opacity: 0.7; }
-
         /* ─── Hero ───────────────────────────────── */
         .svc-hero {
           position: relative; min-height: 100vh;
@@ -496,27 +470,6 @@ export default async function ServicesPage() {
           align-items: center; justify-content: center;
           padding: 128px 24px 164px;
           overflow: hidden;
-        }
-        .svc-hero__orb {
-          position: absolute; border-radius: 50%;
-          filter: blur(80px); pointer-events: none; z-index: 0;
-        }
-        .svc-hero__orb--gold {
-          bottom: -12%; left: 50%; transform: translateX(-50%);
-          width: 900px; height: 480px;
-          background: radial-gradient(ellipse at center, rgba(250,204,21,0.13) 0%, transparent 70%);
-          animation: svcOrbGold 9s ease-in-out infinite;
-        }
-        @keyframes svcOrbGold { 0%,100%{opacity:0.85} 50%{opacity:0.5} }
-        .svc-hero__orb--amber {
-          top: -8%; left: -12%;
-          width: 640px; height: 640px;
-          background: radial-gradient(circle, rgba(251,146,60,0.055) 0%, transparent 65%);
-          animation: svcOrbAmber 13s ease-in-out infinite alternate;
-        }
-        @keyframes svcOrbAmber {
-          from { opacity: 0.6; transform: translate(0,0); }
-          to   { opacity: 1; transform: translate(24px,18px); }
         }
         .svc-hero__grid {
           position: absolute; inset: 0; pointer-events: none; z-index: 0;
@@ -558,21 +511,6 @@ export default async function ServicesPage() {
           display: flex; flex-direction: column;
           align-items: center; text-align: center;
         }
-        .svc-hero__title {
-          font-size: clamp(3.6rem, 11vw, 128px) !important;
-          font-weight: 900 !important; line-height: 0.88 !important;
-          letter-spacing: -0.055em !important;
-          background: linear-gradient(135deg, #fff 38%, #facc15 52%, #fff 68%);
-          background-size: 200% auto;
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: svcShimmer 6s linear infinite;
-          margin-bottom: 48px !important; word-break: break-word;
-        }
-        @keyframes svcShimmer {
-          0%   { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
         .svc-hero__rule {
           width: 52%; max-width: 540px; height: 1px;
           background: linear-gradient(to right, transparent, rgba(250,204,21,0.38), transparent);
@@ -587,14 +525,6 @@ export default async function ServicesPage() {
         .svc-hero__bold { font-size: clamp(1rem,1.9vw,1.4rem); font-weight: 700; color: rgba(255,255,255,0.88); line-height: 1.35; }
         .svc-hero__short { font-size: 1rem; color: rgba(255,255,255,0.46); line-height: 1.74; max-width: 560px; }
         .svc-hero__more { font-size: 0.9rem; color: rgba(255,255,255,0.32); line-height: 1.8; max-width: 560px; }
-        .svc-hero__cta {
-          display: inline-flex; align-items: center; gap: 10px;
-          background: #facc15; color: #000; font-weight: 700; font-size: 15px;
-          padding: 16px 34px; border-radius: 999px;
-          transition: background 0.22s, transform 0.25s, box-shadow 0.25s;
-          box-shadow: 0 4px 28px rgba(250,204,21,0.24);
-        }
-        .svc-hero__cta:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 14px 48px rgba(250,204,21,0.3); }
         .svc-scroll-cue {
           position: absolute; bottom: 72px; left: 50%; transform: translateX(-50%);
           display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -614,32 +544,12 @@ export default async function ServicesPage() {
           border-top: 1px solid rgba(255,255,255,0.06);
           background: rgba(10,10,10,0.6); backdrop-filter: blur(12px);
         }
-        .svc-hero__strip-track {
-          display: flex; align-items: center; white-space: nowrap;
-          animation: svcStrip 44s linear infinite;
-        }
         .svc-hero__strip-item {
           display: inline-flex; align-items: center; gap: 14px; padding: 0 28px;
           font-size: 9px; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase;
           color: rgba(255,255,255,0.28);
         }
         .svc-hero__strip-dot { color: #facc15; font-size: 7px; }
-        @keyframes svcStrip { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-
-        /* ─── Shared section styles ──────────────── */
-        .svc-section-head { text-align: center; margin-bottom: 72px; }
-        .svc-section-title {
-          font-size: clamp(2.2rem, 5.5vw, 4.8rem);
-          font-weight: 900; letter-spacing: -0.04em; line-height: 1;
-          color: #fff; margin-bottom: 18px;
-        }
-        .svc-section-title--dark { color: #0a0a0a; }
-        .svc-section-sub { font-size: 1.05rem; color: #6b7280; max-width: 600px; margin: 0 auto; line-height: 1.74; }
-        .svc-section-sub--dark { color: #4b5563; }
-
-        /* ─── Wave transitions ───────────────────── */
-        .svc-wave-down { position: relative; line-height: 0; z-index: 2; margin-top: 64px; }
-        .svc-wave-down svg { width: 100%; display: block; }
 
         /* ─── Product Design ─────────────────────── */
         .svc-prod { position: relative; padding: 112px 0 0; }

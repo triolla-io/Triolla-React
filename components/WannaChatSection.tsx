@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { GlowOrb } from "@/components/ui";
 import { submitContactForm } from "@/app/actions/contact";
 import {
   initialContactState,
@@ -80,9 +81,12 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
       <section className="wc-root">
         <div className="wc-card">
           {/* ── background layers ── */}
-          <div className="wc-orb wc-orb--a" />
-          <div className="wc-orb wc-orb--b" />
-          <div className="wc-orb wc-orb--c" />
+          <GlowOrb size={720} fade="60%" blur={96} color="rgba(250,204,21,0.11)"
+            className="top-[-25%] left-[-10%] opacity-80 max-md:w-[260px] max-md:h-[260px] max-md:top-[-15%] max-md:left-[-15%]" />
+          <GlowOrb size={560} fade="60%" blur={96} color="rgba(251,146,60,0.08)"
+            className="bottom-[-20%] right-[-8%] opacity-80 max-md:w-[200px] max-md:h-[200px] max-md:bottom-[-10%] max-md:right-[-10%]" />
+          <GlowOrb size={380} fade="60%" blur={96} color="rgba(250,204,21,0.04)"
+            className="top-[35%] left-[42%] opacity-80 max-md:hidden" />
           <div className="wc-grid" />
 
           {/* floating particles */}
@@ -279,36 +283,6 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
         }
 
         /* ── orbs ── */
-        .wc-orb {
-          position: absolute;
-          border-radius: 50%;
-          pointer-events: none;
-          filter: blur(96px);
-        }
-        .wc-orb--a {
-          top: -25%; left: -10%;
-          width: 720px; height: 720px;
-          background: radial-gradient(circle, rgba(250,204,21,0.11) 0%, transparent 60%);
-          animation: wcFloat 13s ease-in-out infinite;
-        }
-        .wc-orb--b {
-          bottom: -20%; right: -8%;
-          width: 560px; height: 560px;
-          background: radial-gradient(circle, rgba(251,146,60,0.08) 0%, transparent 60%);
-          animation: wcFloat 17s ease-in-out infinite reverse;
-        }
-        .wc-orb--c {
-          top: 35%; left: 42%;
-          width: 380px; height: 380px;
-          background: radial-gradient(circle, rgba(250,204,21,0.04) 0%, transparent 60%);
-          animation: wcFloat 22s ease-in-out infinite;
-        }
-        @keyframes wcFloat {
-          0%,100% { transform: translate(0,0) scale(1); opacity: 0.8; }
-          33%      { transform: translate(24px,-18px) scale(1.06); opacity: 1; }
-          66%      { transform: translate(-12px,22px) scale(0.97); opacity: 0.85; }
-        }
-
         /* ── grid texture ── */
         .wc-grid {
           position: absolute;
@@ -696,17 +670,6 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
             padding: 44px 22px 48px;
             gap: 40px;
           }
-
-          /* Orbs: much smaller so they don't bleed everywhere */
-          .wc-orb--a {
-            width: 260px; height: 260px;
-            top: -15%; left: -15%;
-          }
-          .wc-orb--b {
-            width: 200px; height: 200px;
-            bottom: -10%; right: -10%;
-          }
-          .wc-orb--c { display: none; }
 
           /* Heading: fluid, commands the space */
           .wc-heading {

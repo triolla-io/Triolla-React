@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { EASE } from "@/lib/motion";
 
 // Actual WP homepage grid images (hometopimage1–9 from triolla.io)
 const WP_IMAGES = [
@@ -28,11 +29,11 @@ function MasonryColumn({ indices, delay }: { indices: number[]; delay: number })
         return (
           <motion.div
             key={img.src}
-            className="portfolio-card group overflow-hidden rounded-2xl relative bg-[#0f0f0f]"
+            className="shine-card group overflow-hidden rounded-2xl relative bg-[#0f0f0f]"
             initial={{ opacity: 0, y: 36 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.65, delay: delay + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
+            transition={{ duration: 0.65, delay: delay + i * 0.1, ease: [...EASE.smooth] }}
           >
             <img
               src={img.src}
@@ -40,7 +41,7 @@ function MasonryColumn({ indices, delay }: { indices: number[]; delay: number })
               className="w-full h-auto block"
             />
             {/* hover shine sweep */}
-            <div className="portfolio-card__shine" aria-hidden="true" />
+            <div className="shine-card__shine" aria-hidden="true" />
           </motion.div>
         );
       })}

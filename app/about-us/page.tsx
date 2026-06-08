@@ -8,6 +8,7 @@ import { AboutImageCarousel } from "@/components/AboutImageCarousel";
 import { WhyUsSection } from "@/components/WhyUsSection";
 import AnimatedSteps from "@/components/AnimatedSteps";
 import { ClientsSection } from "@/components/ClientsSection";
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from "@/components/ui";
 import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
@@ -76,17 +77,19 @@ export default async function AboutUsPage() {
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
       {/* Grain overlay */}
-      <div aria-hidden="true" className="about-grain" />
+      <GrainOverlay />
 
       {/* ══ HERO ══ */}
       <section className="about-hero">
-        <div
-          className="about-hero__orb about-hero__orb--gold"
-          aria-hidden="true"
+        <GlowOrb
+          size={900} height={480} shape="ellipse" fade="70%" blur={80}
+          color="rgba(250,204,21,0.14)"
+          className="bottom-[-12%] left-1/2 -translate-x-1/2 z-0 opacity-85"
         />
-        <div
-          className="about-hero__orb about-hero__orb--amber"
-          aria-hidden="true"
+        <GlowOrb
+          size={640} fade="65%" blur={80}
+          color="rgba(251,146,60,0.06)"
+          className="top-[-8%] left-[-12%] z-0 opacity-60"
         />
         <div className="about-hero__grid" aria-hidden="true" />
 
@@ -127,17 +130,24 @@ export default async function AboutUsPage() {
         <div className="about-hero__content">
           {ap.headerSubText && (
             <FadeIn yOffset={20} duration={0.7}>
-              <div className="about-eyebrow about-eyebrow--gold">
-                <span className="about-eyebrow__dot" />
+              <Eyebrow
+                ornament="dot"
+                align="center"
+                style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em", "--eb-dot": "5px" } as React.CSSProperties}
+              >
                 {ap.headerSubText}
-                <span className="about-eyebrow__dot" />
-              </div>
+              </Eyebrow>
             </FadeIn>
           )}
 
           {heroTitle && (
             <FadeIn yOffset={70} delay={0.1} duration={1}>
-              <h1 className="about-hero__title">{heroTitle}</h1>
+              <h1
+                className="gradient-text gradient-text--animate text-[clamp(3.6rem,11vw,128px)] font-black leading-[0.88] tracking-[-0.055em] mb-12 [word-break:break-word]"
+                style={{ "--gt-gradient": "linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)" } as React.CSSProperties}
+              >
+                {heroTitle}
+              </h1>
             </FadeIn>
           )}
 
@@ -166,24 +176,16 @@ export default async function AboutUsPage() {
               )}
               {ap.buttonText && (
                 <FadeIn yOffset={20} delay={0.56}>
-                  <Link href="/contact-us" className="about-hero__cta">
+                  <Button
+                    href="/contact-us"
+                    variant="primary"
+                    style={{ "--btn-pad": "16px 34px", "--btn-gap": "10px", boxShadow: "0 4px 28px rgba(250,204,21,0.24)" } as React.CSSProperties}
+                  >
                     {ap.buttonText}
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                      <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                  </Link>
+                  </Button>
                 </FadeIn>
               )}
             </div>
@@ -199,19 +201,17 @@ export default async function AboutUsPage() {
         {/* Scrolling category strip — derived from why-us titles */}
         {heroStripWords.length > 0 && (
           <div className="about-hero__strip" aria-hidden="true">
-            <div className="about-hero__strip-track">
-              {[
-                ...heroStripWords,
-                ...heroStripWords,
-                ...heroStripWords,
-                ...heroStripWords,
-              ].map((w, i) => (
+            <Marquee
+              items={heroStripWords as string[]}
+              repeat={4}
+              speed={44}
+              renderItem={(w, i) => (
                 <span key={i} className="about-hero__strip-item">
                   {w}
                   <span className="about-hero__strip-dot">✦</span>
                 </span>
-              ))}
-            </div>
+              )}
+            />
           </div>
         )}
       </section>
@@ -219,7 +219,11 @@ export default async function AboutUsPage() {
       {/* ══ SHOWCASE CAROUSEL (below hero) ══ */}
       {showcaseImages.length > 0 && (
         <section className="about-showcase">
-          <div className="about-showcase__orb" aria-hidden="true" />
+          <GlowOrb
+            size={1100} height={600} shape="ellipse" fade="65%" blur={100}
+            color="rgba(250,204,21,0.05)"
+            className="top-[10%] left-1/2 -translate-x-1/2 z-0"
+          />
 
           <FadeIn yOffset={40} duration={0.9}>
             <div className="about-showcase__stage">
@@ -287,18 +291,14 @@ export default async function AboutUsPage() {
       <section className="about-crafting">
         <div className="about-crafting__inner">
           <FadeIn yOffset={40}>
-            <div className="about-section-head">
-              <div className="about-eyebrow about-eyebrow--center about-eyebrow--gold">
-                <span className="about-eyebrow__line about-eyebrow__line--gold" />
+            <div className="section-head">
+              <Eyebrow ornament="line" align="center" color="#facc15" style={{ "--eb-line-bg": "#facc15", "--eb-line-opacity": "0.7", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
                 — 02 —
-                <span className="about-eyebrow__line about-eyebrow__line--gold" />
-              </div>
-              {ap.toprightTitle && (
-                <h2 className="about-section-title">{ap.toprightTitle}</h2>
-              )}
+              </Eyebrow>
+              {ap.toprightTitle && <h2 className="section-head__title">{ap.toprightTitle}</h2>}
               {ap.toprightext && (
                 /* WP-sourced HTML — trusted backend only */
-                <div className="about-section-sub">{parse(ap.toprightext)}</div>
+                <div className="section-head__sub" style={{ "--sh-sub-max": "620px" } as React.CSSProperties}>{parse(ap.toprightext)}</div>
               )}
             </div>
           </FadeIn>
@@ -336,40 +336,21 @@ export default async function AboutUsPage() {
         </div>
 
         {/* Wave: dark → cream */}
-        <div className="about-wave-down" aria-hidden="true">
-          <svg
-            viewBox="0 0 1440 90"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z"
-              fill="#f0eeea"
-            />
-          </svg>
-        </div>
+        <WaveDivider to="#f0eeea" />
       </section>
 
       {/* ══ SERVICES ══ */}
       <section className="about-services">
         <div className="about-services__dots" aria-hidden="true" />
         <div className="about-services__inner">
-          <FadeIn className="about-section-head">
-            <div className="about-eyebrow about-eyebrow--center about-eyebrow--dark-text">
-              <span className="about-eyebrow__line about-eyebrow__line--dark" />
+          <FadeIn className="section-head">
+            <Eyebrow ornament="line" align="center" color="rgba(0,0,0,0.45)" style={{ "--eb-line-bg": "rgba(0,0,0,0.35)", "--eb-line-opacity": "1", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
               — 03 —
-              <span className="about-eyebrow__line about-eyebrow__line--dark" />
-            </div>
-            {ap.servtitle && (
-              <h2 className="about-section-title about-section-title--dark">
-                {ap.servtitle}
-              </h2>
-            )}
+            </Eyebrow>
+            {ap.servtitle && <h2 className="section-head__title" style={{ color: "#0a0a0a" }}>{ap.servtitle}</h2>}
             {ap.servtext && (
               /* WP-sourced HTML — trusted backend only */
-              <div className="about-section-sub about-section-sub--dark">
-                {parse(ap.servtext)}
-              </div>
+              <div className="section-head__sub" style={{ "--sh-sub-max": "620px", color: "#4b5563" } as React.CSSProperties}>{parse(ap.servtext)}</div>
             )}
           </FadeIn>
 
@@ -416,18 +397,7 @@ export default async function AboutUsPage() {
         </div>
 
         {/* Wave: cream → dark */}
-        <div className="about-wave-down" aria-hidden="true">
-          <svg
-            viewBox="0 0 1440 90"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z"
-              fill="#080808"
-            />
-          </svg>
-        </div>
+        <WaveDivider to="#080808" />
       </section>
 
       {/* ══ WHY US ══ */}
@@ -452,20 +422,20 @@ export default async function AboutUsPage() {
       {/* ══ LEARN ══ */}
       {(ap.learnslider ?? []).length > 0 && (
         <section className="about-learn">
-          <div className="about-learn__orb" aria-hidden="true" />
+          <GlowOrb
+            size={600} fade="65%" blur={90}
+            color="rgba(250,204,21,0.04)"
+            className="top-[-8%] left-[-4%] z-0"
+          />
           <div className="about-learn__inner">
-            <FadeIn className="about-section-head">
-              <div className="about-eyebrow about-eyebrow--center about-eyebrow--gold">
-                <span className="about-eyebrow__line about-eyebrow__line--gold" />
+            <FadeIn className="section-head">
+              <Eyebrow ornament="line" align="center" color="#facc15" style={{ "--eb-line-bg": "#facc15", "--eb-line-opacity": "0.7", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
                 — 05 —
-                <span className="about-eyebrow__line about-eyebrow__line--gold" />
-              </div>
-              {ap.learntitle && (
-                <h2 className="about-section-title">{ap.learntitle}</h2>
-              )}
+              </Eyebrow>
+              {ap.learntitle && <h2 className="section-head__title">{ap.learntitle}</h2>}
               {ap.learntext && (
                 /* WP-sourced HTML — trusted backend only */
-                <div className="about-section-sub">{parse(ap.learntext)}</div>
+                <div className="section-head__sub" style={{ "--sh-sub-max": "620px" } as React.CSSProperties}>{parse(ap.learntext)}</div>
               )}
             </FadeIn>
             <AboutImageCarousel
@@ -490,11 +460,9 @@ export default async function AboutUsPage() {
         <section className="about-faq">
           <div className="about-faq__inner">
             <FadeIn>
-              <div className="about-eyebrow about-eyebrow--gold">
-                <span className="about-eyebrow__line about-eyebrow__line--gold" />
+              <Eyebrow ornament="line" color="#facc15" style={{ "--eb-line-bg": "#facc15", "--eb-line-opacity": "0.7", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
                 Got Questions
-                <span className="about-eyebrow__line about-eyebrow__line--gold" />
-              </div>
+              </Eyebrow>
               <h2 className="about-faq__title">Frequently Asked Questions</h2>
             </FadeIn>
             <FAQAccordion items={faqItems} />
@@ -508,53 +476,6 @@ export default async function AboutUsPage() {
         ::selection { background: #fed125; color: #000; }
         .about-services ::selection { background: #0a0a0a; color: #fff; }
 
-        /* ─── Grain ──────────────────────────── */
-        .about-grain {
-          position: fixed; inset: -50%;
-          width: 200%; height: 200%;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-          background-size: 200px 200px;
-          opacity: 0.04; pointer-events: none; z-index: 9999;
-          animation: aboutGrain 8s steps(10) infinite;
-        }
-        @keyframes aboutGrain {
-          0%   { transform: translate(0,0); }
-          10%  { transform: translate(-5%,-10%); }
-          20%  { transform: translate(-15%,5%); }
-          30%  { transform: translate(7%,-25%); }
-          40%  { transform: translate(-5%,25%); }
-          50%  { transform: translate(-15%,10%); }
-          60%  { transform: translate(15%,0%); }
-          70%  { transform: translate(0%,15%); }
-          80%  { transform: translate(3%,35%); }
-          90%  { transform: translate(-10%,10%); }
-          100% { transform: translate(0,0); }
-        }
-
-        /* ─── Eyebrow ────────────────────────── */
-        .about-eyebrow {
-          display: inline-flex; align-items: center; gap: 14px;
-          color: rgba(255,255,255,0.3);
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 0.32em; text-transform: uppercase;
-          margin-bottom: 24px;
-        }
-        .about-eyebrow--center { display: flex; justify-content: center; }
-        .about-eyebrow--gold { color: #facc15; }
-        .about-eyebrow--dark-text { color: rgba(0,0,0,0.45); }
-        .about-eyebrow__dot {
-          width: 5px; height: 5px; border-radius: 50%;
-          background: currentColor;
-          animation: aboutDot 2.2s ease-in-out infinite;
-        }
-        @keyframes aboutDot { 0%,100%{opacity:1} 50%{opacity:0.22} }
-        .about-eyebrow__line {
-          display: block; width: 32px; height: 1px;
-          background: currentColor; opacity: 0.55;
-        }
-        .about-eyebrow__line--dark { background: rgba(0,0,0,0.35); opacity: 1; }
-        .about-eyebrow__line--gold { background: #facc15; opacity: 0.7; }
-
         /* ─── HERO (dark, services-style) ─────── */
         .about-hero {
           position: relative; min-height: 100vh;
@@ -562,27 +483,6 @@ export default async function AboutUsPage() {
           align-items: center; justify-content: center;
           padding: 128px 24px 164px;
           overflow: hidden;
-        }
-        .about-hero__orb {
-          position: absolute; border-radius: 50%;
-          filter: blur(80px); pointer-events: none; z-index: 0;
-        }
-        .about-hero__orb--gold {
-          bottom: -12%; left: 50%; transform: translateX(-50%);
-          width: 900px; height: 480px;
-          background: radial-gradient(ellipse at center, rgba(250,204,21,0.14) 0%, transparent 70%);
-          animation: aboutOrbGold 9s ease-in-out infinite;
-        }
-        @keyframes aboutOrbGold { 0%,100%{opacity:0.85} 50%{opacity:0.5} }
-        .about-hero__orb--amber {
-          top: -8%; left: -12%;
-          width: 640px; height: 640px;
-          background: radial-gradient(circle, rgba(251,146,60,0.06) 0%, transparent 65%);
-          animation: aboutOrbAmber 13s ease-in-out infinite alternate;
-        }
-        @keyframes aboutOrbAmber {
-          from { opacity: 0.6; transform: translate(0,0); }
-          to   { opacity: 1; transform: translate(24px,18px); }
         }
         .about-hero__grid {
           position: absolute; inset: 0; pointer-events: none; z-index: 0;
@@ -624,21 +524,6 @@ export default async function AboutUsPage() {
           display: flex; flex-direction: column;
           align-items: center; text-align: center;
         }
-        .about-hero__title {
-          font-size: clamp(3.6rem, 11vw, 128px);
-          font-weight: 900; line-height: 0.88;
-          letter-spacing: -0.055em;
-          background: linear-gradient(135deg, #fff 38%, #facc15 52%, #fff 68%);
-          background-size: 200% auto;
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text; color: transparent;
-          animation: aboutShimmer 6s linear infinite;
-          margin-bottom: 48px; word-break: break-word;
-        }
-        @keyframes aboutShimmer {
-          0%   { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
         .about-hero__rule {
           width: 52%; max-width: 540px; height: 1px;
           background: linear-gradient(to right, transparent, rgba(250,204,21,0.38), transparent);
@@ -653,14 +538,6 @@ export default async function AboutUsPage() {
         .about-hero__bold { font-size: clamp(1rem,1.9vw,1.4rem); font-weight: 700; color: rgba(255,255,255,0.88); line-height: 1.35; }
         .about-hero__short { font-size: 1rem; color: rgba(255,255,255,0.46); line-height: 1.74; max-width: 560px; }
         .about-hero__more { font-size: 0.9rem; color: rgba(255,255,255,0.32); line-height: 1.8; max-width: 560px; }
-        .about-hero__cta {
-          display: inline-flex; align-items: center; gap: 10px;
-          background: #facc15; color: #000; font-weight: 700; font-size: 15px;
-          padding: 16px 34px; border-radius: 999px;
-          transition: background 0.22s, transform 0.25s, box-shadow 0.25s;
-          box-shadow: 0 4px 28px rgba(250,204,21,0.24);
-        }
-        .about-hero__cta:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 14px 48px rgba(250,204,21,0.3); }
         .about-scroll-cue {
           position: absolute; bottom: 72px; left: 50%; transform: translateX(-50%);
           display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -680,29 +557,18 @@ export default async function AboutUsPage() {
           border-top: 1px solid rgba(255,255,255,0.06);
           background: rgba(10,10,10,0.6); backdrop-filter: blur(12px);
         }
-        .about-hero__strip-track {
-          display: flex; align-items: center; white-space: nowrap;
-          animation: aboutStrip 44s linear infinite;
-        }
         .about-hero__strip-item {
           display: inline-flex; align-items: center; gap: 14px; padding: 0 28px;
           font-size: 9px; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase;
           color: rgba(255,255,255,0.28);
         }
         .about-hero__strip-dot { color: #facc15; font-size: 7px; }
-        @keyframes aboutStrip { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 
         /* ─── SHOWCASE (carousel below hero) ─── */
         .about-showcase {
           position: relative;
           padding: 96px 0 80px;
           overflow: hidden;
-        }
-        .about-showcase__orb {
-          position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
-          width: 1100px; height: 600px;
-          background: radial-gradient(ellipse at center, rgba(250,204,21,0.05) 0%, transparent 65%);
-          filter: blur(100px); pointer-events: none; z-index: 0;
         }
         .about-showcase__stage {
           position: relative;
@@ -834,21 +700,6 @@ export default async function AboutUsPage() {
           100% { transform: translateX(-50%); }
         }
 
-        /* ─── Shared section heads ───────────── */
-        .about-section-head { text-align: center; margin-bottom: 72px; }
-        .about-section-title {
-          font-size: clamp(2.2rem, 5.5vw, 4.8rem);
-          font-weight: 900; letter-spacing: -0.04em; line-height: 1;
-          color: #fff; margin-bottom: 18px;
-        }
-        .about-section-title--dark { color: #0a0a0a; }
-        .about-section-sub { font-size: 1.05rem; color: #6b7280; max-width: 620px; margin: 0 auto; line-height: 1.74; }
-        .about-section-sub--dark { color: #4b5563; }
-
-        /* ─── Wave transitions ───────────────── */
-        .about-wave-down { position: relative; line-height: 0; z-index: 2; margin-top: 64px; }
-        .about-wave-down svg { width: 100%; display: block; }
-
         /* ─── CRAFTING ───────────────────────── */
         .about-crafting { padding: 96px 0 0; position: relative; }
         .about-crafting__inner {
@@ -953,12 +804,6 @@ export default async function AboutUsPage() {
           position: relative; background: #0a0a0a;
           border-top: 1px solid rgba(255,255,255,0.05);
           padding: 112px 0 80px; overflow: hidden;
-        }
-        .about-learn__orb {
-          position: absolute; top: -8%; left: -4%;
-          width: 600px; height: 600px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(250,204,21,0.04) 0%, transparent 65%);
-          filter: blur(90px); pointer-events: none;
         }
         .about-learn__inner {
           max-width: 1600px; margin: 0 auto; padding: 0 32px;

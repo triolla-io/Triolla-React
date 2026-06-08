@@ -6,6 +6,7 @@ interface HeroHeadlineProps {
   headline: string;
   subtext?: string;
   headlineClassName?: string;
+  headlineStyle?: React.CSSProperties;
   subtextClassName?: string;
 }
 
@@ -13,13 +14,14 @@ export function HeroHeadline({
   headline,
   subtext,
   headlineClassName = "",
+  headlineStyle,
   subtextClassName = "",
 }: HeroHeadlineProps) {
   const words = headline.split(" ");
 
   return (
     <>
-      <h1 className={headlineClassName}>
+      <h1 className={headlineClassName} style={headlineStyle}>
         {words.map((word, i) => (
           <motion.span
             key={i}

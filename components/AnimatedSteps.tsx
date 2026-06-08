@@ -1,5 +1,6 @@
 import parse from "html-react-parser";
 import { FadeIn } from "./FadeIn";
+import { GlowOrb, Eyebrow } from "@/components/ui";
 
 function decodeHtml(html: string): string {
   return (html ?? "")
@@ -34,7 +35,7 @@ export default function AnimatedSteps({
   const ac = accentColor;
 
   return (
-    <section className="tech-steps">
+    <section className="tech-steps" style={{ "--accent": accentColor } as React.CSSProperties}>
       <style>{`
         /* ─── Steps section ─────────────────────── */
         .tech-steps {
@@ -43,23 +44,7 @@ export default function AnimatedSteps({
           border-top: 1px solid rgba(255,255,255,0.07);
           overflow: hidden;
         }
-        .tech-steps__orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(110px);
-          pointer-events: none;
-        }
-        .tech-steps__orb--l {
-          top: 35%; left: -8%;
-          width: 460px; height: 460px;
-          background: radial-gradient(circle, ${ac}10 0%, transparent 65%);
-        }
-        .tech-steps__orb--r {
-          bottom: 6%; right: -6%;
-          width: 380px; height: 380px;
-          background: radial-gradient(circle, ${ac}0a 0%, transparent 65%);
-        }
-        .tech-steps__head {
+        .section-head {
           position: relative; z-index: 2;
           text-align: center;
           max-width: 760px;
@@ -67,24 +52,7 @@ export default function AnimatedSteps({
           padding: 0 24px;
           margin-bottom: clamp(40px, 5vw, 64px);
         }
-        .tech-steps__eyebrow {
-          display: inline-flex; align-items: center; gap: 16px;
-          margin-bottom: 22px;
-        }
-        .tech-steps__eyebrow-line {
-          display: block; width: 56px; height: 1px;
-          background: linear-gradient(to right, transparent, ${ac});
-          opacity: 0.7;
-        }
-        .tech-steps__eyebrow-line--rev {
-          background: linear-gradient(to left, transparent, ${ac});
-        }
-        .tech-steps__eyebrow-mark {
-          color: ${ac};
-          font-size: 14px;
-          line-height: 1;
-        }
-        .tech-steps__title {
+        .section-head__title {
           font-size: clamp(2rem, 5vw, 4rem);
           font-weight: 900;
           letter-spacing: -0.028em;
@@ -92,17 +60,17 @@ export default function AnimatedSteps({
           margin-bottom: 18px;
           color: #fff;
         }
-        .tech-steps__title span { color: ${ac}; }
-        .tech-steps__sub {
+        .section-head__title span { color: var(--accent); }
+        .section-head__sub {
           color: rgba(255,255,255,0.5);
           font-size: 17px;
           line-height: 1.78;
         }
-        .tech-steps__sub p { margin-bottom: 6px; }
-        .tech-steps__sub p:last-child { margin-bottom: 0; }
+        .section-head__sub p { margin-bottom: 6px; }
+        .section-head__sub p:last-child { margin-bottom: 0; }
         .tech-steps__hint {
           align-items: center; gap: 8px;
-          color: ${ac}aa;
+          color: color-mix(in srgb, var(--accent) 66.7%, transparent);
           font-size: 10px; font-weight: 700;
           letter-spacing: 0.22em; text-transform: uppercase;
           max-width: 1600px;
@@ -167,7 +135,7 @@ export default function AnimatedSteps({
           50%      { opacity: 1;   transform: scale(1.04); }
         }
         .tech-step:hover .tech-step__bg-num {
-          color: ${ac}26;
+          color: color-mix(in srgb, var(--accent) 14.9%, transparent);
           transform: translateY(-4px) scale(1.06);
           animation-play-state: paused;
         }
@@ -177,8 +145,8 @@ export default function AnimatedSteps({
           position: absolute;
           width: 4px; height: 4px;
           border-radius: 50%;
-          background: ${ac};
-          box-shadow: 0 0 12px ${ac}, 0 0 24px ${ac}66;
+          background: var(--accent);
+          box-shadow: 0 0 12px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 40%, transparent);
           opacity: 0;
           pointer-events: none;
           z-index: 1;
@@ -208,9 +176,9 @@ export default function AnimatedSteps({
           background: linear-gradient(
             to right,
             transparent 0%,
-            ${ac}66 40%,
-            ${ac} 50%,
-            ${ac}66 60%,
+            color-mix(in srgb, var(--accent) 40%, transparent) 40%,
+            var(--accent) 50%,
+            color-mix(in srgb, var(--accent) 40%, transparent) 60%,
             transparent 100%
           );
           filter: blur(2px);
@@ -230,26 +198,26 @@ export default function AnimatedSteps({
           z-index: 2;
           display: inline-block;
           width: 14px; height: 14px;
-          background: ${ac};
+          background: var(--accent);
           border-radius: 50%;
           box-shadow:
-            0 0 0 4px ${ac}26,
-            0 0 22px ${ac}55,
+            0 0 0 4px color-mix(in srgb, var(--accent) 14.9%, transparent),
+            0 0 22px color-mix(in srgb, var(--accent) 33.3%, transparent),
             inset 0 0 6px rgba(255,255,255,0.4);
           transition: box-shadow 0.35s ease, transform 0.35s ease;
         }
         .tech-step:hover .tech-step__dot {
           transform: scale(1.18);
           box-shadow:
-            0 0 0 5px ${ac}40,
-            0 0 36px ${ac}aa,
+            0 0 0 5px color-mix(in srgb, var(--accent) 25%, transparent),
+            0 0 36px color-mix(in srgb, var(--accent) 66.7%, transparent),
             inset 0 0 8px rgba(255,255,255,0.55);
         }
         .tech-step__dot-ring {
           position: absolute;
           inset: 0;
           border-radius: 50%;
-          border: 1.5px solid ${ac};
+          border: 1.5px solid var(--accent);
           opacity: 0;
           animation: techDotRing 2.6s cubic-bezier(0.32, 0, 0.18, 1) infinite;
           animation-delay: calc(var(--si, 0) * 0.4s);
@@ -271,8 +239,8 @@ export default function AnimatedSteps({
           height: 1px; right: -28px;
           background: linear-gradient(
             to right,
-            ${ac}66 0%,
-            ${ac}33 30%,
+            color-mix(in srgb, var(--accent) 40%, transparent) 0%,
+            color-mix(in srgb, var(--accent) 20%, transparent) 30%,
             rgba(255,255,255,0.05) 75%,
             transparent 100%
           );
@@ -287,7 +255,7 @@ export default function AnimatedSteps({
           background: linear-gradient(
             to right,
             transparent 0%,
-            ${ac}ee 50%,
+            color-mix(in srgb, var(--accent) 93.3%, transparent) 50%,
             transparent 100%
           );
           filter: blur(2px);
@@ -306,7 +274,7 @@ export default function AnimatedSteps({
         .tech-step__num {
           display: block;
           font-size: 11px; font-weight: 700;
-          color: ${ac};
+          color: var(--accent);
           letter-spacing: 0.22em;
           margin-bottom: 10px;
           transition: letter-spacing 0.35s ease, color 0.35s ease;
@@ -345,8 +313,8 @@ export default function AnimatedSteps({
         }
       `}</style>
 
-      <div className="tech-steps__orb tech-steps__orb--l" aria-hidden="true" />
-      <div className="tech-steps__orb tech-steps__orb--r" aria-hidden="true" />
+      <GlowOrb size={460} blur={110} color="color-mix(in srgb, var(--accent) 6.25%, transparent)" className="top-[35%] left-[-8%]" />
+      <GlowOrb size={380} blur={110} color="color-mix(in srgb, var(--accent) 3.9%, transparent)" className="bottom-[6%] right-[-6%]" />
 
       {/* Floating sparkles */}
       {[...Array(10)].map((_, i) => (
@@ -364,17 +332,24 @@ export default function AnimatedSteps({
       </div>
 
       {(title || subtext) && (
-        <FadeIn className="tech-steps__head">
-          <div className="tech-steps__eyebrow" aria-hidden="true">
-            <span className="tech-steps__eyebrow-line" />
-            <span className="tech-steps__eyebrow-mark">✦</span>
-            <span className="tech-steps__eyebrow-line tech-steps__eyebrow-line--rev" />
-          </div>
+        <FadeIn className="section-head">
+          <Eyebrow
+            ornament="mark"
+            align="center"
+            color="var(--accent)"
+            style={{
+              "--eb-gap": "16px",
+              "--eb-size": "10px",
+              "--eb-spacing": "0.25em",
+              "--eb-line-w": "56px",
+              "--eb-line-bg": "linear-gradient(to right, transparent, var(--accent))",
+            } as React.CSSProperties}
+          >{""}</Eyebrow>
           {title && (
-            <div className="tech-steps__title">{parse(decodeHtml(title))}</div>
+            <h2 className="section-head__title">{parse(decodeHtml(title))}</h2>
           )}
           {subtext && (
-            <div className="tech-steps__sub">{parse(decodeHtml(subtext))}</div>
+            <div className="section-head__sub">{parse(decodeHtml(subtext))}</div>
           )}
         </FadeIn>
       )}

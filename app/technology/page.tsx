@@ -1,15 +1,14 @@
 import { client } from "@/lib/apollo-client";
 import { GET_TECHNOLOGY_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
-import Link from "next/link";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { TechStickyFeature } from "@/components/TechStickyFeature";
 import { TechStackSection } from "@/components/TechStackSection";
 import AnimatedSteps from "@/components/AnimatedSteps";
-import parse from "html-react-parser";
 import { ClientsSection } from "@/components/ClientsSection";
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from "@/components/ui";
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -66,7 +65,6 @@ export default async function TechnologyPage() {
   const accentColor: string = "#facc15";
 
   const companies: any[] = tp.companyList ?? [];
-  const marqueeItems = [...companies, ...companies];
 
   const gridImages = [
     {
@@ -153,35 +151,11 @@ export default async function TechnologyPage() {
   ].filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
-    <main className="overflow-x-clip bg-[#080808] text-white">
+    <main
+      className="overflow-x-clip bg-[#080808] text-white"
+      style={{ "--accent": accentColor } as React.CSSProperties}
+    >
       <style>{`
-        /* ─── Grain overlay ─────────────────────────────── */
-        .tech-grain {
-          position: fixed;
-          inset: -50%;
-          width: 200%;
-          height: 200%;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-          background-size: 200px 200px;
-          opacity: 0.04;
-          pointer-events: none;
-          z-index: 9999;
-          animation: techGrain 8s steps(10) infinite;
-        }
-        @keyframes techGrain {
-          0%   { transform: translate(0,0); }
-          10%  { transform: translate(-5%,-10%); }
-          20%  { transform: translate(-15%, 5%); }
-          30%  { transform: translate( 7%,-25%); }
-          40%  { transform: translate(-5%, 25%); }
-          50%  { transform: translate(-15%, 10%); }
-          60%  { transform: translate(15%, 0%); }
-          70%  { transform: translate( 0%, 15%); }
-          80%  { transform: translate( 3%,  35%); }
-          90%  { transform: translate(-10%, 10%); }
-          100% { transform: translate(0, 0); }
-        }
-
         /* ─── Hero ──────────────────────────────────────── */
         .tech-hero-bg {
           position: absolute;
@@ -205,63 +179,6 @@ export default async function TechnologyPage() {
           inset: 0;
           background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
           background-size: 28px 28px;
-        }
-        .tech-hero-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          pointer-events: none;
-        }
-        .tech-hero-orb--gold {
-          bottom: -10%;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 900px;
-          height: 500px;
-          background: radial-gradient(ellipse at center, ${accentColor}22 0%, transparent 70%);
-          animation: techOrbPulse 8s ease-in-out infinite;
-        }
-        .tech-hero-orb--amber {
-          top: 10%;
-          right: -8%;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, ${accentColor}0d 0%, transparent 65%);
-          animation: techOrbPulse 14s ease-in-out infinite reverse;
-        }
-        @keyframes techOrbPulse {
-          0%,100% { opacity: 1; transform: scale(1); }
-          50%      { opacity: 0.7; transform: scale(1.08); }
-        }
-        @keyframes techShimmer {
-          0%   { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
-        .tech-shimmer-heading {
-          background: linear-gradient(135deg, #fff 40%, ${accentColor} 55%, #fff 70%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: techShimmer 6s linear infinite;
-        }
-        .tech-eyebrow-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 13px;
-          font-weight: 600;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          padding: 8px 16px;
-          border-radius: 999px;
-          margin-bottom: 32px;
-        }
-        .tech-eyebrow-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          flex-shrink: 0;
         }
         .tech-cta-pill {
           display: inline-flex;
@@ -290,7 +207,7 @@ export default async function TechnologyPage() {
         .tech-scroll-cue__line {
           width: 1px;
           height: 48px;
-          background: linear-gradient(to bottom, transparent, ${accentColor}99);
+          background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--accent) 60%, transparent));
           animation: techScrollPulse 2s ease-in-out infinite;
         }
         .tech-scroll-cue__label {
@@ -305,18 +222,6 @@ export default async function TechnologyPage() {
         }
 
         /* ─── Marquee banner ────────────────────────────── */
-        @keyframes techMarquee {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .tech-marquee-track {
-          display: inline-flex;
-          align-items: center;
-          white-space: nowrap;
-          animation: techMarquee 55s linear infinite;
-          will-change: transform;
-        }
-        .tech-marquee-track:hover { animation-play-state: paused; }
         .tech-marquee-item {
           display: inline-flex;
           align-items: center;
@@ -357,8 +262,8 @@ export default async function TechnologyPage() {
         .tech-grid-card:hover {
           animation-play-state: paused;
           transform: translateY(-8px);
-          box-shadow: 0 0 0 1px ${accentColor}4d, 0 24px 48px rgba(0,0,0,0.5);
-          border-color: ${accentColor}4d;
+          box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 24px 48px rgba(0,0,0,0.5);
+          border-color: color-mix(in srgb, var(--accent) 30%, transparent);
         }
         .tech-grid-card img {
           transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
@@ -375,7 +280,7 @@ export default async function TechnologyPage() {
           transition: box-shadow 0.4s;
         }
         .tech-featured-card:hover {
-          box-shadow: 0 0 0 1px ${accentColor}4d, 0 32px 64px rgba(0,0,0,0.5);
+          box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 32px 64px rgba(0,0,0,0.5);
         }
         .tech-featured-card img {
           transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
@@ -384,7 +289,7 @@ export default async function TechnologyPage() {
       `}</style>
 
       {/* Grain overlay */}
-      <div aria-hidden="true" className="tech-grain" />
+      <GrainOverlay />
 
       {/* ════════════════════════════════════════════
           HERO
@@ -406,17 +311,31 @@ export default async function TechnologyPage() {
         )}
 
         {/* Ambient orbs */}
-        <div className="tech-hero-orb tech-hero-orb--gold" aria-hidden="true" />
-        <div
-          className="tech-hero-orb tech-hero-orb--amber"
-          aria-hidden="true"
+        <GlowOrb
+          size={900}
+          height={500}
+          color="color-mix(in srgb, var(--accent) 13.3%, transparent)"
+          shape="ellipse"
+          fade="70%"
+          blur={80}
+          animation="none"
+          className="bottom-[-10%] left-1/2 -translate-x-1/2"
+        />
+        <GlowOrb
+          size={500}
+          color="color-mix(in srgb, var(--accent) 5.1%, transparent)"
+          shape="circle"
+          fade="65%"
+          blur={80}
+          animation="none"
+          className="top-[10%] right-[-8%]"
         />
 
         {/* Editorial frame — corner indices */}
         <div className="absolute top-8 left-6 lg:left-12 z-10 hidden sm:flex items-center gap-4">
           <span
             className="text-[11px] font-black tabular-nums tracking-[0.36em]"
-            style={{ color: accentColor }}
+            style={{ color: "var(--accent)" }}
           >
             01
           </span>
@@ -424,7 +343,7 @@ export default async function TechnologyPage() {
             aria-hidden="true"
             className="block h-px w-20"
             style={{
-              background: `linear-gradient(to right, ${accentColor}66, transparent)`,
+              background: "linear-gradient(to right, color-mix(in srgb, var(--accent) 40%, transparent), transparent)",
             }}
           />
         </div>
@@ -432,18 +351,18 @@ export default async function TechnologyPage() {
           <span aria-hidden="true" className="block h-px w-14 bg-white/25" />
           <span
             className="block w-1.5 h-1.5 rounded-full"
-            style={{ background: accentColor }}
+            style={{ background: "var(--accent)" }}
           />
         </div>
         <div className="absolute bottom-8 left-6 lg:left-12 z-10 hidden sm:flex items-center gap-3">
           <span className="relative inline-flex w-1.5 h-1.5">
             <span
               className="absolute inset-0 rounded-full"
-              style={{ background: accentColor }}
+              style={{ background: "var(--accent)" }}
             />
             <span
               className="absolute inset-0 rounded-full animate-ping"
-              style={{ background: accentColor }}
+              style={{ background: "var(--accent)" }}
             />
           </span>
           <span aria-hidden="true" className="block h-px w-16 bg-white/20" />
@@ -453,7 +372,7 @@ export default async function TechnologyPage() {
           <span
             aria-hidden="true"
             className="block w-1.5 h-1.5 rotate-45 border-l border-t"
-            style={{ borderColor: `${accentColor}aa` }}
+            style={{ borderColor: "color-mix(in srgb, var(--accent) 67%, transparent)" }}
           />
         </div>
 
@@ -461,21 +380,24 @@ export default async function TechnologyPage() {
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-10 w-full flex flex-col items-center text-center">
           {tp.headerSubText && (
             <FadeIn delay={0.05} yOffset={20}>
-              <span
-                className="tech-eyebrow-pill mx-auto"
-                style={{ background: `${accentColor}18`, color: accentColor }}
+              <Eyebrow
+                ornament="dot"
+                align="center"
+                pill
+                style={
+                  {
+                    "--eb-pill-bg": "color-mix(in srgb, var(--accent) 9.4%, transparent)",
+                    "--eb-mb": "32px",
+                  } as React.CSSProperties
+                }
               >
-                <span
-                  className="tech-eyebrow-dot"
-                  style={{ background: accentColor }}
-                />
                 {tp.headerSubText}
-              </span>
+              </Eyebrow>
             </FadeIn>
           )}
 
           <FadeIn delay={0.12} yOffset={30}>
-            <h1 className="text-[clamp(60px,10.5vw,168px)] font-black tracking-[-0.035em] leading-[0.86] mb-10 tech-shimmer-heading mx-auto">
+            <h1 className="text-[clamp(60px,10.5vw,168px)] font-black tracking-[-0.035em] leading-[0.86] mb-10 gradient-text gradient-text--animate mx-auto">
               {tp.headerTitle}
             </h1>
           </FadeIn>
@@ -486,12 +408,12 @@ export default async function TechnologyPage() {
                 <span
                   aria-hidden="true"
                   className="hidden sm:block h-px w-10"
-                  style={{ background: `${accentColor}88` }}
+                  style={{ background: "color-mix(in srgb, var(--accent) 53%, transparent)" }}
                 />
                 <a
                   href="#contact"
                   className="tech-cta-pill"
-                  style={{ background: accentColor, color: "#000" }}
+                  style={{ background: "var(--accent)", color: "#000" }}
                 >
                   {tp.buttonText}
                   <svg
@@ -513,7 +435,7 @@ export default async function TechnologyPage() {
                 <span
                   aria-hidden="true"
                   className="hidden sm:block h-px w-10"
-                  style={{ background: `${accentColor}88` }}
+                  style={{ background: "color-mix(in srgb, var(--accent) 53%, transparent)" }}
                 />
               </div>
             </FadeIn>
@@ -532,34 +454,26 @@ export default async function TechnologyPage() {
       ════════════════════════════════════════════ */}
       {companies.length > 0 && (
         <div className="relative overflow-hidden border-t border-b border-white/[0.07] py-7">
-          <div
-            aria-hidden="true"
-            className="absolute inset-y-0 left-0 w-40 z-10 pointer-events-none"
-            style={{
-              background: "linear-gradient(to right, #080808, transparent)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-y-0 right-0 w-40 z-10 pointer-events-none"
-            style={{
-              background: "linear-gradient(to left, #080808, transparent)",
-            }}
-          />
-          <div className="tech-marquee-track">
-            {marqueeItems.map((c: any, i: number) => (
+          <Marquee
+            items={companies}
+            repeat={2}
+            speed={55}
+            pauseOnHover
+            fade
+            fadeColor="#080808"
+            renderItem={(c: any, i: number) => (
               <span key={i} className="tech-marquee-item">
                 <span className="tech-marquee-name">{c.companyName}</span>
                 <span
                   className="tech-marquee-sep"
-                  style={{ color: accentColor }}
+                  style={{ color: "var(--accent)" }}
                   aria-hidden="true"
                 >
                   ✦
                 </span>
               </span>
-            ))}
-          </div>
+            )}
+          />
         </div>
       )}
 

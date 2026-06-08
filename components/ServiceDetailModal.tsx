@@ -326,7 +326,7 @@ export function useServiceModal(
               .svcm-curtain {
                 position: absolute; inset: 0; z-index: 2; transform-origin: bottom;
                 background: linear-gradient(180deg, #fde047 0%, #facc15 55%, #eab308 100%);
-                animation: svcmCurtain 0.92s cubic-bezier(.16,1,.3,1) forwards;
+                animation: svcmCurtain 0.92s var(--ease-bounce) forwards;
                 pointer-events: none;
               }
               @keyframes svcmCurtain {
@@ -349,7 +349,7 @@ export function useServiceModal(
                 display: flex; flex-direction: column;
                 box-shadow: 0 0 120px rgba(0,0,0,0.8);
                 opacity: 0;
-                animation: svcmPanelIn 0.7s cubic-bezier(.16,1,.3,1) 0.42s forwards;
+                animation: svcmPanelIn 0.7s var(--ease-bounce) 0.42s forwards;
               }
               @keyframes svcmPanelIn {
                 from { opacity: 0; transform: translateY(28px); }
@@ -406,7 +406,7 @@ export function useServiceModal(
               .svcm-hero__img {
                 width: 100%; height: 100%; object-fit: cover; display: block;
                 transform: scale(1.08);
-                animation: svcmHeroIn 1.3s cubic-bezier(.16,1,.3,1) 0.5s both;
+                animation: svcmHeroIn 1.3s var(--ease-bounce) 0.5s both;
               }
               @keyframes svcmHeroIn { to { transform: scale(1); } }
               .svcm-hero__scrim {
@@ -430,7 +430,7 @@ export function useServiceModal(
                 background-size: 200% auto;
                 -webkit-background-clip: text; -webkit-text-fill-color: transparent;
                 background-clip: text;
-                animation: svcmShimmer 6s linear infinite, svcmReveal 0.7s cubic-bezier(.16,1,.3,1) both;
+                animation: svcmShimmer 6s linear infinite, svcmReveal 0.7s var(--ease-bounce) both;
               }
               @keyframes svcmShimmer {
                 0% { background-position: 200% center; }
@@ -440,7 +440,7 @@ export function useServiceModal(
                 max-width: 760px; margin: 0 auto 44px; text-align: center;
                 font-size: clamp(1.25rem, 2.6vw, 1.85rem);
                 font-weight: 700; line-height: 1.32; color: rgba(255,255,255,0.92);
-                animation: svcmReveal 0.7s cubic-bezier(.16,1,.3,1) both;
+                animation: svcmReveal 0.7s var(--ease-bounce) both;
               }
               .svcm-lead p { margin: 0 0 0.5em; }
               .svcm-lead p:last-child { margin-bottom: 0; }
@@ -448,7 +448,7 @@ export function useServiceModal(
               .svcm-body {
                 max-width: 720px; margin: 0 auto;
                 counter-reset: svcmstep;
-                animation: svcmReveal 0.7s cubic-bezier(.16,1,.3,1) both;
+                animation: svcmReveal 0.7s var(--ease-bounce) both;
               }
               @keyframes svcmReveal {
                 from { opacity: 0; transform: translateY(24px); }
@@ -541,7 +541,7 @@ export function useServiceModal(
                 to { opacity: 0; transform: translateY(32px); }
               }
               .svcm-overlay--closing .svcm-curtain {
-                animation: svcmCurtainOut 0.56s cubic-bezier(.16,1,.3,1) forwards;
+                animation: svcmCurtainOut 0.56s var(--ease-bounce) forwards;
               }
               @keyframes svcmCurtainOut {
                 0%   { transform: scaleY(0); transform-origin: top; }

@@ -3,6 +3,7 @@ import { FadeIn } from "@/components/FadeIn";
 import AnimatedSteps from "@/components/AnimatedSteps";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { CountUpNumber } from "@/components/CountUpNumber";
+import { Marquee } from "@/components/ui";
 import parse from "html-react-parser";
 
 function stripHtml(html: string): string {
@@ -49,10 +50,9 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
   const whyItems: any[] = pf.whyDoList ?? [];
   const companies: any[] = pf.companyList ?? [];
   const accentColor: string = pf.headerBgColor ?? "#fed125";
-  const marqueeItems = [...companies, ...companies];
 
   return (
-    <main className="overflow-hidden bg-[#080808] text-white">
+    <main className="overflow-hidden bg-[#080808] text-white" style={{ "--accent": accentColor } as React.CSSProperties}>
       <style>{`
         /* ─── Hero ───────────────────────────────── */
         .cs-hero-dots {
@@ -60,7 +60,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           background-size: 28px 28px;
         }
         .cs-hero-glow {
-          background: radial-gradient(circle at 70% 30%, ${accentColor}22 0%, transparent 60%);
+          background: radial-gradient(circle at 70% 30%, color-mix(in srgb, var(--accent) 13.3%, transparent) 0%, transparent 60%);
         }
 
         /* ─── Portfolio cards ────────────────────── */
@@ -115,10 +115,10 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         }
         .cs-why-card:hover {
           transform: translateY(-7px);
-          border-color: ${accentColor}55;
+          border-color: color-mix(in srgb, var(--accent) 33.3%, transparent);
           box-shadow: 0 24px 64px rgba(0,0,0,0.45),
-                      0 0 0 1px ${accentColor}18,
-                      0 0 40px ${accentColor}0a;
+                      0 0 0 1px color-mix(in srgb, var(--accent) 9.4%, transparent),
+                      0 0 40px color-mix(in srgb, var(--accent) 3.9%, transparent);
         }
         .cs-why-card__ghost {
           position: absolute;
@@ -135,11 +135,11 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         .cs-why-card__bar {
           width: 28px;
           height: 2.5px;
-          background: ${accentColor};
+          background: var(--accent);
           border-radius: 2px;
           margin-bottom: 24px;
           transition: width 0.4s cubic-bezier(.23,1,.32,1);
-          box-shadow: 0 0 10px ${accentColor}66;
+          box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 40%, transparent);
         }
         .cs-why-card:hover .cs-why-card__bar {
           width: 52px;
@@ -163,38 +163,23 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           background-position: -100% 0;
         }
 
-        /* ─── Companies marquee ──────────────────── */
-        @keyframes cs-marquee {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .cs-marquee-track {
-          display: flex;
-          white-space: nowrap;
-          animation: cs-marquee 40s linear infinite;
-          will-change: transform;
-        }
-        .cs-marquee-track:hover {
-          animation-play-state: paused;
-        }
-
         /* ─── Stat title ────────────────────────── */
         .cs-stat-num {
           font-size: clamp(96px, 14vw, 180px);
           font-weight: 900;
           line-height: 0.88;
           letter-spacing: -0.04em;
-          color: ${accentColor};
+          color: var(--accent);
           text-shadow:
-            0 0 60px ${accentColor}55,
-            0 0 140px ${accentColor}22;
+            0 0 60px color-mix(in srgb, var(--accent) 33.3%, transparent),
+            0 0 140px color-mix(in srgb, var(--accent) 13.3%, transparent);
           display: inline-block;
         }
         .cs-stat-line {
           display: block;
           width: 2px;
           height: 72px;
-          background: linear-gradient(to bottom, ${accentColor}, transparent);
+          background: linear-gradient(to bottom, var(--accent), transparent);
           margin: 28px auto;
           border-radius: 2px;
         }
@@ -234,11 +219,11 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           <FadeIn delay={0.05} yOffset={20}>
             <span
               className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-full mb-8"
-              style={{ background: `${accentColor}18`, color: accentColor }}
+              style={{ background: "color-mix(in srgb, var(--accent) 9.4%, transparent)", color: "var(--accent)" }}
             >
               <span
                 className="w-1.5 h-1.5 rounded-full"
-                style={{ background: accentColor }}
+                style={{ background: "var(--accent)" }}
               />
               {pf.headerSubText}
             </span>
@@ -255,7 +240,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
               <a
                 href="#portfolio"
                 className="inline-flex items-center gap-2.5 text-[13px] font-bold tracking-[0.06em] uppercase px-7 py-3.5 rounded-full shrink-0 transition-opacity hover:opacity-80"
-                style={{ background: accentColor, color: "#000" }}
+                style={{ background: "var(--accent)", color: "#000" }}
               >
                 {pf.buttonText}
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -299,17 +284,15 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           MARQUEE BANNER
       ════════════════════════════════════════════ */}
       <div className="overflow-hidden border-t border-b border-white/[0.07] py-5">
-        <div className="cs-marquee-track">
-          {marqueeItems.map((c: any, i: number) => (
-            <span
-              key={i}
-              className="text-[13px] font-semibold tracking-[0.06em] uppercase text-gray-600 mx-6 shrink-0"
-            >
-              {c.companyName}
-              <span className="ml-12 text-gray-800">·</span>
-            </span>
-          ))}
-        </div>
+        <Marquee items={companies} repeat={2} speed={40} renderItem={(c: any, i: number) => (
+          <span
+            key={i}
+            className="text-[13px] font-semibold tracking-[0.06em] uppercase text-gray-600 mx-6 shrink-0"
+          >
+            {c.companyName}
+            <span className="ml-12 text-gray-800">·</span>
+          </span>
+        )} />
       </div>
 
       {/* ════════════════════════════════════════════

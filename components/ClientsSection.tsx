@@ -1,5 +1,6 @@
-import Link from "next/link";
+import React from "react";
 import parse from "html-react-parser";
+import { GlowOrb, Eyebrow, Marquee, Button } from "@/components/ui";
 
 function decodeHtml(html: string): string {
   return (html ?? "")
@@ -29,10 +30,9 @@ export function ClientsSection({
   if (logos.length === 0) return null;
 
   const ac = accentColor;
-  const duped = [...logos, ...logos];
 
   return (
-    <section className="cs-clients">
+    <section className="cs-clients" style={{ "--accent": ac } as React.CSSProperties}>
       <style>{`
         .cs-clients {
           position: relative;
@@ -40,90 +40,17 @@ export function ClientsSection({
           overflow: hidden;
           border-top: 1px solid rgba(255,255,255,0.07);
         }
-        .cs-clients__orb {
-          position: absolute; border-radius: 50%;
-          filter: blur(110px); pointer-events: none;
-        }
-        .cs-clients__orb--l {
-          top: 50%; left: -8%; transform: translateY(-50%);
-          width: 520px; height: 520px;
-          background: radial-gradient(circle, ${ac}10 0%, transparent 65%);
-        }
-        .cs-clients__orb--r {
-          top: 50%; right: -8%; transform: translateY(-50%);
-          width: 420px; height: 420px;
-          background: radial-gradient(circle, ${ac}0c 0%, transparent 65%);
-        }
         .cs-clients__head {
           text-align: center;
           margin-bottom: clamp(36px,4.5vw,64px);
           position: relative; z-index: 10;
           padding: 0 24px;
         }
-        .cs-clients__eyebrow {
-          display: inline-flex; align-items: center; gap: 18px;
-          font-size: 11px; font-weight: 700;
-          letter-spacing: 0.32em; text-transform: uppercase;
-          color: ${ac};
-          margin-bottom: 20px;
-        }
-        .cs-clients__eyebrow-line {
-          display: block; width: 48px; height: 1px;
-          background: linear-gradient(to right, transparent, ${ac});
-          opacity: 0.7;
-        }
-        .cs-clients__eyebrow-line--rev {
-          background: linear-gradient(to left, transparent, ${ac});
-        }
         .cs-clients__title {
           font-size: clamp(2rem, 6vw, 5.5rem);
           font-weight: 900; letter-spacing: -0.03em;
           line-height: 0.95; max-width: 800px;
           margin: 0 auto; color: white;
-        }
-        .cs-clients__cta {
-          display: inline-flex; align-items: center; gap: 8px;
-          font-weight: 700; font-size: 14px;
-          padding: 14px 32px; border-radius: 999px;
-          color: #000; letter-spacing: 0.04em;
-          transition: opacity 0.2s, transform 0.2s;
-        }
-        .cs-clients__cta:hover { opacity: 0.85; transform: translateY(-2px); }
-
-        /* ─── Marquee ─── */
-        .cs-mq {
-          position: relative; overflow: hidden; padding: 10px 0;
-        }
-        .cs-mq__fade {
-          position: absolute; top: 0; bottom: 0;
-          width: 220px; z-index: 2; pointer-events: none;
-        }
-        .cs-mq__fade--l {
-          left: 0;
-          background: linear-gradient(to right, #080808 0%, transparent 100%);
-        }
-        .cs-mq__fade--r {
-          right: 0;
-          background: linear-gradient(to left, #080808 0%, transparent 100%);
-        }
-        .cs-mq__track {
-          display: flex; gap: 20px;
-          width: max-content;
-          animation: csMqFwd 32s linear infinite;
-          will-change: transform;
-        }
-        .cs-mq__track--rev {
-          animation-name: csMqRev;
-          animation-duration: 26s;
-        }
-        .cs-mq:hover .cs-mq__track { animation-play-state: paused; }
-        @keyframes csMqFwd {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes csMqRev {
-          0%   { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
         }
         .cs-logo-card {
           flex-shrink: 0;
@@ -133,42 +60,48 @@ export function ClientsSection({
           background: rgba(255,255,255,0.025);
           display: flex; align-items: center; justify-content: center;
           padding: 14px;
-          transition: border-color 0.4s, background 0.4s, transform 0.4s, box-shadow 0.4s;
+          position: relative;
+          transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
           overflow: hidden;
           backdrop-filter: blur(2px);
         }
-        .cs-logo-card:hover {
-          border-color: ${ac}30;
-          background: ${ac}08;
-          transform: translateY(-5px) scale(1.04);
-          box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 24px ${ac}12;
+        /* Inset radial glow — revealed on hover via pseudo-element, zero overflow */
+        .cs-logo-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 70%);
+          opacity: 0;
+          transition: opacity 0.35s ease;
+          pointer-events: none;
         }
+        .cs-logo-card:hover {
+          border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+          background: color-mix(in srgb, var(--accent) 3.5%, transparent);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent);
+        }
+        .cs-logo-card:hover::after { opacity: 1; }
         .cs-logo-img {
           width: 100%; height: 100%;
           object-fit: contain; object-position: center;
           border-radius: 10px;
+          transition: opacity 0.35s ease;
         }
+        .cs-logo-card:hover .cs-logo-img { opacity: 0.9; }
         @media (max-width: 768px) {
           .cs-clients { padding: 52px 0 64px; }
-          .cs-mq__fade { width: 100px; }
           .cs-logo-card { width: 136px; height: 88px; border-radius: 18px; }
         }
       `}</style>
 
-      <div className="cs-clients__orb cs-clients__orb--l" aria-hidden="true" />
-      <div className="cs-clients__orb cs-clients__orb--r" aria-hidden="true" />
+      <GlowOrb size={520} blur={110} color="color-mix(in srgb, var(--accent) 6.25%, transparent)" className="top-1/2 left-[-8%] -translate-y-1/2" />
+      <GlowOrb size={420} blur={110} color="color-mix(in srgb, var(--accent) 4.7%, transparent)" className="top-1/2 right-[-8%] -translate-y-1/2" />
 
       {(heading || bigText) && (
         <div className="cs-clients__head">
           {heading && (
-            <div className="cs-clients__eyebrow">
-              <span className="cs-clients__eyebrow-line" aria-hidden="true" />
-              {heading}
-              <span
-                className="cs-clients__eyebrow-line cs-clients__eyebrow-line--rev"
-                aria-hidden="true"
-              />
-            </div>
+            <Eyebrow ornament="line" color="var(--accent)" style={{ "--eb-gap": "18px", "--eb-size": "11px", "--eb-line-w": "48px", "--eb-line-bg": "linear-gradient(to right, transparent, var(--accent))", "--eb-line-opacity": "0.7", "--eb-mb": "20px" } as React.CSSProperties}>{heading}</Eyebrow>
           )}
           {bigText && (
             <h3 className="cs-clients__title">
@@ -179,46 +112,22 @@ export function ClientsSection({
       )}
 
       {/* Row 1 — forward */}
-      <div className="cs-mq mb-5">
-        <div className="cs-mq__fade cs-mq__fade--l" aria-hidden="true" />
-        <div className="cs-mq__fade cs-mq__fade--r" aria-hidden="true" />
-        <div className="cs-mq__track">
-          {duped.map((logo, i) => (
-            <div key={i} className="cs-logo-card">
-              <img
-                src={logo.url}
-                alt={logo.alt || "Client logo"}
-                className="cs-logo-img"
-              />
-            </div>
-          ))}
+      <Marquee items={logos} repeat={2} speed={32} direction="left" pauseOnHover fade fadeColor="#080808" className="mb-5" renderItem={(logo, i) => (
+        <div key={i} className="cs-logo-card">
+          <img src={logo.url} alt={logo.alt || "Client logo"} className="cs-logo-img" />
         </div>
-      </div>
+      )} />
 
       {/* Row 2 — reverse */}
-      <div className="cs-mq">
-        <div className="cs-mq__fade cs-mq__fade--l" aria-hidden="true" />
-        <div className="cs-mq__fade cs-mq__fade--r" aria-hidden="true" />
-        <div className="cs-mq__track cs-mq__track--rev">
-          {duped.map((logo, i) => (
-            <div key={i} className="cs-logo-card">
-              <img
-                src={logo.url}
-                alt={logo.alt || "Client logo"}
-                className="cs-logo-img"
-              />
-            </div>
-          ))}
+      <Marquee items={logos} repeat={2} speed={26} direction="right" pauseOnHover fade fadeColor="#080808" renderItem={(logo, i) => (
+        <div key={i} className="cs-logo-card">
+          <img src={logo.url} alt={logo.alt || "Client logo"} className="cs-logo-img" />
         </div>
-      </div>
+      )} />
 
       {ctaText && (
         <div className="text-center mt-12 relative z-10">
-          <Link
-            href="/contact-us"
-            className="cs-clients__cta"
-            style={{ background: ac }}
-          >
+          <Button variant="primary" href="/contact-us" style={{ "--btn-pad": "14px 32px", background: "var(--accent)" } as React.CSSProperties}>
             {ctaText}
             <svg
               width="16"
@@ -234,7 +143,7 @@ export function ClientsSection({
                 strokeLinecap="round"
               />
             </svg>
-          </Link>
+          </Button>
         </div>
       )}
     </section>

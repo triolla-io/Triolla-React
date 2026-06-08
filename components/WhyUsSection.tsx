@@ -1,5 +1,6 @@
-import Link from "next/link";
+import React from "react";
 import { SectionReveal } from "@/components/SectionReveal";
+import { GlowOrb, Button } from "@/components/ui";
 
 interface WhyUsCard {
   abteintitle?: string | null;
@@ -33,7 +34,7 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
 
   return (
     <section className="why-section py-16 md:py-24 mx-2 md:mx-4 lg:mx-10 px-5 md:px-8 lg:px-24 mb-16 md:mb-32 relative overflow-hidden">
-      <div className="why-section__orb" aria-hidden="true" />
+      <GlowOrb size={600} blur={60} color="rgba(250,204,21,0.05)" className="top-[-20%] right-[-10%]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col lg:flex-row justify-between mb-20 gap-10">
@@ -90,10 +91,7 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
 
         {ctaText && (
           <div className="mt-12 md:mt-20 flex justify-center px-4 md:px-0">
-            <Link
-              href={ctaLink || "/contact-us"}
-              className="btn-outline-gold w-full md:w-auto justify-center"
-            >
+            <Button variant="outline" href={ctaLink || "/contact-us"} style={{ "--btn-size": "16px" } as React.CSSProperties} className="w-full md:w-auto justify-center">
               {ctaText}
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path
@@ -104,7 +102,7 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
                   strokeLinejoin="round"
                 />
               </svg>
-            </Link>
+            </Button>
           </div>
         )}
       </div>
@@ -115,18 +113,6 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
           border-radius: 48px;
           border: 1px solid rgba(255,255,255,0.05);
         }
-        .why-section__orb {
-          position: absolute;
-          top: -20%;
-          right: -10%;
-          width: 600px;
-          height: 600px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(250,204,21,0.05) 0%, transparent 65%);
-          filter: blur(60px);
-          pointer-events: none;
-        }
-
         .service-card {
           position: relative;
           background: #111;
@@ -159,29 +145,7 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
           object-fit: contain;
         }
 
-        .btn-outline-gold {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          border: 1px solid #facc15;
-          color: #facc15;
-          font-weight: 600;
-          font-size: 16px;
-          padding: 14px 32px;
-          border-radius: 999px;
-          transition: background 0.2s, color 0.2s, transform 0.2s;
-        }
-        .btn-outline-gold:hover {
-          background: #facc15;
-          color: #000;
-          transform: translateY(-2px);
-        }
-
         @media (max-width: 768px) {
-          .why-section__orb {
-            width: 300px; height: 300px;
-            top: -10%; right: -15%;
-          }
           .service-card {
             padding: 28px 20px 24px;
             border-radius: 20px;
@@ -191,10 +155,6 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
           }
           .service-card__icon-img {
             width: 110px; height: 110px;
-          }
-          .btn-outline-gold {
-            padding: 14px 24px;
-            font-size: 15px;
           }
         }
       `}</style>
