@@ -23,14 +23,36 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
         className="aic-track"
       >
         {validImages.map((src, i) => (
-          <ShineImageCard key={i} src={src} alt="" radius={20} shineAngle="135deg" imgScale={1.04} style={{ "--sc-lift": "0px", "--sc-scale": "1", boxShadow: "0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)" } as React.CSSProperties} className="w-[340px] h-[400px] shrink-0 flex-shrink-0 max-md:w-[260px] max-md:h-[320px]" />
+          <ShineImageCard
+            key={i}
+            src={src}
+            alt=""
+            radius={20}
+            shineAngle="135deg"
+            imgScale={1.04}
+            style={
+              {
+                "--sc-lift": "0px",
+                "--sc-scale": "1",
+                boxShadow:
+                  "0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)",
+              } as React.CSSProperties
+            }
+            className="w-[340px] h-[400px] shrink-0 max-md:w-[260px] max-md:h-[320px]"
+          />
         ))}
       </motion.div>
 
       {/* drag hint */}
       <div className="aic-hint" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M3 10H17M12 5L17 10L12 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M3 10H17M12 5L17 10L12 15"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
         <span>Drag</span>
       </div>
