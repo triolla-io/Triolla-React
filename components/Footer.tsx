@@ -2,10 +2,17 @@ import Link from "next/link";
 import { client } from "@/lib/apollo-client";
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import { SectionReveal } from "@/components/SectionReveal";
 import { FooterModalProvider } from "@/components/FooterServiceModal";
 import { FooterNavLink } from "@/components/FooterNavLink";
 import { getAllServices, deriveUri } from "@/lib/service-details";
+import type {
+  GetFooterData,
+  GetThemeSettingsData,
+  FooterMenu,
+  ThemeOptions,
+} from "@/lib/graphql-types";
 
 /* ── Types ──────────────────────────────────────────────── */
 
@@ -17,9 +24,6 @@ interface WPMenu {
   name: string;
   slug: string;
   menuItems: { nodes: MenuItem[] };
-}
-interface FooterQueryResult {
-  menus: { nodes: WPMenu[] };
 }
 
 interface MentionLogo {
@@ -50,26 +54,26 @@ const COL_HEADING_FIELDS = [
 
 /* ── Data fetching ──────────────────────────────────────── */
 
-async function getFooterMenus(): Promise<WPMenu[]> {
+const FOOTER_QUERY: TypedDocumentNode<GetFooterData> = gql`
+  ${GET_FOOTER_DATA}
+`;
+
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
+
+async function getFooterMenus(): Promise<FooterMenu[]> {
   try {
-    const { data } = await client.query<FooterQueryResult>({
-      query: gql`
-        ${GET_FOOTER_DATA}
-      `,
-    });
+    const { data } = await client.query({ query: FOOTER_QUERY });
     return data?.menus?.nodes ?? [];
   } catch {
     return [];
   }
 }
 
-async function getThemeSettings() {
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_THEME_SETTINGS}
-      `,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;

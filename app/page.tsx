@@ -14,6 +14,21 @@ import { GrainOverlay, GlowOrb, Eyebrow } from "@/components/ui";
 import { client } from "@/lib/apollo-client";
 import { GET_HOME_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
+import type {
+  GetHomePageData,
+  GetThemeSettingsData,
+  HomePageFields,
+  ThemeOptions,
+} from "@/lib/graphql-types";
+
+const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
+  ${GET_HOME_PAGE}
+`;
+
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
 
 /* ── WP content helpers ──────────────────────────── */
 
@@ -41,26 +56,18 @@ function parseAward(wboxTitle: string): { rank: number; label: string } {
 
 /* ── Data fetching ───────────────────────────────── */
 
-async function getHomeData() {
+async function getHomeData(): Promise<HomePageFields> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_HOME_PAGE}
-      `,
-    });
-    return data?.page?.template?.homePage ?? {};
+    const { data } = await client.query({ query: HOME_PAGE_QUERY });
+    return data?.page?.template?.homePage ?? ({} as HomePageFields);
   } catch {
-    return {};
+    return {} as HomePageFields;
   }
 }
 
-async function getThemeSettings() {
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_THEME_SETTINGS}
-      `,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;

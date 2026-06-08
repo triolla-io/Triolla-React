@@ -2,6 +2,7 @@ import { client } from "@/lib/apollo-client";
 import { GET_SERVICES_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { enrichServiceDetails } from "@/lib/service-details";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import { SectionReveal } from "@/components/SectionReveal";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
@@ -11,6 +12,20 @@ import { ServiceModalMenu } from "@/components/ServiceModalMenu";
 import { ServiceTechGroups, type TechGroup } from "@/components/ServiceTechGroups";
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from "@/components/ui";
 import parse from "html-react-parser";
+import type {
+  GetServicesPageData,
+  GetThemeSettingsData,
+  ServicesPageFields,
+  ThemeOptions,
+} from "@/lib/graphql-types";
+
+const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
+  ${GET_SERVICES_PAGE}
+`;
+
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -22,22 +37,18 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-async function getServicesData() {
+async function getServicesData(): Promise<ServicesPageFields> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`${GET_SERVICES_PAGE}`,
-    });
-    return data?.page?.template?.servicePage ?? {};
+    const { data } = await client.query({ query: SERVICES_PAGE_QUERY });
+    return data?.page?.template?.servicePage ?? ({} as ServicesPageFields);
   } catch {
-    return {};
+    return {} as ServicesPageFields;
   }
 }
 
-async function getThemeSettings() {
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`${GET_THEME_SETTINGS}`,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;
@@ -140,7 +151,7 @@ export default async function ServicesPage() {
     sp.prodtitle,
     sp.brandtitle,
     sp.devtitle,
-  ].filter(Boolean).map(stripHtml);
+  ].filter((v): v is string => Boolean(v)).map(stripHtml);
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">

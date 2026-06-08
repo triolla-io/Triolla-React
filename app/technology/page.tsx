@@ -1,6 +1,7 @@
 import { client } from "@/lib/apollo-client";
 import { GET_TECHNOLOGY_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQSection } from "@/components/FAQSection";
 import { WannaChatSection } from "@/components/WannaChatSection";
@@ -9,6 +10,20 @@ import { TechStackSection } from "@/components/TechStackSection";
 import AnimatedSteps from "@/components/AnimatedSteps";
 import { ClientsSection } from "@/components/ClientsSection";
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from "@/components/ui";
+import type {
+  GetTechnologyPageData,
+  GetThemeSettingsData,
+  TechnologyPageFields,
+  ThemeOptions,
+} from "@/lib/graphql-types";
+
+const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
+  ${GET_TECHNOLOGY_PAGE}
+`;
+
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -31,26 +46,18 @@ function decodeHtml(html: string): string {
     .replace(/&#8217;/g, "'");
 }
 
-async function getTechData() {
+async function getTechData(): Promise<TechnologyPageFields> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_TECHNOLOGY_PAGE}
-      `,
-    });
-    return data?.page?.template?.technologyPage ?? {};
+    const { data } = await client.query({ query: TECH_PAGE_QUERY });
+    return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields);
   } catch {
-    return {};
+    return {} as TechnologyPageFields;
   }
 }
 
-async function getThemeSettings() {
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_THEME_SETTINGS}
-      `,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;

@@ -1,7 +1,17 @@
 import { client } from "@/lib/apollo-client";
 import { GET_SERVICES_PAGE, buildServiceDetailsQuery } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import type { ServiceDetail } from "@/components/ServiceDetailModal";
+import type {
+  GetServicesPageData,
+  GetServiceDetailsData,
+  ServicesPageFields,
+} from "@/lib/graphql-types";
+
+const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
+  ${GET_SERVICES_PAGE}
+`;
 
 /** Turn a WP link ("https://triolla.io/services/x/" or "/services/x") into a
  *  URI path ("services/x") suitable for `page(idType: URI)` — and for matching
@@ -44,9 +54,8 @@ export async function enrichServiceDetails(
   if (queryable.length === 0) return enriched;
 
   try {
-    const { data } = await client.query<any>({
-      query: gql`${buildServiceDetailsQuery(queryable.map((q) => q.uri))}`,
-    });
+    const detailQuery: TypedDocumentNode<GetServiceDetailsData> = gql`${buildServiceDetailsQuery(queryable.map((q) => q.uri))}`;
+    const { data } = await client.query({ query: detailQuery });
     queryable.forEach((q, i) => {
       const page = data?.[`s${i}`];
       if (!page) return; // unresolved → stays a plain link
@@ -72,22 +81,20 @@ export async function enrichServiceDetails(
  *  instead of navigating to a page that no longer exists. On any failure it
  *  returns `[]`, so the footer simply keeps its plain links. */
 export async function getAllServices(): Promise<ServiceDetail[]> {
-  let sp: any = {};
+  let sp: ServicesPageFields = {} as ServicesPageFields;
   try {
-    const { data } = await client.query<any>({
-      query: gql`${GET_SERVICES_PAGE}`,
-    });
-    sp = data?.page?.template?.servicePage ?? {};
+    const { data } = await client.query({ query: SERVICES_PAGE_QUERY });
+    sp = data?.page?.template?.servicePage ?? ({} as ServicesPageFields);
   } catch {
     return [];
   }
 
   const menu = [
-    ...(sp.prodrightMenu ?? []).map((i: any) => ({
+    ...(sp.prodrightMenu ?? []).map((i) => ({
       label: i?.prodmtitle ?? null,
       link: i?.prodmlink ?? null,
     })),
-    ...(sp.brandrightMenu ?? []).map((i: any) => ({
+    ...(sp.brandrightMenu ?? []).map((i) => ({
       label: i?.rightmetitle ?? null,
       link: i?.rightmelink ?? null,
     })),

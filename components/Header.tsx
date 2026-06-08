@@ -1,30 +1,34 @@
 import { client } from "@/lib/apollo-client";
 import { GET_THEME_SETTINGS, GET_PRIMARY_MENU } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import { HeaderClient } from "./HeaderClient";
 import type { NavItem } from "./HeaderClient";
+import type {
+  GetThemeSettingsData,
+  GetPrimaryMenuData,
+  MenuItemNode,
+  ThemeOptions,
+} from "@/lib/graphql-types";
 
-interface FlatMenuItem {
-  databaseId: number;
-  label: string;
-  url: string | null;
-  parentDatabaseId: number | null;
-}
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
 
-async function getThemeSettings() {
+const PRIMARY_MENU_QUERY: TypedDocumentNode<GetPrimaryMenuData> = gql`
+  ${GET_PRIMARY_MENU}
+`;
+
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_THEME_SETTINGS}
-      `,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;
   }
 }
 
-function buildNavTree(flat: FlatMenuItem[]): NavItem[] {
+function buildNavTree(flat: MenuItemNode[]): NavItem[] {
   const roots = flat.filter((item) => !item.parentDatabaseId);
   return roots.map((item) => {
     const directChildren = flat.filter(
@@ -39,14 +43,14 @@ function buildNavTree(flat: FlatMenuItem[]): NavItem[] {
       if (grandchildren.length > 0) {
         // Intermediate grouping node — flatten its children up into the dropdown
         for (const gc of grandchildren) {
-          children.push({ label: gc.label, url: gc.url || "#" });
+          children.push({ label: gc.label || "", url: gc.url || "#" });
         }
       } else if (child.url && child.url !== "#") {
-        children.push({ label: child.label, url: child.url });
+        children.push({ label: child.label || "", url: child.url });
       }
     }
 
-    return { label: item.label, url: item.url || "#", children };
+    return { label: item.label || "", url: item.url || "#", children };
   });
 }
 
@@ -55,12 +59,8 @@ async function getPrimaryMenu(): Promise<{
   mobile: NavItem[];
 }> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_PRIMARY_MENU}
-      `,
-    });
-    const flatNav: FlatMenuItem[] = data?.primaryMenu?.menuItems?.nodes ?? [];
+    const { data } = await client.query({ query: PRIMARY_MENU_QUERY });
+    const flatNav: MenuItemNode[] = data?.primaryMenu?.menuItems?.nodes ?? [];
     return { nav: buildNavTree(flatNav), mobile: buildNavTree(flatNav) };
   } catch {
     return { nav: [], mobile: [] };

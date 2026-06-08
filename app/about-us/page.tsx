@@ -1,6 +1,7 @@
 import { client } from "@/lib/apollo-client";
 import { GET_ABOUT_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import Link from "next/link";
 import { FadeIn } from "@/components/FadeIn";
 import { FAQAccordion } from "@/components/FAQAccordion";
@@ -10,6 +11,20 @@ import AnimatedSteps from "@/components/AnimatedSteps";
 import { ClientsSection } from "@/components/ClientsSection";
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from "@/components/ui";
 import parse from "html-react-parser";
+import type {
+  GetAboutPageData,
+  GetThemeSettingsData,
+  AboutPageFields,
+  ThemeOptions,
+} from "@/lib/graphql-types";
+
+const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
+  ${GET_ABOUT_PAGE}
+`;
+
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -21,26 +36,18 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-async function getAboutData() {
+async function getAboutData(): Promise<AboutPageFields> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_ABOUT_PAGE}
-      `,
-    });
-    return data?.page?.template?.aboutPage ?? {};
+    const { data } = await client.query({ query: ABOUT_PAGE_QUERY });
+    return data?.page?.template?.aboutPage ?? ({} as AboutPageFields);
   } catch {
-    return {};
+    return {} as AboutPageFields;
   }
 }
 
-async function getThemeSettings() {
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_THEME_SETTINGS}
-      `,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;

@@ -6,8 +6,28 @@ import {
   GET_THEME_SETTINGS,
 } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import { notFound } from "next/navigation";
 import { PortfolioTemplate } from "@/components/PortfolioTemplate";
+import type {
+  GetPortfolioSlugsData,
+  GetPortfolioPageData,
+  GetThemeSettingsData,
+  PortfolioFields,
+  ThemeOptions,
+} from "@/lib/graphql-types";
+
+const PORTFOLIO_SLUGS_QUERY: TypedDocumentNode<GetPortfolioSlugsData> = gql`
+  ${GET_PORTFOLIO_SLUGS}
+`;
+
+const PORTFOLIO_PAGE_QUERY: TypedDocumentNode<GetPortfolioPageData> = gql`
+  ${GET_PORTFOLIO_PAGE}
+`;
+
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
 
 // Only slugs returned by generateStaticParams resolve here; any other slug 404s.
 // Static route folders (about-us, services, technology) take Next.js precedence
@@ -16,13 +36,9 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_PORTFOLIO_SLUGS}
-      `,
-    });
+    const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY });
 
-    const nodes: any[] = data?.pages?.nodes ?? [];
+    const nodes = data?.pages?.nodes ?? [];
     return nodes
       .filter((n) => n?.template?.__typename === "Template_PortfolioPage")
       .map((n) => ({ slug: (n.uri ?? "").replace(/^\/+|\/+$/g, "") }))
@@ -33,12 +49,10 @@ export async function generateStaticParams() {
   }
 }
 
-async function getPortfolioData(slug: string) {
+async function getPortfolioData(slug: string): Promise<PortfolioFields | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_PORTFOLIO_PAGE}
-      `,
+    const { data } = await client.query({
+      query: PORTFOLIO_PAGE_QUERY,
       variables: { uri: slug },
     });
     return data?.page?.template?.portfolioFields ?? null;
@@ -47,13 +61,9 @@ async function getPortfolioData(slug: string) {
   }
 }
 
-async function getThemeSettings() {
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_THEME_SETTINGS}
-      `,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;

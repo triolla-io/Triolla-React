@@ -3,11 +3,24 @@ import type { Metadata } from "next";
 import { client } from "@/lib/apollo-client";
 import { GET_CONTACT_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
 import { gql } from "@apollo/client";
+import type { TypedDocumentNode } from "@apollo/client";
 import { FadeIn } from "@/components/FadeIn";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { GlowOrb, Eyebrow } from "@/components/ui";
+import type {
+  GetContactPageData,
+  GetThemeSettingsData,
+  ContactFields,
+  ThemeOptions,
+} from "@/lib/graphql-types";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+const CONTACT_PAGE_QUERY: TypedDocumentNode<GetContactPageData> = gql`
+  ${GET_CONTACT_PAGE}
+`;
+
+const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
+  ${GET_THEME_SETTINGS}
+`;
 
 function stripHtml(html: string): string {
   return (html ?? "")
@@ -18,13 +31,9 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-async function getContactData() {
+async function getContactData(): Promise<{ title: string | null; fields: ContactFields | null }> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_CONTACT_PAGE}
-      `,
-    });
+    const { data } = await client.query({ query: CONTACT_PAGE_QUERY });
     return {
       title: data?.page?.title ?? null,
       fields: data?.page?.template?.contactFields ?? null,
@@ -34,13 +43,9 @@ async function getContactData() {
   }
 }
 
-async function getThemeSettings() {
+async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query<any>({
-      query: gql`
-        ${GET_THEME_SETTINGS}
-      `,
-    });
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
     return data?.themeSetting?.themeOptions ?? null;
   } catch {
     return null;
