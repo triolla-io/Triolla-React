@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import parse from "html-react-parser";
+import { GlowOrb } from "@/components/ui";
 
 function decodeHtml(html: string): string {
   return (html ?? "")
@@ -135,7 +136,7 @@ export function TechStickyFeature({
         }
         .tsf-scan {
           position: absolute; left: 0; right: 0; height: 1px;
-          background: linear-gradient(to right, transparent, ${accentColor}55, transparent);
+          background: linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 33%, transparent), transparent);
           animation: tsf-scan 7s ease-in-out 1.5s infinite;
           pointer-events: none; z-index: 5;
         }
@@ -194,22 +195,12 @@ export function TechStickyFeature({
         .tsf-stmt-cta:hover { transform: scale(1.04) translateY(-2px); }
         .tsf-stmt-cta:active { transform: scale(0.97); }
 
-        /* ─── Orb pulse on cream ────────────────────── */
-        @keyframes tsf-orb-cream {
-          0%,100% { opacity: 0.35; transform: translate(-50%,-50%) scale(1); }
-          50%      { opacity: 0.65; transform: translate(-50%,-50%) scale(1.12); }
-        }
-        .tsf-cream-orb {
-          position: absolute; top: 50%; left: 50%;
-          transform: translate(-50%,-50%);
-          width: 800px; height: 600px; border-radius: 50%;
-          background: radial-gradient(ellipse, ${accentColor}20 0%, transparent 65%);
-          filter: blur(80px); pointer-events: none;
-          animation: tsf-orb-cream 5s ease-in-out infinite;
-        }
       `}</style>
 
-      <section className="border-t border-white/[0.07]">
+      <section
+        className="border-t border-white/[0.07]"
+        style={{ "--accent": accentColor } as React.CSSProperties}
+      >
         {/* ══════════════════════════════════════
             STICKY SPLIT LAYOUT
         ══════════════════════════════════════ */}
@@ -265,11 +256,11 @@ export function TechStickyFeature({
                       height: i === activeIndex ? "10px" : "5px",
                       background:
                         i === activeIndex
-                          ? accentColor
+                          ? "var(--accent)"
                           : "rgba(255,255,255,0.2)",
                       boxShadow:
                         i === activeIndex
-                          ? `0 0 14px ${accentColor}, 0 0 28px ${accentColor}55`
+                          ? "0 0 14px var(--accent), 0 0 28px color-mix(in srgb, var(--accent) 33%, transparent)"
                           : "none",
                     }}
                   />
@@ -278,7 +269,7 @@ export function TechStickyFeature({
               {/* Panel counter */}
               <div
                 className="absolute left-6 bottom-8 font-black tabular-nums select-none pointer-events-none leading-none z-20"
-                style={{ fontSize: "88px", color: `${accentColor}22` }}
+                style={{ fontSize: "88px", color: "color-mix(in srgb, var(--accent) 13.3%, transparent)" }}
                 aria-hidden="true"
               >
                 {String(activeIndex + 1).padStart(2, "0")}
@@ -286,7 +277,7 @@ export function TechStickyFeature({
                   className="block"
                   style={{
                     fontSize: "16px",
-                    color: `${accentColor}55`,
+                    color: "color-mix(in srgb, var(--accent) 33%, transparent)",
                     letterSpacing: "0.3em",
                     fontWeight: 800,
                   }}
@@ -315,7 +306,7 @@ export function TechStickyFeature({
                     className="absolute top-0 right-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
                     style={{
                       fontSize: "clamp(120px,20vw,240px)",
-                      color: `${accentColor}07`,
+                      color: "color-mix(in srgb, var(--accent) 2.7%, transparent)",
                     }}
                     aria-hidden="true"
                   >
@@ -364,7 +355,7 @@ export function TechStickyFeature({
                         {isActive && (
                           <div
                             className="tsf-bar h-full w-full rounded-full"
-                            style={{ background: accentColor }}
+                            style={{ background: "var(--accent)" }}
                           />
                         )}
                       </div>
@@ -404,9 +395,9 @@ export function TechStickyFeature({
                                 key={ti}
                                 className="tsf-tag"
                                 style={{
-                                  background: `${accentColor}10`,
-                                  color: accentColor,
-                                  border: `1px solid ${accentColor}2a`,
+                                  background: "color-mix(in srgb, var(--accent) 6.25%, transparent)",
+                                  color: "var(--accent)",
+                                  border: "1px solid color-mix(in srgb, var(--accent) 16.5%, transparent)",
                                 }}
                               >
                                 {tag.trim()}
@@ -444,7 +435,15 @@ export function TechStickyFeature({
 
             <div ref={stmtRef} className="tsf-stmt">
               <div className="tsf-stmt__grid" aria-hidden="true" />
-              <div className="tsf-cream-orb" aria-hidden="true" />
+              <GlowOrb
+                size={800}
+                height={600}
+                color="color-mix(in srgb, var(--accent) 12.5%, transparent)"
+                shape="ellipse"
+                blur={80}
+                animation="none"
+                className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.35]"
+              />
 
               <div className="relative z-10 max-w-[1400px] mx-auto">
                 {/* Eyebrow lines */}
@@ -453,19 +452,19 @@ export function TechStickyFeature({
                     <div
                       className="tsf-dline h-[1.5px] w-20 rounded-full"
                       style={{
-                        background: `linear-gradient(to right, transparent, ${accentColor})`,
+                        background: "linear-gradient(to right, transparent, var(--accent))",
                       }}
                     />
                     <span
                       className="font-bold tracking-[0.4em] uppercase"
-                      style={{ fontSize: "11px", color: accentColor }}
+                      style={{ fontSize: "11px", color: "var(--accent)" }}
                     >
                       Our Promise
                     </span>
                     <div
                       className="tsf-dline tsf-dline-r h-[1.5px] w-20 rounded-full"
                       style={{
-                        background: `linear-gradient(to left, transparent, ${accentColor})`,
+                        background: "linear-gradient(to left, transparent, var(--accent))",
                       }}
                     />
                   </div>
@@ -489,7 +488,7 @@ export function TechStickyFeature({
                           animationDelay: stmtVisible
                             ? `${wi * 0.065}s`
                             : undefined,
-                          color: isGold ? accentColor : "#111",
+                          color: isGold ? "var(--accent)" : "#111",
                           marginRight: "0.22em",
                           display: "inline-block",
                         }}

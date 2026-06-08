@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import parse from "html-react-parser";
+import { GlowOrb, Eyebrow, GradientText } from "@/components/ui";
 
 function decodeHtml(html: string): string {
   return (html ?? "")
@@ -77,10 +78,32 @@ export function TechStackSection({
 
   return (
     <>
-      <section ref={sectionRef} className="tss-root">
+      <section
+        ref={sectionRef}
+        className="tss-root"
+        style={{ "--accent": accentColor } as React.CSSProperties}
+      >
         {/* Ambient layers */}
-        <div className="tss-orb tss-orb--tr" aria-hidden="true" />
-        <div className="tss-orb tss-orb--bl" aria-hidden="true" />
+        {/* tss-orb--tr: circle, 620px, ${accentColor}14 = 7.8%, blur 110, pulse 12s */}
+        <GlowOrb
+          size={620}
+          color="color-mix(in srgb, var(--accent) 7.8%, transparent)"
+          shape="circle"
+          fade="65%"
+          blur={110}
+          animation="none"
+          className="top-[-8%] right-[-8%]"
+        />
+        {/* tss-orb--bl: circle, 480px, ${accentColor}0c = 4.7%, blur 110, pulse-rev 15s */}
+        <GlowOrb
+          size={480}
+          color="color-mix(in srgb, var(--accent) 4.7%, transparent)"
+          shape="circle"
+          fade="65%"
+          blur={110}
+          animation="none"
+          className="bottom-[-10%] left-[-8%]"
+        />
         <div className="tss-dots" aria-hidden="true" />
 
         {/* Editorial corner markers */}
@@ -97,20 +120,22 @@ export function TechStackSection({
           {/* ── Centered header ── */}
           <div className={`tss-head ${visible ? "tss-head--on" : ""}`}>
             {cleanMidTitle && (
-              <div className="tss-eyebrow">
-                <span className="tss-eyebrow__line" aria-hidden="true" />
-                <span className="tss-eyebrow__mark" aria-hidden="true">
-                  ✦
-                </span>
-                <span className="tss-eyebrow__text">{cleanMidTitle}</span>
-                <span className="tss-eyebrow__mark" aria-hidden="true">
-                  ✦
-                </span>
-                <span
-                  className="tss-eyebrow__line tss-eyebrow__line--rev"
-                  aria-hidden="true"
-                />
-              </div>
+              <Eyebrow
+                ornament="mark"
+                align="center"
+                style={
+                  {
+                    "--eb-gap": "16px",
+                    "--eb-line-w": "clamp(40px, 7vw, 72px)",
+                    "--eb-line-bg": "linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 67%, transparent))",
+                    "--eb-mb": "28px",
+                    "--eb-spacing": "0.36em",
+                    "--eb-weight": "800",
+                  } as React.CSSProperties
+                }
+              >
+                {cleanMidTitle}
+              </Eyebrow>
             )}
 
             {(titleOne || titleTwo) && (
@@ -119,9 +144,15 @@ export function TechStackSection({
                   <span className="tss-title__line">{parse(decodeHtml(titleOne))}</span>
                 )}
                 {titleTwo && (
-                  <span className="tss-title__line tss-title__line--accent">
+                  <GradientText
+                    as="span"
+                    animate
+                    duration={7}
+                    gradient="linear-gradient(135deg, #fff 38%, var(--accent) 58%, #fff 78%)"
+                    className="tss-title__line italic"
+                  >
                     {parse(decodeHtml(titleTwo))}
-                  </span>
+                  </GradientText>
                 )}
               </h2>
             )}
@@ -211,30 +242,6 @@ export function TechStackSection({
           overflow: hidden;
         }
 
-        /* ── Ambient orbs (matches page hero/steps language) ── */
-        .tss-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(110px);
-          pointer-events: none;
-        }
-        .tss-orb--tr {
-          top: -8%; right: -8%;
-          width: 620px; height: 620px;
-          background: radial-gradient(circle, ${accentColor}14 0%, transparent 65%);
-          animation: tssOrbPulse 12s ease-in-out infinite;
-        }
-        .tss-orb--bl {
-          bottom: -10%; left: -8%;
-          width: 480px; height: 480px;
-          background: radial-gradient(circle, ${accentColor}0c 0%, transparent 65%);
-          animation: tssOrbPulse 15s ease-in-out infinite reverse;
-        }
-        @keyframes tssOrbPulse {
-          0%,100% { opacity: 1;   transform: scale(1); }
-          50%      { opacity: 0.7; transform: scale(1.08); }
-        }
-
         /* ── Dot grid with radial mask ── */
         .tss-dots {
           position: absolute; inset: 0; pointer-events: none;
@@ -256,11 +263,11 @@ export function TechStackSection({
           font-size: 11px; font-weight: 900;
           letter-spacing: 0.36em;
           font-variant-numeric: tabular-nums;
-          color: ${accentColor};
+          color: var(--accent);
         }
         .tss-marker__line {
           display: block; width: 64px; height: 1px;
-          background: linear-gradient(to right, ${accentColor}66, transparent);
+          background: linear-gradient(to right, color-mix(in srgb, var(--accent) 40%, transparent), transparent);
         }
         .tss-marker__line--rev {
           width: 56px;
@@ -268,8 +275,8 @@ export function TechStackSection({
         }
         .tss-marker__dot {
           width: 6px; height: 6px; border-radius: 50%;
-          background: ${accentColor};
-          box-shadow: 0 0 12px ${accentColor}aa;
+          background: var(--accent);
+          box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 67%, transparent);
         }
 
         /* ── Inner container ── */
@@ -291,28 +298,6 @@ export function TechStackSection({
         }
         .tss-head--on { opacity: 1; transform: none; }
 
-        .tss-eyebrow {
-          display: inline-flex; align-items: center; gap: 16px;
-          margin-bottom: 28px;
-        }
-        .tss-eyebrow__line {
-          display: block; width: clamp(40px, 7vw, 72px); height: 1px;
-          background: linear-gradient(to right, transparent, ${accentColor}aa);
-        }
-        .tss-eyebrow__line--rev {
-          background: linear-gradient(to left, transparent, ${accentColor}aa);
-        }
-        .tss-eyebrow__mark {
-          color: ${accentColor};
-          font-size: 13px; line-height: 1;
-        }
-        .tss-eyebrow__text {
-          font-size: 11px; font-weight: 800;
-          letter-spacing: 0.36em; text-transform: uppercase;
-          color: ${accentColor};
-          white-space: nowrap;
-        }
-
         .tss-title {
           font-size: clamp(40px, 6.4vw, 88px);
           font-weight: 900;
@@ -321,19 +306,6 @@ export function TechStackSection({
           margin-bottom: 30px;
         }
         .tss-title__line { display: block; color: #fff; }
-        .tss-title__line--accent {
-          background: linear-gradient(135deg, #fff 38%, ${accentColor} 58%, #fff 78%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: tssShimmer 7s linear infinite;
-          font-style: italic;
-        }
-        @keyframes tssShimmer {
-          0%   { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
 
         .tss-desc {
           font-size: clamp(16px, 1.3vw, 18px);
@@ -355,7 +327,7 @@ export function TechStackSection({
           top: 50%; left: 50%;
           width: 85%; aspect-ratio: 2 / 1;
           transform: translate(-50%, -50%);
-          background: radial-gradient(ellipse at center, ${accentColor}1a 0%, transparent 62%);
+          background: radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 10.2%, transparent) 0%, transparent 62%);
           filter: blur(70px);
           pointer-events: none;
           z-index: 0;
@@ -398,7 +370,7 @@ export function TechStackSection({
           position: absolute;
           inset: -28%;
           border-radius: 50%;
-          background: radial-gradient(circle, ${accentColor}26 0%, transparent 60%);
+          background: radial-gradient(circle, color-mix(in srgb, var(--accent) 14.9%, transparent) 0%, transparent 60%);
           opacity: 0;
           transition: opacity 0.5s ease, transform 0.5s ease;
           pointer-events: none;
@@ -451,7 +423,7 @@ export function TechStackSection({
         .tss-card__corner {
           position: absolute;
           width: 11px; height: 11px;
-          border: 1px solid ${accentColor};
+          border: 1px solid var(--accent);
           opacity: 0;
           transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.23,1,0.32,1);
           pointer-events: none;
@@ -470,11 +442,11 @@ export function TechStackSection({
         }
         .tss-card__face-wrap:hover .tss-card__face {
           background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
-          border-color: ${accentColor}77;
+          border-color: color-mix(in srgb, var(--accent) 47%, transparent);
           box-shadow:
-            0 0 0 1px ${accentColor}44,
+            0 0 0 1px color-mix(in srgb, var(--accent) 27%, transparent),
             0 22px 56px rgba(0,0,0,0.65),
-            0 0 56px ${accentColor}33,
+            0 0 56px color-mix(in srgb, var(--accent) 20%, transparent),
             inset 0 1px 0 rgba(255,255,255,0.22);
           transform: scale(1.08) translateY(-6px);
         }
@@ -508,7 +480,7 @@ export function TechStackSection({
           line-height: 1.3;
         }
         .tss-card__float:hover .tss-card__label {
-          color: ${accentColor};
+          color: var(--accent);
           letter-spacing: 0.12em;
         }
 
@@ -529,10 +501,10 @@ export function TechStackSection({
         .tss-foot__line {
           flex: 1; height: 1px;
           min-width: 40px;
-          background: linear-gradient(to right, transparent, ${accentColor}55 60%, rgba(255,255,255,0.1));
+          background: linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 33%, transparent) 60%, rgba(255,255,255,0.1));
         }
         .tss-foot__line--rev {
-          background: linear-gradient(to left, transparent, ${accentColor}55 60%, rgba(255,255,255,0.1));
+          background: linear-gradient(to left, transparent, color-mix(in srgb, var(--accent) 33%, transparent) 60%, rgba(255,255,255,0.1));
         }
 
         .tss-foot__counter {
@@ -544,14 +516,14 @@ export function TechStackSection({
           font-weight: 900;
           letter-spacing: -0.045em;
           line-height: 0.88;
-          background: linear-gradient(180deg, #fff 0%, ${accentColor} 100%);
+          background: linear-gradient(180deg, #fff 0%, var(--accent) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
           font-variant-numeric: tabular-nums;
         }
         .tss-foot__slash {
-          color: ${accentColor}88;
+          color: color-mix(in srgb, var(--accent) 53%, transparent);
           font-weight: 300;
           font-size: 40px;
           transform: translateY(-6px);
@@ -600,9 +572,7 @@ export function TechStackSection({
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .tss-orb,
-          .tss-card__float,
-          .tss-title__line--accent {
+          .tss-card__float {
             animation: none !important;
           }
         }
