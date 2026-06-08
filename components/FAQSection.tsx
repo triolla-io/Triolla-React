@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import parse from "html-react-parser";
+import { GlowOrb, GradientText } from "@/components/ui";
 
 
 interface FAQItem {
@@ -26,9 +27,9 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
     <>
       <section className="fq-root">
         <div className="fq-card">
-          <div className="fq-orb fq-orb--a" />
-          <div className="fq-orb fq-orb--b" />
-          <div className="fq-orb fq-orb--c" />
+          <GlowOrb animation="none" size={640} fade="60%" blur={100} color="rgba(250,204,21,0.09)" className="top-[-20%] right-[-8%] opacity-[0.85]" />
+          <GlowOrb animation="none" size={500} fade="60%" blur={100} color="rgba(251,146,60,0.06)" className="bottom-[-15%] left-[-6%] opacity-[0.85]" />
+          <GlowOrb animation="none" size={320} fade="60%" blur={100} color="rgba(250,204,21,0.03)" className="top-[50%] left-[30%] opacity-[0.85]" />
           <div className="fq-grid" />
 
           <div className="fq-layout">
@@ -39,10 +40,10 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
                 {heading && <h2 className="fq-heading">{heading}</h2>}
                 {subtext  && <p className="fq-subtext">{subtext}</p>}
                 <div className="fq-rule" />
-                <div className="fq-count" aria-hidden="true">
+                <GradientText as="span" gradient="linear-gradient(128deg,#facc15,#f59e0b)" className="fq-count" aria-hidden="true">
                   {String(items.length).padStart(2, "0")}
                   <span className="fq-count__label">questions</span>
-                </div>
+                </GradientText>
               </div>
               <div className="fq-deco" aria-hidden="true">?</div>
             </div>
@@ -116,37 +117,6 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
           box-shadow:
             0 60px 140px rgba(0,0,0,0.65),
             inset 0 1px 0 rgba(255,255,255,0.04);
-        }
-
-        /* orbs */
-        .fq-orb {
-          position: absolute;
-          border-radius: 50%;
-          pointer-events: none;
-          filter: blur(100px);
-        }
-        .fq-orb--a {
-          top: -20%; right: -8%;
-          width: 640px; height: 640px;
-          background: radial-gradient(circle, rgba(250,204,21,0.09) 0%, transparent 60%);
-          animation: fqFloat 14s ease-in-out infinite;
-        }
-        .fq-orb--b {
-          bottom: -15%; left: -6%;
-          width: 500px; height: 500px;
-          background: radial-gradient(circle, rgba(251,146,60,0.06) 0%, transparent 60%);
-          animation: fqFloat 18s ease-in-out infinite reverse;
-        }
-        .fq-orb--c {
-          top: 50%; left: 30%;
-          width: 320px; height: 320px;
-          background: radial-gradient(circle, rgba(250,204,21,0.03) 0%, transparent 60%);
-          animation: fqFloat 24s ease-in-out infinite;
-        }
-        @keyframes fqFloat {
-          0%,100% { transform: translate(0,0)        scale(1);    opacity: 0.85; }
-          33%      { transform: translate(-20px,16px) scale(1.05); opacity: 1;    }
-          66%      { transform: translate(14px,-20px) scale(0.96); opacity: 0.8;  }
         }
 
         /* grid texture */
@@ -230,10 +200,6 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
           font-size: 2.6rem;
           font-weight: 900;
           letter-spacing: -0.04em;
-          background: linear-gradient(128deg, #facc15, #f59e0b);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
         }
         .fq-count__label {
           font-size: 0.7rem;
@@ -422,11 +388,6 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
 
           /* Hide the huge decorative "?" on mobile — wastes space */
           .fq-deco { display: none; }
-
-          /* Orbs scaled down */
-          .fq-orb--a { width: 260px; height: 260px; top: -15%; right: -10%; }
-          .fq-orb--b { width: 220px; height: 220px; }
-          .fq-orb--c { display: none; }
 
           /* Accordion items — touch-friendly, compact */
           .fq-item { border-radius: 16px; }

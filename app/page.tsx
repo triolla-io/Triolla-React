@@ -369,69 +369,6 @@ export default async function Home() {
           color: rgba(255,255,255,0.3);
         }
 
-        /* ─── Portfolio cards ───────────────────── */
-        .portfolio-card {
-          overflow: hidden;
-          border-radius: 20px;
-          position: relative;
-          background: #0f0f0f;
-          box-shadow: 0 4px 40px rgba(0,0,0,0.4);
-          transition: transform 0.5s cubic-bezier(.23,1,.32,1), box-shadow 0.5s;
-          width: 100%;
-        }
-        .portfolio-card:hover {
-          transform: translateY(-5px) scale(1.01);
-          box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(250,204,21,0.18);
-        }
-        .portfolio-card__img {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: top center;
-          transition: transform 0.7s cubic-bezier(.23,1,.32,1);
-          display: block;
-        }
-        .portfolio-card:hover .portfolio-card__img {
-          transform: scale(1.07);
-        }
-        .portfolio-card__overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 45%, transparent 65%);
-          display: flex;
-          align-items: flex-end;
-          padding: 24px;
-          opacity: 0;
-          transition: opacity 0.35s;
-        }
-        .portfolio-card:hover .portfolio-card__overlay { opacity: 1; }
-        .portfolio-card__tag {
-          background: #facc15;
-          color: #000;
-          font-size: 12px;
-          font-weight: 700;
-          padding: 6px 14px;
-          border-radius: 999px;
-          letter-spacing: 0.05em;
-          transform: translateY(10px);
-          transition: transform 0.4s cubic-bezier(.23,1,.32,1);
-        }
-        .portfolio-card:hover .portfolio-card__tag { transform: translateY(0); }
-        .portfolio-card__shine {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.045) 50%, transparent 60%);
-          background-size: 200% 100%;
-          background-position: 200% 0;
-          transition: background-position 0.55s;
-          pointer-events: none;
-        }
-        .portfolio-card:hover .portfolio-card__shine {
-          background-position: -200% 0;
-        }
-
         /* ─── Winners section ───────────────────── */
         .winners-section {
           position: relative;

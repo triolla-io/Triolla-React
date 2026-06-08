@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { motion } from "motion/react";
+import { GlowOrb } from "@/components/ui";
 
 interface GridImageSectionProps {
   imageUrl?: string | null;
@@ -54,9 +55,9 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
       <div className="gi-section" ref={sectionRef}>
 
         {/* ── ambient glow orbs ── */}
-        <div className="gi-orb gi-orb--a" aria-hidden="true" />
-        <div className="gi-orb gi-orb--b" aria-hidden="true" />
-        <div className="gi-orb gi-orb--c" aria-hidden="true" />
+        <GlowOrb animation="none" size={680} fade="62%" blur={110} color="rgba(250,204,21,0.10)" className="top-[-35%] left-[-8%] opacity-[0.85]" />
+        <GlowOrb animation="none" size={560} fade="62%" blur={110} color="rgba(251,146,60,0.07)" className="bottom-[-35%] right-[-6%] opacity-[0.85]" />
+        <GlowOrb animation="none" size={420} fade="62%" blur={110} color="rgba(250,204,21,0.04)" className="top-[20%] left-[38%] opacity-[0.85]" />
 
         {/* ── entrance animation ── */}
         <motion.div
@@ -135,37 +136,6 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
           padding: 0 16px;
         }
         @media (min-width: 1024px) { .gi-section { padding: 0 32px; } }
-
-        /* ── ambient orbs ── */
-        .gi-orb {
-          position: absolute;
-          border-radius: 50%;
-          pointer-events: none;
-          filter: blur(110px);
-        }
-        .gi-orb--a {
-          top: -35%; left: -8%;
-          width: 680px; height: 680px;
-          background: radial-gradient(circle, rgba(250,204,21,0.10) 0%, transparent 62%);
-          animation: giOrb 15s ease-in-out infinite;
-        }
-        .gi-orb--b {
-          bottom: -35%; right: -6%;
-          width: 560px; height: 560px;
-          background: radial-gradient(circle, rgba(251,146,60,0.07) 0%, transparent 62%);
-          animation: giOrb 20s ease-in-out infinite reverse;
-        }
-        .gi-orb--c {
-          top: 20%; left: 38%;
-          width: 420px; height: 420px;
-          background: radial-gradient(circle, rgba(250,204,21,0.04) 0%, transparent 62%);
-          animation: giOrb 26s ease-in-out infinite;
-        }
-        @keyframes giOrb {
-          0%,100% { transform: translate(0,0) scale(1); opacity: 0.85; }
-          40%      { transform: translate(22px,-16px) scale(1.07); opacity: 1; }
-          70%      { transform: translate(-12px,18px) scale(0.96); opacity: 0.75; }
-        }
 
         /* ── outer frame ── */
         .gi-frame {
@@ -413,11 +383,6 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
           .gi-corner--tr { top: 14px;    right: 14px; }
           .gi-corner--bl { bottom: 14px; left: 14px; }
           .gi-corner--br { bottom: 14px; right: 14px; }
-
-          /* Orbs scaled down — still atmospheric */
-          .gi-orb--a { width: 260px; height: 260px; }
-          .gi-orb--b { width: 220px; height: 220px; }
-          .gi-orb--c { display: none; }
 
           /* Grid texture more subtle on mobile */
           .gi-grid { opacity: 0.45; }
