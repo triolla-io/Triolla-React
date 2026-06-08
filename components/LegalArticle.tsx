@@ -2,6 +2,7 @@ import parse, {
   type HTMLReactParserOptions,
   Element as ParserElement,
 } from "html-react-parser";
+import { GlowOrb } from "@/components/ui";
 
 /** Strip interactive/script chrome from WP content — only the readable article
  *  (headings, paragraphs, lists, links) survives. Same allowlist approach the
@@ -45,7 +46,7 @@ export function LegalArticle({ title, content, eyebrow }: LegalArticleProps) {
   return (
     <main className="legal-root bg-[#080808] text-white overflow-x-clip relative">
       {/* Glow orb (brand hero accent) */}
-      <div className="legal-orb" aria-hidden="true" />
+      <GlowOrb size={900} height={460} shape="ellipse" fade="70%" blur={40} color="rgba(250,204,21,0.07)" className="top-0 left-1/2 -translate-x-1/2 z-0" />
 
       <article className="legal-inner">
         <header className="legal-head">
@@ -62,12 +63,6 @@ export function LegalArticle({ title, content, eyebrow }: LegalArticleProps) {
 
       <style>{`
         .legal-root { padding: 0 0 120px; }
-        .legal-orb {
-          position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-          width: 900px; height: 460px; pointer-events: none; z-index: 0;
-          background: radial-gradient(ellipse at center, rgba(250,204,21,0.07) 0%, transparent 70%);
-          filter: blur(40px);
-        }
         .legal-inner {
           position: relative; z-index: 1;
           max-width: 820px; margin: 0 auto;

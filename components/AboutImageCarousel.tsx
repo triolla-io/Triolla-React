@@ -1,7 +1,9 @@
 "use client";
 
+import React from "react";
 import { useRef } from "react";
 import { motion } from "motion/react";
+import { ShineImageCard } from "@/components/ui";
 
 interface AboutImageCarouselProps {
   images: (string | null)[];
@@ -21,10 +23,7 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
         className="aic-track"
       >
         {validImages.map((src, i) => (
-          <div key={i} className="aic-slide">
-            <img src={src} alt="" className="aic-slide__img" draggable={false} />
-            <div className="aic-slide__shine" aria-hidden="true" />
-          </div>
+          <ShineImageCard key={i} src={src} alt="" radius={20} shineAngle="135deg" imgScale={1.04} style={{ "--sc-lift": "0px", "--sc-scale": "1", boxShadow: "0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)" } as React.CSSProperties} className="w-[340px] h-[400px] shrink-0 flex-shrink-0 max-md:w-[260px] max-md:h-[320px]" />
         ))}
       </motion.div>
 
@@ -50,31 +49,6 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
           width: max-content;
           padding: 0 4px 0 0;
         }
-        .aic-slide {
-          position: relative;
-          width: 340px;
-          height: 400px;
-          flex-shrink: 0;
-          border-radius: 20px;
-          overflow: hidden;
-          background: #111;
-          box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
-        }
-        .aic-slide__img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          pointer-events: none;
-          display: block;
-          transition: transform 0.7s cubic-bezier(.23,1,.32,1);
-        }
-        .aic-slide:hover .aic-slide__img { transform: scale(1.04); }
-        .aic-slide__shine {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, transparent 40%, rgba(250,204,21,0.05) 55%, transparent 65%);
-          pointer-events: none;
-        }
         .aic-hint {
           position: absolute;
           bottom: 20px;
@@ -99,9 +73,6 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
         @keyframes aicHintFade {
           0%,100% { opacity: 0.7; }
           50% { opacity: 1; }
-        }
-        @media (max-width: 768px) {
-          .aic-slide { width: 260px; height: 320px; }
         }
       `}</style>
     </div>
