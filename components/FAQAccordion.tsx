@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import parse from "html-react-parser";
 
 
@@ -19,7 +19,27 @@ export function FAQAccordion({ items, className = "" }: FAQAccordionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <div className={className}>
+    <div className={`faq-acc ${className}`} style={{ overflowAnchor: "none" }}>
+      <style>{`
+        .faq-acc { overflow-anchor: none; }
+        .faq-acc__panel {
+          display: grid;
+          grid-template-rows: 0fr;
+          opacity: 0;
+          overflow-anchor: none;
+          transition:
+            grid-template-rows 0.4s cubic-bezier(.23,1,.32,1),
+            opacity           0.28s ease;
+        }
+        .faq-acc__panel[data-open="true"] {
+          grid-template-rows: 1fr;
+          opacity: 1;
+        }
+        .faq-acc__panel-inner { min-height: 0; overflow: hidden; }
+        @media (prefers-reduced-motion: reduce) {
+          .faq-acc__panel { transition: none; }
+        }
+      `}</style>
       {items.map((item, i) => (
         <div key={i} className="border-b border-white/10">
           <button
@@ -45,22 +65,15 @@ export function FAQAccordion({ items, className = "" }: FAQAccordionProps) {
               </svg>
             </motion.div>
           </button>
-          <AnimatePresence initial={false}>
-            {openIndex === i && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                style={{ overflow: "hidden" }}
-              >
-                {/* Content is from trusted WP backend only — same pattern as moreText, toprightext, devtext throughout this codebase */}
-                <div className="text-gray-400 text-[18px] leading-relaxed pb-6">
-                  {parse(item.faqAnswer)}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* CSS grid-rows expand — smooth height with no scroll-anchor jump */}
+          <div className="faq-acc__panel" data-open={openIndex === i}>
+            <div className="faq-acc__panel-inner">
+              {/* Content is from trusted WP backend only — same pattern as moreText, toprightext, devtext throughout this codebase */}
+              <div className="text-gray-400 text-[18px] leading-relaxed pb-6">
+                {parse(item.faqAnswer)}
+              </div>
+            </div>
+          </div>
         </div>
       ))}
     </div>

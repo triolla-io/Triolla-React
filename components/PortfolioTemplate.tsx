@@ -3,6 +3,7 @@ import { FadeIn } from "@/components/FadeIn";
 import AnimatedSteps from "@/components/AnimatedSteps";
 import { WannaChatSection } from "@/components/WannaChatSection";
 import { CountUpNumber } from "@/components/CountUpNumber";
+import { PortfolioShowcase } from "@/components/PortfolioShowcase";
 import { Marquee } from "@/components/ui";
 import parse from "html-react-parser";
 
@@ -52,7 +53,10 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
   const accentColor: string = pf.headerBgColor ?? "#fed125";
 
   return (
-    <main className="overflow-hidden bg-[#080808] text-white" style={{ "--accent": accentColor } as React.CSSProperties}>
+    <main
+      className="overflow-x-clip bg-[#080808] text-white"
+      style={{ "--accent": accentColor } as React.CSSProperties}
+    >
       <style>{`
         /* ─── Hero ───────────────────────────────── */
         .cs-hero-dots {
@@ -61,44 +65,6 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         }
         .cs-hero-glow {
           background: radial-gradient(circle at 70% 30%, color-mix(in srgb, var(--accent) 13.3%, transparent) 0%, transparent 60%);
-        }
-
-        /* ─── Portfolio cards ────────────────────── */
-        .cs-p-card {
-          border-top: 1px solid rgba(255,255,255,0.08);
-          padding: 48px 0;
-        }
-        .cs-p-card:last-child {
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .cs-p-img {
-          border-radius: 18px;
-          overflow: hidden;
-          background: #111;
-          box-shadow: 0 40px 80px rgba(0,0,0,0.5);
-        }
-        .cs-p-img img {
-          width: 100%;
-          height: auto;
-          display: block;
-          transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        .cs-p-card:hover .cs-p-img img {
-          transform: scale(1.025);
-        }
-        .cs-tag {
-          display: inline-block;
-          padding: 5px 14px;
-          border-radius: 999px;
-          border: 1px solid rgba(250,204,21,0.3);
-          color: #facc15;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
-          transition: background 0.2s;
-        }
-        .cs-tag:hover {
-          background: rgba(250,204,21,0.1);
         }
 
         /* ─── Why cards ──────────────────────────── */
@@ -122,13 +88,13 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         }
         .cs-why-card__ghost {
           position: absolute;
-          top: -10px;
-          right: 20px;
-          font-size: 96px;
+          top: 22px;
+          right: 28px;
+          font-size: 84px;
           font-weight: 900;
           line-height: 1;
           letter-spacing: -0.04em;
-          color: rgba(255,255,255,0.028);
+          color: rgba(255,255,255,0.03);
           pointer-events: none;
           user-select: none;
         }
@@ -219,7 +185,11 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           <FadeIn delay={0.05} yOffset={20}>
             <span
               className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-full mb-8"
-              style={{ background: "color-mix(in srgb, var(--accent) 9.4%, transparent)", color: "var(--accent)" }}
+              style={{
+                background:
+                  "color-mix(in srgb, var(--accent) 9.4%, transparent)",
+                color: "var(--accent)",
+              }}
             >
               <span
                 className="w-1.5 h-1.5 rounded-full"
@@ -284,15 +254,20 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           MARQUEE BANNER
       ════════════════════════════════════════════ */}
       <div className="overflow-hidden border-t border-b border-white/[0.07] py-5">
-        <Marquee items={companies} repeat={2} speed={40} renderItem={(c: any, i: number) => (
-          <span
-            key={i}
-            className="text-[13px] font-semibold tracking-[0.06em] uppercase text-gray-600 mx-6 shrink-0"
-          >
-            {c.companyName}
-            <span className="ml-12 text-gray-800">·</span>
-          </span>
-        )} />
+        <Marquee
+          items={companies}
+          repeat={2}
+          speed={40}
+          renderItem={(c: any, i: number) => (
+            <span
+              key={i}
+              className="text-[13px] font-semibold tracking-[0.06em] uppercase text-gray-600 mx-6 shrink-0"
+            >
+              {c.companyName}
+              <span className="ml-12 text-gray-800">·</span>
+            </span>
+          )}
+        />
       </div>
 
       {/* ════════════════════════════════════════════
@@ -300,10 +275,10 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       ════════════════════════════════════════════ */}
       <section
         id="portfolio"
-        className="max-w-[1400px] mx-auto px-6 lg:px-10 pb-28 border-t border-white/[0.07]"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 border-t border-white/[0.07]"
       >
         {/* ── Stat title ── */}
-        <FadeIn className="pt-20 pb-4 text-center">
+        <FadeIn className="pt-20 pb-10 text-center">
           <div className="cs-stat-num">
             <CountUpNumber target={50} suffix="+" duration={1800} />
           </div>
@@ -312,67 +287,10 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
             {(pf.partnerWithUsText ?? "").replace(/^\d+\+?\s*/, "")}
           </p>
         </FadeIn>
-
-        {portfolioItems.map((item: any, i: number) => {
-          const isEven = i % 2 === 0;
-          return (
-            <div key={i} className="cs-p-card">
-              <div
-                className={`flex flex-col lg:gap-16 lg:items-center ${isEven ? "lg:flex-row" : "lg:flex-row-reverse"}`}
-              >
-                {/* Text panel — vertically centered against image */}
-                <FadeIn
-                  xOffset={isEven ? -40 : 40}
-                  yOffset={0}
-                  duration={0.7}
-                  delay={0.05}
-                  className="lg:w-[40%] shrink-0 flex flex-col gap-5 py-8"
-                >
-                  {item.pLogo?.node?.sourceUrl && (
-                    <img
-                      src={item.pLogo.node.sourceUrl}
-                      alt=""
-                      className="h-12 object-contain self-start"
-                      style={{ filter: "brightness(0) invert(1)" }}
-                    />
-                  )}
-                  <h3 className="text-[20px] font-bold leading-snug text-white tracking-tight">
-                    {item.pTitle}
-                  </h3>
-                  {/* WP-sourced HTML — trusted backend only */}
-                  <div className="text-[15px] text-gray-400 leading-relaxed">
-                    {parse(item.sortText ?? "")}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {(item.pTags ?? []).map((tag: any, ti: number) => (
-                      <span key={ti} className="cs-tag">
-                        {tag.tagName}
-                      </span>
-                    ))}
-                  </div>
-                </FadeIn>
-
-                {/* Image panel */}
-                <FadeIn
-                  xOffset={isEven ? 40 : -40}
-                  yOffset={0}
-                  duration={0.7}
-                  delay={0.1}
-                  className="lg:w-[60%] cs-p-img"
-                >
-                  {item.pImage?.node?.sourceUrl && (
-                    <img
-                      src={item.pImage.node.sourceUrl}
-                      alt={stripHtml(item.pTitle ?? "")}
-                      loading={i < 2 ? "eager" : "lazy"}
-                    />
-                  )}
-                </FadeIn>
-              </div>
-            </div>
-          );
-        })}
       </section>
+
+      {/* Sticky split-screen case studies — image left, copy scrolls right */}
+      <PortfolioShowcase items={portfolioItems} accentColor={accentColor} />
 
       {/* ════════════════════════════════════════════
           DESIGN PROCESS

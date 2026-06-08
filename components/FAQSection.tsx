@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import parse from "html-react-parser";
 import { GlowOrb, GradientText } from "@/components/ui";
 
@@ -70,19 +69,12 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
                       </span>
                     </button>
 
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.38, ease: [0.23, 1, 0.32, 1] }}
-                          style={{ overflow: "hidden" }}
-                        >
-                          <div className="fq-item__ans">{parse(item.faqAnswer)}</div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                    {/* CSS grid-rows expand — no JS height measurement, no scroll-anchor jump */}
+                    <div className="fq-item__panel" data-open={isOpen}>
+                      <div className="fq-item__panel-inner">
+                        <div className="fq-item__ans">{parse(item.faqAnswer)}</div>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -232,6 +224,32 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
           display: flex;
           flex-direction: column;
           gap: 10px;
+          /* stop the browser from yanking the viewport when an item above
+             this one collapses/expands — kills the "whole screen jump" */
+          overflow-anchor: none;
+        }
+
+        /* collapsible answer panel — grid-rows trick animates to natural
+           height with zero layout thrash (smooth every time) */
+        .fq-item__panel {
+          display: grid;
+          grid-template-rows: 0fr;
+          opacity: 0;
+          transition:
+            grid-template-rows 0.42s cubic-bezier(.23,1,.32,1),
+            opacity           0.3s ease;
+          overflow-anchor: none;
+        }
+        .fq-item__panel[data-open="true"] {
+          grid-template-rows: 1fr;
+          opacity: 1;
+        }
+        .fq-item__panel-inner {
+          min-height: 0;
+          overflow: hidden;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .fq-item__panel { transition: none; }
         }
 
         /* accordion item card */
