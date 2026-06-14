@@ -9,15 +9,11 @@ import type { ThemeOptions } from '@/lib/graphql-types'
  */
 export function ContactCTA({ ts }: { ts: ThemeOptions | null }) {
   const contactItems = [
-    ts?.cEmailLabel && ts?.cEmailAddress
-      ? { label: ts.cEmailLabel, value: ts.cEmailAddress, href: `mailto:${ts.cEmailAddress}` }
-      : null,
+    ts?.cEmailLabel && ts?.cEmailAddress ? { label: ts.cEmailLabel, value: ts.cEmailAddress, href: `mailto:${ts.cEmailAddress}` } : null,
     ts?.cTlvLabel && ts?.cTlvNumber
       ? { label: ts.cTlvLabel, value: ts.cTlvNumber, href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, '')}` }
       : null,
-    ts?.cNyLabel && ts?.cNyNumber
-      ? { label: ts.cNyLabel, value: ts.cNyNumber, href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, '')}` }
-      : null,
+    ts?.cNyLabel && ts?.cNyNumber ? { label: ts.cNyLabel, value: ts.cNyNumber, href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, '')}` } : null,
     ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
   ].filter((x): x is NonNullable<typeof x> => x !== null)
 

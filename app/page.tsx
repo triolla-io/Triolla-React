@@ -79,20 +79,14 @@ export default async function Home() {
   const whyText = stripHtml(hp.abtthretext ?? '')
   const serviceCards = hp.abthrelist ?? []
 
-  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap(
-    (item: { cLogo: WPImage | null }) => {
-      const url = item.cLogo?.node?.sourceUrl
-      return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
-    }
-  )
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap((item: { cLogo: WPImage | null }) => {
+    const url = item.cLogo?.node?.sourceUrl
+    return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
+  })
 
-  const faqItems = (ts?.questionAnswerList ?? []).flatMap(
-    (q: { fQuestion: string | null; fAnswer: string | null }) => {
-      return q?.fQuestion
-        ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }]
-        : []
-    }
-  )
+  const faqItems = (ts?.questionAnswerList ?? []).flatMap((q: { fQuestion: string | null; fAnswer: string | null }) => {
+    return q?.fQuestion ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }] : []
+  })
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
