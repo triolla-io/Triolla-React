@@ -57,7 +57,7 @@ export default async function AboutUsPage() {
     (l: { logoImage: WPImage | null; logoName: string | null }) => {
       const url = l.logoImage?.node?.sourceUrl
       return url ? [{ url, alt: l.logoName ?? '' }] : []
-    }
+    },
   )
 
   const heroTitle = stripHtml(ap.headerTitle ?? '')
