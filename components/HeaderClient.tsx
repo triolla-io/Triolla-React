@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m } from 'motion/react'
 
 export interface ChildItem {
   label: string
@@ -84,7 +84,7 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
         item.children.length > 0 &&
         rect &&
         createPortal(
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
@@ -170,7 +170,7 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
 
                 <div className={`grid gap-x-6 gap-y-0.5 ${item.children.length > 6 ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   {item.children.map((child, idx) => (
-                    <motion.div
+                    <m.div
                       key={idx}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -213,7 +213,7 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
                           />
                         </svg>
                       </Link>
-                    </motion.div>
+                    </m.div>
                   ))}
                 </div>
               </div>
@@ -229,7 +229,7 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
                       background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent)',
                     }}
                   />
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, x: 16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.35, ease: 'easeOut', delay: 0.1 }}
@@ -253,7 +253,7 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
                         transform: 'scale(1.2)',
                       }}
                     />
-                    <motion.img
+                    <m.img
                       src={menuPromoImage}
                       alt=""
                       aria-hidden="true"
@@ -273,11 +273,11 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
                       }}
                       whileHover={{ scale: 1.03 }}
                     />
-                  </motion.div>
+                  </m.div>
                 </>
               )}
             </div>
-          </motion.div>,
+          </m.div>,
           document.body,
         )}
     </div>
@@ -299,24 +299,25 @@ export function HeaderClient({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isTickerDismissed, setIsTickerDismissed] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
-  const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pathname = usePathname()
 
   useEffect(() => {
+    let scrollTimer: ReturnType<typeof setTimeout> | null = null
+
     const handleScroll = () => {
       if (window.scrollY < 40) {
         setIsScrolling(false)
-        if (scrollTimer.current) clearTimeout(scrollTimer.current)
+        if (scrollTimer) clearTimeout(scrollTimer)
         return
       }
       setIsScrolling(true)
-      if (scrollTimer.current) clearTimeout(scrollTimer.current)
-      scrollTimer.current = setTimeout(() => setIsScrolling(false), 400)
+      if (scrollTimer) clearTimeout(scrollTimer)
+      scrollTimer = setTimeout(() => setIsScrolling(false), 400)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
-      if (scrollTimer.current) clearTimeout(scrollTimer.current)
+      if (scrollTimer) clearTimeout(scrollTimer)
     }
   }, [])
 
@@ -341,7 +342,7 @@ export function HeaderClient({
 
       {/* Floating pill nav */}
       <div className="pointer-events-auto flex justify-center px-4 pt-4">
-        <motion.div
+        <m.div
           initial={{ maxWidth: 920 }}
           animate={{ maxWidth: isScrolling ? 340 : 920 }}
           transition={{ type: 'spring', stiffness: 120, damping: 28, mass: 1 }}
@@ -357,7 +358,7 @@ export function HeaderClient({
           </Link>
 
           {/* Nav + all buttons — fade out while scrolling, always mounted */}
-          <motion.div
+          <m.div
             animate={{ opacity: isScrolling ? 0 : 1 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             style={{ pointerEvents: isScrolling ? 'none' : 'auto' }}
@@ -412,7 +413,7 @@ export function HeaderClient({
                       <path
                         fillRule="evenodd"
                         clipRule="evenodd"
-                        d="M8.61418 2.45849V3.07326C8.60311 3.6185 7.72211 3.92927 7.44361 3.33357C7.40611 3.25295 7.38767 3.16372 7.38582 3.07326V2.45849H5.5439C5.07112 2.43572 4.75451 1.81725 5.07973 1.44124C5.19162 1.31201 5.282 1.24186 5.5439 1.22894C6.15746 1.22894 6.77164 1.22709 7.38582 1.2234V0.614775C7.38767 0.514467 7.3975 0.481851 7.41656 0.422158C7.49771 0.175386 7.74056 0 8.0123 0C8.33998 0.0129232 8.6068 0.258464 8.61418 0.614775V1.21601C9.84192 1.20863 11.0703 1.20186 12.2986 1.20801V0.614775C12.3048 0.286157 12.5446 0.014154 12.9005 0C12.9085 0 12.9165 0 12.9245 0C13.2528 0.0129232 13.5196 0.258464 13.5264 0.614775V1.21909C13.7465 1.22217 13.9666 1.22586 14.1861 1.22955C15.1273 1.25909 15.9647 2.06956 15.9825 3.05049C16.0058 6.7533 16.0058 10.4567 15.9825 14.1601C15.9653 15.1109 15.1433 15.9626 14.1633 15.9811C10.0546 16.0063 5.94536 16.0063 1.8367 15.9811C0.890528 15.9632 0.0359654 15.1571 0.0175216 14.1601C-0.00584054 10.4567 -0.00584054 6.7533 0.0175216 3.05049C0.0347358 2.09294 0.854255 1.2357 1.8576 1.22894H2.47362V0.614775C2.47547 0.514467 2.48469 0.481851 2.50436 0.422158C2.58551 0.175386 2.82836 0 3.09948 0C3.42778 0.0129232 3.6946 0.258464 3.70136 0.614775V3.07326C3.69091 3.61788 2.83512 3.92311 2.54186 3.35572C2.49698 3.26895 2.47547 3.17234 2.47362 3.07326V2.45602C2.26336 2.45479 2.05372 2.45479 1.84407 2.45849C1.53237 2.46833 1.2551 2.74156 1.24526 3.05788C1.17702 6.75514 1.17641 10.4549 1.24526 14.1521C1.2551 14.4648 1.52807 14.7417 1.84407 14.7515C5.9472 14.8278 10.0528 14.8278 14.1559 14.7515C14.4676 14.7417 14.7449 14.4684 14.7547 14.1521C14.823 10.4549 14.823 6.75514 14.7547 3.05788C14.7449 2.73972 14.4615 2.46033 14.1387 2.45849H13.5264V3.07326C13.5159 3.61296 12.6577 3.91758 12.3669 3.55572C12.3226 3.26895 12.3005 3.17234 12.2986 3.07326V2.45849H8.61418ZM3.08719 12.293C3.42655 12.293 3.70136 12.5687 3.70136 12.9078C3.70136 13.2469 3.42655 13.5226 3.08719 13.5226C2.74843 13.5226 2.47362 13.2469 2.47362 12.9078C2.47362 12.5687 2.74843 12.293 3.08719 12.293ZM5.5439 12.293C5.88265 12.293 6.15746 12.5687 6.15746 12.9078C6.15746 13.2469 5.88265 13.5226 5.5439 13.5226C5.20453 13.5226 4.92972 13.2469 4.92972 12.9078C4.92972 12.5687 5.20453 12.293 5.5439 12.293ZM8 12.293C8.33875 12.293 8.61418 12.5687 8.61418 12.9078C8.61418 13.2469 8.33875 13.5226 8 13.5226C7.66125 13.5226 7.38582 13.2469 7.38582 12.9078C7.38582 12.5687 7.66125 12.293 8 12.293ZM3.08719 9.83456C3.42655 9.83456 3.70136 10.1096 3.70136 10.4493C3.70136 10.7884 3.42655 11.0635 3.08719 11.0635C2.74843 11.0635 2.47362 10.7884 2.47362 10.4493C2.47362 10.1096 2.74843 9.83456 3.08719 9.83456ZM5.5439 9.83456C5.88265 9.83456 6.15746 10.1096 6.15746 10.4493C6.15746 10.7884 5.88265 11.0635 5.5439 11.0635C5.20453 11.0635 4.92972 10.7884 4.92972 10.4493C4.92972 10.1096 5.20453 9.83456 5.5439 9.83456ZM8 9.83456C8.33875 9.83456 8.61418 10.1096 8.61418 10.4493C8.61418 10.7884 8.33875 11.0635 8 11.0635C7.66125 11.0635 7.38582 10.7884 7.38582 10.4493C7.38582 10.1096 7.66125 9.83456 8 9.83456ZM10.4561 9.83456C10.7949 9.83456 11.0703 10.1096 11.0703 10.4493C11.0703 10.7884 10.7949 11.0635 10.4561 11.0635C10.1173 11.0635 9.84192 10.7884 9.84192 10.4493C9.84192 10.1096 10.1173 9.83456 10.4561 9.83456ZM12.9122 9.83456C13.2516 9.83456 13.5264 10.1096 13.5264 10.4493C13.5264 10.7884 13.2516 11.0635 12.9122 11.0635C12.5734 11.0635 12.2986 10.7884 12.2986 10.4493C12.2986 10.1096 12.5734 9.83456 12.9122 9.83456ZM5.5439 7.37607C5.88265 7.37607 6.15746 7.65115 6.15746 7.99023C6.15746 8.32993 5.88265 8.60501 5.5439 8.60501C5.20453 8.60501 4.92972 8.32993 4.92972 7.99023C4.92972 7.65115 5.20453 7.37607 5.5439 7.37607ZM8 7.37607C8.33875 7.37607 8.61418 7.65115 8.61418 7.99023C8.61418 8.32993 8.33875 8.60501 8 8.60501C7.66125 8.60501 7.38582 8.32993 7.38582 7.99023C7.38582 7.65115 7.66125 7.37607 8 7.37607ZM10.4561 7.37607C10.7949 7.37607 11.0703 7.65115 11.0703 7.99023C11.0703 8.32993 10.7949 8.60501 10.4561 8.60501C10.1173 8.60501 9.84192 8.32993 9.84192 7.99023C9.84192 7.65115 10.1173 7.37607 10.4561 7.37607ZM12.9122 7.37607C13.2516 7.37607 13.5264 7.65115 13.5264 7.99023C13.5264 8.32993 13.2516 8.60501 12.9122 8.60501C12.5734 8.60501 12.2986 8.32993 12.2986 7.99023C12.2986 7.65115 12.5734 7.37607 12.9122 7.37607Z"
+                        d="M11 2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h1V1a1 1 0 0 1 2 0v1h4V1a1 1 0 0 1 2 0v1zM4 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z"
                       />
                     </svg>
                     {bookButtonText}
@@ -420,7 +421,7 @@ export function HeaderClient({
                 )}
               </div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Contact us — always visible, anchored to right edge */}
           {contactButtonHref && contactButtonText && (
@@ -464,13 +465,13 @@ export function HeaderClient({
               )}
             </button>
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Mobile menu — full-screen vault overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
+          <m.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -536,7 +537,7 @@ export function HeaderClient({
                   <span className="text-[18px] font-bold tracking-tight text-white lowercase">triolla</span>
                 )}
               </Link>
-              <motion.button
+              <m.button
                 initial={{ rotate: 0 }}
                 animate={{ rotate: 90 }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -547,7 +548,7 @@ export function HeaderClient({
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
-              </motion.button>
+              </m.button>
             </div>
 
             {/* Gold hairline */}
@@ -555,7 +556,7 @@ export function HeaderClient({
 
             {/* Nav items */}
             <nav className="relative z-10 flex-1 overflow-y-auto px-6 pt-8 pb-4">
-              <motion.div
+              <m.div
                 initial="hidden"
                 animate="visible"
                 variants={{
@@ -570,7 +571,7 @@ export function HeaderClient({
                   const href = toHref(item.url)
                   const isActive = pathname === href
                   return (
-                    <motion.div
+                    <m.div
                       key={`mobile-${item.label}-${i}`}
                       variants={{
                         hidden: { opacity: 0, x: 30 },
@@ -586,7 +587,7 @@ export function HeaderClient({
                     >
                       <div className="flex items-center gap-0 group">
                         {/* Gold left bar */}
-                        <motion.div
+                        <m.div
                           initial={{ scaleY: 0 }}
                           animate={{ scaleY: 1 }}
                           transition={{
@@ -621,10 +622,10 @@ export function HeaderClient({
                           ))}
                         </div>
                       )}
-                    </motion.div>
+                    </m.div>
                   )
                 })}
-              </motion.div>
+              </m.div>
             </nav>
 
             {/* Bottom CTA section */}
@@ -675,7 +676,7 @@ export function HeaderClient({
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </header>

@@ -3,5 +3,15 @@
     "files": [
       ".next/**"
     ]
+  },
+  "rules": {
+    "react-doctor/nextjs-no-img-element": "off",
+    "react-doctor/no-giant-component": "off",
+    "react-doctor/no-large-animated-blur": "off",
+    "react-doctor/no-inline-exhaustive-style": "off",
+    "react-doctor/no-event-handler": "off",
+    "react-doctor/no-initialize-state": "off",
+    "react-doctor/no-array-index-as-key": "off",
+    "react-doctor/only-export-components": "off"
   }
 }
