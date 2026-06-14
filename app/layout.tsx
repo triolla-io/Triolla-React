@@ -31,12 +31,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
-        <Header />
-        <main className="grow">
-          <MotionProvider>{children}</MotionProvider>
-        </main>
-        <Footer />
-        <CookieBanner />
+        <MotionProvider>
+          <Header />
+          <main className="grow">{children}</main>
+          <Footer />
+          <CookieBanner />
+        </MotionProvider>
         <BfcacheReloader />
       </body>
     </html>
