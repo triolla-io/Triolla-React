@@ -38,12 +38,12 @@ The first product image (`.svc-img-card--featured`) currently spans the full wid
 
 The service sub-pages use the `page-servicedetail.php` template = **`Template_ServiceDetailPage`** in GraphQL.
 
-| Modal element            | Source                          | GraphQL path                                                |
-| ------------------------ | ------------------------------- | ----------------------------------------------------------- |
-| Real headline            | WP page title                   | `title`                                                     |
-| Bold lead tagline        | ACF `top_bold_text` (wysiwyg)   | `template { ... on Template_ServiceDetailPage { postFields { topBoldText } } }` |
-| Featured hero image      | WP featured image               | `featuredImage { node { sourceUrl altText } }`              |
-| Rich body (process steps)| WP post content                 | `content`                                                   |
+| Modal element             | Source                        | GraphQL path                                                                    |
+| ------------------------- | ----------------------------- | ------------------------------------------------------------------------------- |
+| Real headline             | WP page title                 | `title`                                                                         |
+| Bold lead tagline         | ACF `top_bold_text` (wysiwyg) | `template { ... on Template_ServiceDetailPage { postFields { topBoldText } } }` |
+| Featured hero image       | WP featured image             | `featuredImage { node { sourceUrl altText } }`                                  |
+| Rich body (process steps) | WP post content               | `content`                                                                       |
 
 The long rendered HTML from the old site (banner grid, contact form, Gravity Forms scripts, "trusted by" logos) is **template chrome** — ignored entirely. We pull only the 4 clean fields above.
 
@@ -70,7 +70,9 @@ The long rendered HTML from the old site (banner grid, contact form, Gravity For
 4. In the Server Component, run the batched query inside `try/catch` (hide on failure, per project convention). Map each `s{i}` result back onto the menu item by index → enriched array:
 
    ```ts
-   { title, link, image, altText, boldText, content }
+   {
+     ;(title, link, image, altText, boldText, content)
+   }
    ```
 
 5. Any page that fails to resolve → that menu item renders as a plain link (its original `prodmlink`), not a modal trigger. Graceful degradation, no fabricated content.
@@ -91,11 +93,13 @@ The long rendered HTML from the old site (banner grid, contact form, Gravity For
 Built entirely on the existing design language (dark `#080808`, grain overlay, gold `#facc15` shimmer, editorial brackets/ghost numbers, `cubic-bezier(.16,1,.3,1)` easing) so it feels continuous with the page, not a bolted-on dialog.
 
 **Entry animation:**
+
 - Backdrop fades to dark + backdrop-blur.
 - A **gold curtain sweeps up** from the bottom, then the panel reveals beneath it.
 - Grain overlay carries into the modal for continuity.
 
 **Inside (vertically scrollable), with staggered reveal via `animation-delay`:**
+
 1. **Sticky top bar** — `— 0X —` index, small service eyebrow label, gold-hover close ✕.
 2. **Hero stage** — featured image at ~60vh, `object-fit: cover`; scales `1.08 → 1` on entry plus a slow parallax on scroll; gradient scrim melts the image into `#080808`; faint ghost-number watermark behind.
 3. **Headline** — `title` rendered in the shimmer-gradient `svc-hero__title` treatment.
@@ -110,6 +114,7 @@ Built entirely on the existing design language (dark `#080808`, grain overlay, g
 **Exit:** reverse curtain-down wipe; backdrop fades out.
 
 **Accessibility / robustness:**
+
 - `Esc` closes; backdrop click closes.
 - Body scroll locked while open.
 - Basic focus management (focus the close button on open; restore focus to the trigger on close).

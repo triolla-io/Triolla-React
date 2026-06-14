@@ -1,52 +1,48 @@
-"use client";
+'use client'
 
-import { motion } from "motion/react";
-import { EASE } from "@/lib/motion";
+import { motion } from 'motion/react'
+import { EASE } from '@/lib/motion'
 
 // Actual WP homepage grid images (hometopimage1–9 from triolla.io)
 const WP_IMAGES = [
-  { src: "https://triolla.io/wp-content/uploads/2025/06/2.png",             alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/1.png",             alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/medicak-ipad.png",  alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/3.png",             alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/final_watch6.svg",  alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/6.png",             alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/Front-cloean-1.png",alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/88.png",            alt: "Portfolio work" },
-  { src: "https://triolla.io/wp-content/uploads/2025/06/White-1.png",       alt: "Portfolio work" },
-];
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/2.png', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/1.png', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/medicak-ipad.png', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/3.png', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/final_watch6.svg', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/6.png', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/Front-cloean-1.png', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/88.png', alt: 'Portfolio work' },
+  { src: 'https://triolla.io/wp-content/uploads/2025/06/White-1.png', alt: 'Portfolio work' },
+]
 
 // Split into 3 columns for masonry effect
-const COL1 = [0, 3, 6]; // indices
-const COL2 = [1, 4, 7];
-const COL3 = [2, 5, 8];
+const COL1 = [0, 3, 6] // indices
+const COL2 = [1, 4, 7]
+const COL3 = [2, 5, 8]
 
 function MasonryColumn({ indices, delay }: { indices: number[]; delay: number }) {
   return (
     <div className="flex flex-col gap-3 md:gap-5">
       {indices.map((idx, i) => {
-        const img = WP_IMAGES[idx];
+        const img = WP_IMAGES[idx]
         return (
           <motion.div
             key={img.src}
             className="shine-card group overflow-hidden rounded-2xl relative bg-[#0f0f0f]"
             initial={{ opacity: 0, y: 36 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.65, delay: delay + i * 0.1, ease: [...EASE.smooth] }}
           >
-            <img
-              src={img.src}
-              alt={img.alt}
-              className="w-full h-auto block"
-            />
+            <img src={img.src} alt={img.alt} className="w-full h-auto block" />
             {/* hover shine sweep */}
             <div className="shine-card__shine" aria-hidden="true" />
           </motion.div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
 
 export function PortfolioGrid() {
@@ -56,5 +52,5 @@ export function PortfolioGrid() {
       <MasonryColumn indices={COL2} delay={0.08} />
       <MasonryColumn indices={COL3} delay={0.16} />
     </div>
-  );
+  )
 }

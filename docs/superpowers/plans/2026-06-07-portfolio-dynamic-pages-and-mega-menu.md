@@ -76,7 +76,7 @@ export const GET_PORTFOLIO_SLUGS = `
       }
     }
   }
-`;
+`
 
 export const GET_PORTFOLIO_PAGE = `
   query GetPortfolioPage($uri: ID!) {
@@ -116,7 +116,7 @@ export const GET_PORTFOLIO_PAGE = `
       }
     }
   }
-`;
+`
 ```
 
 - [ ] **Step 3: Verify lint passes (no dangling references yet — the cyber-security page still imports the removed constant)**
@@ -145,43 +145,39 @@ This is a **server component** (no `"use client"`) — it only composes JSX, an 
 Create `components/PortfolioTemplate.tsx` with this exact content:
 
 ```tsx
-import { FadeIn } from "@/components/FadeIn";
-import { SectionReveal } from "@/components/SectionReveal";
-import { WannaChatSection } from "@/components/WannaChatSection";
-import { CountUpNumber } from "@/components/CountUpNumber";
-import parse from "html-react-parser";
+import { FadeIn } from '@/components/FadeIn'
+import { SectionReveal } from '@/components/SectionReveal'
+import { WannaChatSection } from '@/components/WannaChatSection'
+import { CountUpNumber } from '@/components/CountUpNumber'
+import parse from 'html-react-parser'
 
 function stripHtml(html: string): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&#8217;/g, "’")
-    .trim();
+  return (html ?? '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#8217;/g, '’')
+    .trim()
 }
 
 function htmlToLines(html: string): string[] {
-  return (html ?? "")
+  return (html ?? '')
     .split(/<br\s*\/?>/gi)
     .map((s) => stripHtml(s).trim())
-    .filter(Boolean);
+    .filter(Boolean)
 }
 
 function parseAccentHeading(html: string): { text: string; accent: boolean }[] {
-  const cleaned = (html ?? "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/\s+/g, " ");
-  const segments = cleaned.split(/(<span[^>]*>[\s\S]*?<\/span>)/i);
+  const cleaned = (html ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ')
+  const segments = cleaned.split(/(<span[^>]*>[\s\S]*?<\/span>)/i)
   return segments
     .filter((s) => s.length > 0)
     .map((seg) => {
-      const inner = seg.match(/^<span[^>]*>([\s\S]*?)<\/span>$/i);
-      return inner
-        ? { text: inner[1], accent: true }
-        : { text: seg, accent: false };
-    });
+      const inner = seg.match(/^<span[^>]*>([\s\S]*?)<\/span>$/i)
+      return inner ? { text: inner[1], accent: true } : { text: seg, accent: false }
+    })
 }
 
 export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
@@ -197,28 +193,26 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       ? {
           label: ts.cTlvLabel,
           value: ts.cTlvNumber,
-          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
     ts?.cNyLabel && ts?.cNyNumber
       ? {
           label: ts.cNyLabel,
           value: ts.cNyNumber,
-          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
-    ts?.cAddressLabel && ts?.cAddress
-      ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined }
-      : null,
-  ].filter((x): x is NonNullable<typeof x> => x !== null);
+    ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null)
 
-  const portfolioItems: any[] = pf.portfolioList ?? [];
-  const designSteps: any[] = pf.designType ?? [];
-  const whyItems: any[] = pf.whyDoList ?? [];
-  const companies: any[] = pf.companyList ?? [];
-  const accentColor: string = pf.headerBgColor ?? "#fed125";
-  const designHeadingParts = parseAccentHeading(pf.uDesignHeading ?? "");
-  const marqueeItems = [...companies, ...companies];
+  const portfolioItems: any[] = pf.portfolioList ?? []
+  const designSteps: any[] = pf.designType ?? []
+  const whyItems: any[] = pf.whyDoList ?? []
+  const companies: any[] = pf.companyList ?? []
+  const accentColor: string = pf.headerBgColor ?? '#fed125'
+  const designHeadingParts = parseAccentHeading(pf.uDesignHeading ?? '')
+  const marqueeItems = [...companies, ...companies]
 
   return (
     <main className="overflow-hidden bg-[#080808] text-white">
@@ -460,10 +454,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
               className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-full mb-8"
               style={{ background: `${accentColor}18`, color: accentColor }}
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: accentColor }}
-              />
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: accentColor }} />
               {pf.headerSubText}
             </span>
           </FadeIn>
@@ -479,7 +470,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
               <a
                 href="#portfolio"
                 className="inline-flex items-center gap-2.5 text-[13px] font-bold tracking-[0.06em] uppercase px-7 py-3.5 rounded-full shrink-0 transition-opacity hover:opacity-80"
-                style={{ background: accentColor, color: "#000" }}
+                style={{ background: accentColor, color: '#000' }}
               >
                 {pf.buttonText}
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -502,20 +493,14 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       ════════════════════════════════════════════ */}
       <section className="py-28 max-w-[1400px] mx-auto px-6 lg:px-10 border-t border-white/[0.07]">
         <FadeIn className="mb-8">
-          <h2 className="text-[clamp(28px,3.8vw,52px)] font-bold tracking-tight leading-[1.1] text-white max-w-3xl">
-            {pf.boldText}
-          </h2>
+          <h2 className="text-[clamp(28px,3.8vw,52px)] font-bold tracking-tight leading-[1.1] text-white max-w-3xl">{pf.boldText}</h2>
         </FadeIn>
         <FadeIn delay={0.1} className="mb-4">
-          <p className="text-[19px] leading-relaxed text-gray-300 font-medium max-w-3xl">
-            {pf.shortText}
-          </p>
+          <p className="text-[19px] leading-relaxed text-gray-300 font-medium max-w-3xl">{pf.shortText}</p>
         </FadeIn>
         <FadeIn delay={0.18}>
           {/* WP-sourced HTML — trusted backend only */}
-          <div className="text-[16px] leading-[1.85] text-gray-400 max-w-3xl">
-            {parse(pf.moreText ?? "")}
-          </div>
+          <div className="text-[16px] leading-[1.85] text-gray-400 max-w-3xl">{parse(pf.moreText ?? '')}</div>
         </FadeIn>
       </section>
 
@@ -525,10 +510,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       <div className="overflow-hidden border-t border-b border-white/[0.07] py-5">
         <div className="cs-marquee-track">
           {marqueeItems.map((c: any, i: number) => (
-            <span
-              key={i}
-              className="text-[13px] font-semibold tracking-[0.06em] uppercase text-gray-600 mx-6 shrink-0"
-            >
+            <span key={i} className="text-[13px] font-semibold tracking-[0.06em] uppercase text-gray-600 mx-6 shrink-0">
               {c.companyName}
               <span className="ml-12 text-gray-800">·</span>
             </span>
@@ -539,10 +521,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       {/* ════════════════════════════════════════════
           PORTFOLIO CASE STUDIES
       ════════════════════════════════════════════ */}
-      <section
-        id="portfolio"
-        className="max-w-[1400px] mx-auto px-6 lg:px-10 pb-28 border-t border-white/[0.07]"
-      >
+      <section id="portfolio" className="max-w-[1400px] mx-auto px-6 lg:px-10 pb-28 border-t border-white/[0.07]">
         {/* ── Stat title ── */}
         <FadeIn className="pt-20 pb-4 text-center">
           <div className="cs-stat-num">
@@ -550,17 +529,15 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           </div>
           <span className="cs-stat-line" aria-hidden="true" />
           <p className="text-[clamp(22px,3.2vw,44px)] font-bold tracking-tight text-white leading-tight">
-            {(pf.partnerWithUsText ?? "").replace(/^\d+\+?\s*/, "")}
+            {(pf.partnerWithUsText ?? '').replace(/^\d+\+?\s*/, '')}
           </p>
         </FadeIn>
 
         {portfolioItems.map((item: any, i: number) => {
-          const isEven = i % 2 === 0;
+          const isEven = i % 2 === 0
           return (
             <div key={i} className="cs-p-card">
-              <div
-                className={`flex flex-col lg:gap-16 lg:items-center ${isEven ? "lg:flex-row" : "lg:flex-row-reverse"}`}
-              >
+              <div className={`flex flex-col lg:gap-16 lg:items-center ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
                 {/* Text panel — vertically centered against image */}
                 <FadeIn
                   xOffset={isEven ? -40 : 40}
@@ -574,16 +551,12 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
                       src={item.pLogo.node.sourceUrl}
                       alt=""
                       className="h-12 object-contain self-start"
-                      style={{ filter: "brightness(0) invert(1)" }}
+                      style={{ filter: 'brightness(0) invert(1)' }}
                     />
                   )}
-                  <h3 className="text-[20px] font-bold leading-snug text-white tracking-tight">
-                    {item.pTitle}
-                  </h3>
+                  <h3 className="text-[20px] font-bold leading-snug text-white tracking-tight">{item.pTitle}</h3>
                   {/* WP-sourced HTML — trusted backend only */}
-                  <div className="text-[15px] text-gray-400 leading-relaxed">
-                    {parse(item.sortText ?? "")}
-                  </div>
+                  <div className="text-[15px] text-gray-400 leading-relaxed">{parse(item.sortText ?? '')}</div>
                   <div className="flex flex-wrap gap-2">
                     {(item.pTags ?? []).map((tag: any, ti: number) => (
                       <span key={ti} className="cs-tag">
@@ -594,24 +567,14 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
                 </FadeIn>
 
                 {/* Image panel */}
-                <FadeIn
-                  xOffset={isEven ? 40 : -40}
-                  yOffset={0}
-                  duration={0.7}
-                  delay={0.1}
-                  className="lg:w-[60%] cs-p-img"
-                >
+                <FadeIn xOffset={isEven ? 40 : -40} yOffset={0} duration={0.7} delay={0.1} className="lg:w-[60%] cs-p-img">
                   {item.pImage?.node?.sourceUrl && (
-                    <img
-                      src={item.pImage.node.sourceUrl}
-                      alt={stripHtml(item.pTitle ?? "")}
-                      loading={i < 2 ? "eager" : "lazy"}
-                    />
+                    <img src={item.pImage.node.sourceUrl} alt={stripHtml(item.pTitle ?? '')} loading={i < 2 ? 'eager' : 'lazy'} />
                   )}
                 </FadeIn>
               </div>
             </div>
-          );
+          )
         })}
       </section>
 
@@ -622,10 +585,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
           <SectionReveal className="mb-5">
             {[
-              <h2
-                key="h"
-                className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight"
-              >
+              <h2 key="h" className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight">
                 {designHeadingParts.map((seg, i) =>
                   seg.accent ? (
                     <span key={i} style={{ color: accentColor }}>
@@ -639,24 +599,19 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
             ]}
           </SectionReveal>
 
-          <p className="text-[17px] text-gray-400 max-w-2xl mb-16 leading-relaxed">
-            {pf.uSortText}
-          </p>
+          <p className="text-[17px] text-gray-400 max-w-2xl mb-16 leading-relaxed">{pf.uSortText}</p>
 
           <SectionReveal className="flex overflow-x-auto pb-16 cs-hide-scrollbar gap-8 px-10 snap-x">
             {designSteps.map((step: any, i: number) => (
-              <div
-                key={i}
-                className="cs-timeline-item min-w-[260px] shrink-0 snap-center"
-              >
+              <div key={i} className="cs-timeline-item min-w-[260px] shrink-0 snap-center">
                 <div className="cs-timeline-item__bg-num" aria-hidden="true">
-                  {(i + 1).toString().padStart(2, "0")}
+                  {(i + 1).toString().padStart(2, '0')}
                 </div>
                 <div className="relative z-10">
                   <div className="cs-timeline-item__dot" />
                   <div className="cs-timeline-item__line" />
                   <h4 className="text-xl font-bold mb-3 mt-8">
-                    {htmlToLines(step.dName ?? "").map((line, li) => (
+                    {htmlToLines(step.dName ?? '').map((line, li) => (
                       <span key={li} className="block">
                         {line}
                       </span>
@@ -675,32 +630,22 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       <section className="py-28 max-w-[1400px] mx-auto px-6 lg:px-10 border-t border-white/[0.07]">
         <FadeIn className="mb-16">
           {/* WP-sourced HTML — trusted backend only */}
-          <h2 className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight">
-            {parse(pf.whyDoHeading ?? "")}
-          </h2>
+          <h2 className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight">{parse(pf.whyDoHeading ?? '')}</h2>
         </FadeIn>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {whyItems.map((item: any, i: number) => (
-            <FadeIn
-              key={i}
-              delay={i * 0.1}
-              yOffset={28}
-              duration={0.65}
-              className="cs-why-card"
-            >
+            <FadeIn key={i} delay={i * 0.1} yOffset={28} duration={0.65} className="cs-why-card">
               <div className="cs-why-card__ghost" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
+                {String(i + 1).padStart(2, '0')}
               </div>
               <div className="cs-why-card__shine" aria-hidden="true" />
               <div className="cs-why-card__bar" />
               <h3 className="text-[21px] font-bold mb-3 tracking-tight leading-snug text-white relative z-10">
                 {/* WP-sourced HTML — trusted backend only */}
-                <span>{parse(item.whyTitle ?? "")}</span>
+                <span>{parse(item.whyTitle ?? '')}</span>
               </h3>
-              <p className="text-[15px] text-gray-400 leading-relaxed relative z-10">
-                {item.whyShortText}
-              </p>
+              <p className="text-[15px] text-gray-400 leading-relaxed relative z-10">{item.whyShortText}</p>
             </FadeIn>
           ))}
         </div>
@@ -711,19 +656,17 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         leftHeading={
           ts?.cLeftHeading
             ? ts.cLeftHeading
-                .replace(/<br\s*\/?>/gi, "\n")
-                .replace(/<[^>]+>/g, "")
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
                 .trim()
             : null
         }
-        formHeading={
-          ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null
-        }
+        formHeading={ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null}
         submitLabel={ts?.cButton ?? null}
         callUsLabel={ts?.cCallUsLabel ?? null}
       />
     </main>
-  );
+  )
 }
 ```
 
@@ -747,20 +690,16 @@ git commit -m "feat(portfolio): extract shared PortfolioTemplate component"
 Create `app/[slug]/page.tsx` with this exact content:
 
 ```tsx
-import { client } from "@/lib/apollo-client";
-import {
-  GET_PORTFOLIO_PAGE,
-  GET_PORTFOLIO_SLUGS,
-  GET_THEME_SETTINGS,
-} from "@/lib/queries";
-import { gql } from "@apollo/client";
-import { notFound } from "next/navigation";
-import { PortfolioTemplate } from "@/components/PortfolioTemplate";
+import { client } from '@/lib/apollo-client'
+import { GET_PORTFOLIO_PAGE, GET_PORTFOLIO_SLUGS, GET_THEME_SETTINGS } from '@/lib/queries'
+import { gql } from '@apollo/client'
+import { notFound } from 'next/navigation'
+import { PortfolioTemplate } from '@/components/PortfolioTemplate'
 
 // Only slugs returned by generateStaticParams resolve here; any other slug 404s.
 // Static route folders (about-us, services, technology) take Next.js precedence
 // over this dynamic segment, so they are never reached by [slug].
-export const dynamicParams = false;
+export const dynamicParams = false
 
 export async function generateStaticParams() {
   try {
@@ -768,15 +707,15 @@ export async function generateStaticParams() {
       query: gql`
         ${GET_PORTFOLIO_SLUGS}
       `,
-    });
-    const nodes: any[] = data?.pages?.nodes ?? [];
+    })
+    const nodes: any[] = data?.pages?.nodes ?? []
     return nodes
-      .filter((n) => n?.template?.__typename === "Template_PortfolioPage")
-      .map((n) => ({ slug: (n.uri ?? "").replace(/^\/+|\/+$/g, "") }))
-      .filter((p) => p.slug.length > 0);
+      .filter((n) => n?.template?.__typename === 'Template_PortfolioPage')
+      .map((n) => ({ slug: (n.uri ?? '').replace(/^\/+|\/+$/g, '') }))
+      .filter((p) => p.slug.length > 0)
   } catch {
     // Build emits no portfolio routes rather than crashing.
-    return [];
+    return []
   }
 }
 
@@ -787,10 +726,10 @@ async function getPortfolioData(slug: string) {
         ${GET_PORTFOLIO_PAGE}
       `,
       variables: { uri: slug },
-    });
-    return data?.page?.template?.portfolioFields ?? null;
+    })
+    return data?.page?.template?.portfolioFields ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
@@ -800,28 +739,21 @@ async function getThemeSettings() {
       query: gql`
         ${GET_THEME_SETTINGS}
       `,
-    });
-    return data?.themeSetting?.themeOptions ?? null;
+    })
+    return data?.themeSetting?.themeOptions ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
-export default async function PortfolioSlugPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const [pf, ts] = await Promise.all([
-    getPortfolioData(slug),
-    getThemeSettings(),
-  ]);
+export default async function PortfolioSlugPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const [pf, ts] = await Promise.all([getPortfolioData(slug), getThemeSettings()])
 
   // Empty/failed fetch, or a page not actually on the portfolio template.
-  if (!pf || Object.keys(pf).length === 0) notFound();
+  if (!pf || Object.keys(pf).length === 0) notFound()
 
-  return <PortfolioTemplate pf={pf} ts={ts} />;
+  return <PortfolioTemplate pf={pf} ts={ts} />
 }
 ```
 
@@ -967,13 +899,13 @@ with:
 Change the React import (line 5) from:
 
 ```tsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react'
 ```
 
 to:
 
 ```tsx
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 ```
 
 Then add `menuPromoImage` to the `HeaderClientProps` interface — replace:
@@ -1003,69 +935,53 @@ Replace the whole `DropdownItem` function (currently lines ~38–122, from `func
 
 ```tsx
 // Wide promo mega-menu panel width (link grid + divider + promo pane + padding).
-const PROMO_PANEL_WIDTH = 900;
+const PROMO_PANEL_WIDTH = 900
 
-function DropdownItem({
-  item,
-  pathname,
-  menuPromoImage,
-}: {
-  item: NavItem;
-  pathname: string;
-  menuPromoImage: string | null;
-}) {
-  const [open, setOpen] = useState(false);
-  const [rect, setRect] = useState<DOMRect | null>(null);
-  const buttonRef = useRef<HTMLDivElement>(null);
-  const href = toHref(item.url);
-  const isActive = href !== "/" && pathname.startsWith(href);
+function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathname: string; menuPromoImage: string | null }) {
+  const [open, setOpen] = useState(false)
+  const [rect, setRect] = useState<DOMRect | null>(null)
+  const buttonRef = useRef<HTMLDivElement>(null)
+  const href = toHref(item.url)
+  const isActive = href !== '/' && pathname.startsWith(href)
 
   // Content-driven: the promo pane shows only for the large (>6-child) dropdown,
   // which today is Portfolio — no label string is hardcoded.
-  const showPromo = Boolean(menuPromoImage) && item.children.length > 6;
+  const showPromo = Boolean(menuPromoImage) && item.children.length > 6
 
   const handleMouseEnter = () => {
-    if (buttonRef.current) setRect(buttonRef.current.getBoundingClientRect());
-    setOpen(true);
-  };
+    if (buttonRef.current) setRect(buttonRef.current.getBoundingClientRect())
+    setOpen(true)
+  }
 
   // Positioning: link-only dropdowns stay centered on the trigger (unchanged).
   // The wide promo panel is left-anchored and clamped to the viewport so it
   // never overflows either edge. `rect` is only ever set on the client after
   // mouse enter, so reading window dimensions here is safe.
-  let panelStyle: CSSProperties = {};
+  let panelStyle: CSSProperties = {}
   if (rect) {
     if (showPromo) {
-      const desiredLeft = rect.left + rect.width / 2 - PROMO_PANEL_WIDTH / 2;
-      const clampedLeft = Math.max(
-        16,
-        Math.min(desiredLeft, window.innerWidth - PROMO_PANEL_WIDTH - 16),
-      );
+      const desiredLeft = rect.left + rect.width / 2 - PROMO_PANEL_WIDTH / 2
+      const clampedLeft = Math.max(16, Math.min(desiredLeft, window.innerWidth - PROMO_PANEL_WIDTH - 16))
       panelStyle = {
         top: rect.bottom + 12,
         left: clampedLeft,
         minWidth: PROMO_PANEL_WIDTH,
-      };
+      }
     } else {
       panelStyle = {
         top: rect.bottom + 12,
         left: rect.left + rect.width / 2,
-        transform: "translateX(-50%)",
+        transform: 'translateX(-50%)',
         minWidth: Math.min(item.children.length, 6) > 3 ? 460 : 240,
-      };
+      }
     }
   }
 
   return (
-    <div
-      ref={buttonRef}
-      className="relative"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={() => setOpen(false)}
-    >
+    <div ref={buttonRef} className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={() => setOpen(false)}>
       <button
         className={`flex items-center gap-1 text-[14px] font-medium transition-colors hover:text-yellow-400 ${
-          isActive ? "text-yellow-400" : "text-white"
+          isActive ? 'text-yellow-400' : 'text-white'
         }`}
       >
         {item.label}
@@ -1074,15 +990,9 @@ function DropdownItem({
           height="11"
           viewBox="0 0 12 12"
           fill="none"
-          className={`mt-px transition-transform duration-200 opacity-70 ${open ? "rotate-180" : ""}`}
+          className={`mt-px transition-transform duration-200 opacity-70 ${open ? 'rotate-180' : ''}`}
         >
-          <path
-            d="M2 4L6 8L10 4"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
 
@@ -1095,10 +1005,8 @@ function DropdownItem({
               initial={{ opacity: 0, y: 6, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.98 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className={`fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6 z-9999 ${
-                showPromo ? "flex items-stretch gap-6" : ""
-              }`}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className={`fixed bg-white rounded-2xl shadow-2xl shadow-black/15 p-6 z-9999 ${showPromo ? 'flex items-stretch gap-6' : ''}`}
               style={panelStyle}
               onMouseEnter={() => setOpen(true)}
               onMouseLeave={() => setOpen(false)}
@@ -1106,8 +1014,8 @@ function DropdownItem({
               {/* Link grid (left) */}
               <div
                 className={`grid gap-x-10 gap-y-3.5 ${
-                  item.children.length > 6 ? "grid-cols-2" : "grid-cols-1"
-                } ${showPromo ? "content-center" : ""}`}
+                  item.children.length > 6 ? 'grid-cols-2' : 'grid-cols-1'
+                } ${showPromo ? 'content-center' : ''}`}
               >
                 {item.children.map((child, idx) => (
                   <Link
@@ -1124,10 +1032,7 @@ function DropdownItem({
               {/* Promo pane (right) — decorative, WP-sourced, no click target */}
               {showPromo && menuPromoImage && (
                 <>
-                  <div
-                    aria-hidden="true"
-                    className="w-px self-stretch bg-linear-to-b from-transparent via-black/10 to-transparent"
-                  />
+                  <div aria-hidden="true" className="w-px self-stretch bg-linear-to-b from-transparent via-black/10 to-transparent" />
                   <motion.div
                     initial={{ opacity: 0, x: 14 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -1143,10 +1048,9 @@ function DropdownItem({
                       aria-hidden="true"
                       className="absolute inset-0 pointer-events-none"
                       style={{
-                        background:
-                          "radial-gradient(circle at 50% 42%, rgba(250,204,21,0.28) 0%, transparent 68%)",
-                        filter: "blur(18px)",
-                        transform: "scale(1.15)",
+                        background: 'radial-gradient(circle at 50% 42%, rgba(250,204,21,0.28) 0%, transparent 68%)',
+                        filter: 'blur(18px)',
+                        transform: 'scale(1.15)',
                       }}
                     />
                     {/* The promo image floats subtly and lifts on hover */}
@@ -1158,7 +1062,7 @@ function DropdownItem({
                       animate={{ y: [0, -6, 0] }}
                       transition={{
                         duration: 4.5,
-                        ease: "easeInOut",
+                        ease: 'easeInOut',
                         repeat: Infinity,
                       }}
                       whileHover={{ scale: 1.03 }}
@@ -1171,7 +1075,7 @@ function DropdownItem({
           )}
       </AnimatePresence>
     </div>
-  );
+  )
 }
 ```
 
@@ -1205,26 +1109,13 @@ export function HeaderClient({
 Find the desktop nav `DropdownItem` usage (around line 217). Replace:
 
 ```tsx
-return (
-  <DropdownItem
-    key={`nav-${item.label}-${i}`}
-    item={item}
-    pathname={pathname}
-  />
-);
+return <DropdownItem key={`nav-${item.label}-${i}`} item={item} pathname={pathname} />
 ```
 
 with:
 
 ```tsx
-return (
-  <DropdownItem
-    key={`nav-${item.label}-${i}`}
-    item={item}
-    pathname={pathname}
-    menuPromoImage={menuPromoImage}
-  />
-);
+return <DropdownItem key={`nav-${item.label}-${i}`} item={item} pathname={pathname} menuPromoImage={menuPromoImage} />
 ```
 
 - [ ] **Step 5: Commit**

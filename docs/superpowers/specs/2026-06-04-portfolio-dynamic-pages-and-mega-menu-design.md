@@ -69,19 +69,27 @@ phase 2.
   route precedence, so there is no collision.
 
 - **`generateStaticParams()`** runs:
+
   ```graphql
   query GetPortfolioSlugs {
     pages(first: 100) {
-      nodes { uri template { __typename } }
+      nodes {
+        uri
+        template {
+          __typename
+        }
+      }
     }
   }
   ```
+
   Filters `node.template?.__typename === "Template_PortfolioPage"`, maps each `uri` to a
   slug by stripping leading/trailing slashes, returns `[{ slug }, …]`. On fetch failure,
   returns `[]` (build emits no portfolio routes rather than crashing).
 
 - **Parameterized data query** — new constant in `lib/queries.ts` replacing
   `GET_CYBER_SECURITY_PAGE`:
+
   ```graphql
   query GetPortfolioPage($uri: ID!) {
     page(id: $uri, idType: URI) {
@@ -93,6 +101,7 @@ phase 2.
     }
   }
   ```
+
   Called with `variables: { uri: slug }`. The `portfolioFields` shape is unchanged, so
   rendering logic is unchanged.
 
@@ -152,14 +161,14 @@ Upgrade `DropdownItem` inside `components/HeaderClient.tsx`.
 
 ## Files Touched
 
-| File | Change |
-|------|--------|
-| `app/[slug]/page.tsx` | **New** — thin dynamic route + `generateStaticParams` + `dynamicParams=false` |
-| `components/PortfolioTemplate.tsx` | **New** — shared render body extracted from cyber-security page |
-| `app/cyber-security/page.tsx` | **Delete** |
-| `lib/queries.ts` | Remove `GET_CYBER_SECURITY_PAGE`; add `GET_PORTFOLIO_PAGE($uri)` + `GET_PORTFOLIO_SLUGS`; add `menuBackgroundImage` to `GET_THEME_SETTINGS` |
-| `components/Header.tsx` | Pass `menuPromoImage` from `themeOptions.menuBackgroundImage` |
-| `components/HeaderClient.tsx` | Add `menuPromoImage` prop; conditional promo pane in `DropdownItem` |
+| File                               | Change                                                                                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/[slug]/page.tsx`              | **New** — thin dynamic route + `generateStaticParams` + `dynamicParams=false`                                                               |
+| `components/PortfolioTemplate.tsx` | **New** — shared render body extracted from cyber-security page                                                                             |
+| `app/cyber-security/page.tsx`      | **Delete**                                                                                                                                  |
+| `lib/queries.ts`                   | Remove `GET_CYBER_SECURITY_PAGE`; add `GET_PORTFOLIO_PAGE($uri)` + `GET_PORTFOLIO_SLUGS`; add `menuBackgroundImage` to `GET_THEME_SETTINGS` |
+| `components/Header.tsx`            | Pass `menuPromoImage` from `themeOptions.menuBackgroundImage`                                                                               |
+| `components/HeaderClient.tsx`      | Add `menuPromoImage` prop; conditional promo pane in `DropdownItem`                                                                         |
 
 ## Error Handling
 

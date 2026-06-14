@@ -1,36 +1,36 @@
-import React from "react";
-import { SectionReveal } from "@/components/SectionReveal";
-import { GlowOrb, Button } from "@/components/ui";
+import React from 'react'
+import { SectionReveal } from '@/components/SectionReveal'
+import { GlowOrb, Button } from '@/components/ui'
 
 interface WhyUsCard {
-  abteintitle?: string | null;
-  abthreintext?: string | null;
-  abthreimage?: { node?: { sourceUrl?: string | null } | null } | null;
+  abteintitle?: string | null
+  abthreintext?: string | null
+  abthreimage?: { node?: { sourceUrl?: string | null } | null } | null
 }
 
 interface WhyUsSectionProps {
-  title: string;
-  text: string;
-  cards: WhyUsCard[];
-  ctaText?: string | null;
-  ctaLink?: string | null;
+  title: string
+  text: string
+  cards: WhyUsCard[]
+  ctaText?: string | null
+  ctaLink?: string | null
 }
 
 function stripHtml(html: string): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .trim();
+  return (html ?? '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
 }
 
 export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSectionProps) {
-  if (!title && !(cards?.length > 0)) return null;
+  if (!title && !(cards?.length > 0)) return null
 
-  const cleanTitle = stripHtml(title);
-  const cleanText = stripHtml(text);
+  const cleanTitle = stripHtml(title)
+  const cleanText = stripHtml(text)
 
   return (
     <section className="why-section py-16 md:py-24 mx-2 md:mx-4 lg:mx-10 px-5 md:px-8 lg:px-24 mb-16 md:mb-32 relative overflow-hidden">
@@ -40,15 +40,11 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
         <div className="flex flex-col lg:flex-row justify-between mb-20 gap-10">
           {cleanTitle && (
             <div>
-              <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold max-w-2xl leading-tight">
-                {cleanTitle}
-              </h3>
+              <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold max-w-2xl leading-tight">{cleanTitle}</h3>
             </div>
           )}
           {cleanText && (
-            <p className="text-base md:text-xl text-gray-400 max-w-xl leading-relaxed mt-4 lg:mt-10 lg:self-end">
-              {cleanText}
-            </p>
+            <p className="text-base md:text-xl text-gray-400 max-w-xl leading-relaxed mt-4 lg:mt-10 lg:self-end">{cleanText}</p>
           )}
         </div>
 
@@ -57,11 +53,7 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
             <div key={i} className="service-card group">
               <div className="service-card__icon-wrap">
                 {card.abthreimage?.node?.sourceUrl ? (
-                  <img
-                    src={card.abthreimage.node.sourceUrl}
-                    alt=""
-                    className="service-card__icon-img"
-                  />
+                  <img src={card.abthreimage.node.sourceUrl} alt="" className="service-card__icon-img" />
                 ) : (
                   <svg
                     className="service-card__icon-img text-yellow-400"
@@ -79,19 +71,20 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
                   </svg>
                 )}
               </div>
-              <h5 className="text-xl font-bold mb-3 mt-8 leading-snug text-center">
-                {stripHtml(card.abteintitle ?? "")}
-              </h5>
-              <p className="text-gray-400 leading-relaxed text-sm text-center">
-                {stripHtml(card.abthreintext ?? "")}
-              </p>
+              <h5 className="text-xl font-bold mb-3 mt-8 leading-snug text-center">{stripHtml(card.abteintitle ?? '')}</h5>
+              <p className="text-gray-400 leading-relaxed text-sm text-center">{stripHtml(card.abthreintext ?? '')}</p>
             </div>
           ))}
         </SectionReveal>
 
         {ctaText && (
           <div className="mt-12 md:mt-20 flex justify-center px-4 md:px-0">
-            <Button variant="outline" href={ctaLink || "/contact-us"} style={{ "--btn-size": "16px" } as React.CSSProperties} className="w-full md:w-auto justify-center">
+            <Button
+              variant="outline"
+              href={ctaLink || '/contact-us'}
+              style={{ '--btn-size': '16px' } as React.CSSProperties}
+              className="w-full md:w-auto justify-center"
+            >
               {ctaText}
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                 <path
@@ -159,5 +152,5 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
         }
       `}</style>
     </section>
-  );
+  )
 }

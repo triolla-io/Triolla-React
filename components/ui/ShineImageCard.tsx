@@ -1,41 +1,31 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
 interface ShineImageCardProps {
-  src: string;
-  alt: string;
+  src: string
+  alt: string
   /** Border radius in px. Default 20. */
-  radius?: number;
+  radius?: number
   /** Diagonal shine angle, e.g. "105deg" | "128deg" | "135deg". */
-  shineAngle?: string;
+  shineAngle?: string
   /** Image zoom scale on hover. Default 1.07. */
-  imgScale?: number;
+  imgScale?: number
   /** Content shown in the bottom gradient overlay (revealed on hover). */
-  overlay?: ReactNode;
+  overlay?: ReactNode
   /** Static tag/badge content (always visible). */
-  badge?: ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
+  badge?: ReactNode
+  className?: string
+  style?: React.CSSProperties
 }
 
-export function ShineImageCard({
-  src,
-  alt,
-  radius,
-  shineAngle,
-  imgScale,
-  overlay,
-  badge,
-  className = "",
-  style,
-}: ShineImageCardProps) {
+export function ShineImageCard({ src, alt, radius, shineAngle, imgScale, overlay, badge, className = '', style }: ShineImageCardProps) {
   return (
     <div
       className={`shine-card ${className}`.trim()}
       style={
         {
-          ...(radius !== undefined ? { "--sc-radius": `${radius}px` } : {}),
-          ...(shineAngle ? { "--sc-shine-angle": shineAngle } : {}),
-          ...(imgScale !== undefined ? { "--sc-img-scale": String(imgScale) } : {}),
+          ...(radius !== undefined ? { '--sc-radius': `${radius}px` } : {}),
+          ...(shineAngle ? { '--sc-shine-angle': shineAngle } : {}),
+          ...(imgScale !== undefined ? { '--sc-img-scale': String(imgScale) } : {}),
           ...style,
         } as React.CSSProperties
       }
@@ -45,5 +35,5 @@ export function ShineImageCard({
       {overlay != null && <div className="shine-card__overlay">{overlay}</div>}
       {badge != null && badge}
     </div>
-  );
+  )
 }

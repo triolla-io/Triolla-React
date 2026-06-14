@@ -1,20 +1,17 @@
-import { SectionReveal } from "./SectionReveal";
+import { SectionReveal } from './SectionReveal'
 
 interface Logo {
-  sourceUrl: string;
-  name: string;
+  sourceUrl: string
+  name: string
 }
 
 interface ClientLogoStripProps {
-  logos: Logo[];
-  className?: string;
+  logos: Logo[]
+  className?: string
 }
 
-export function ClientLogoStrip({
-  logos,
-  className = "",
-}: ClientLogoStripProps) {
-  if (!logos || logos.length === 0) return null;
+export function ClientLogoStrip({ logos, className = '' }: ClientLogoStripProps) {
+  if (!logos || logos.length === 0) return null
 
   return (
     <div className={className}>
@@ -30,5 +27,5 @@ export function ClientLogoStrip({
         ))}
       </SectionReveal>
     </div>
-  );
+  )
 }

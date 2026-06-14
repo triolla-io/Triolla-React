@@ -1,41 +1,36 @@
-import parse from "html-react-parser";
-import { FadeIn } from "./FadeIn";
-import { GlowOrb, Eyebrow } from "@/components/ui";
+import parse from 'html-react-parser'
+import { FadeIn } from './FadeIn'
+import { GlowOrb, Eyebrow } from '@/components/ui'
 
 function decodeHtml(html: string): string {
-  return (html ?? "")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&amp;/gi, "&")
+  return (html ?? '')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
     .replace(/&#039;/g, "'")
-    .replace(/&#8217;/g, "'");
+    .replace(/&#8217;/g, "'")
 }
 
 interface Step {
-  number?: string;
-  numtitle: string;
+  number?: string
+  numtitle: string
 }
 
 interface AnimatedStepsProps {
-  steps: Step[];
-  title?: string | null;
-  subtext?: string | null;
-  accentColor?: string;
+  steps: Step[]
+  title?: string | null
+  subtext?: string | null
+  accentColor?: string
 }
 
-export default function AnimatedSteps({
-  steps,
-  title,
-  subtext,
-  accentColor = "#facc15",
-}: AnimatedStepsProps) {
-  if (steps.length === 0) return null;
+export default function AnimatedSteps({ steps, title, subtext, accentColor = '#facc15' }: AnimatedStepsProps) {
+  if (steps.length === 0) return null
 
-  const ac = accentColor;
+  const ac = accentColor
 
   return (
-    <section className="tech-steps" style={{ "--accent": accentColor } as React.CSSProperties}>
+    <section className="tech-steps" style={{ '--accent': accentColor } as React.CSSProperties}>
       <style>{`
         /* ─── Steps section ─────────────────────── */
         .tech-steps {
@@ -318,12 +313,7 @@ export default function AnimatedSteps({
 
       {/* Floating sparkles */}
       {[...Array(10)].map((_, i) => (
-        <span
-          key={`sp-${i}`}
-          className="tech-steps__sparkle"
-          style={{ "--spi": i } as React.CSSProperties}
-          aria-hidden="true"
-        />
+        <span key={`sp-${i}`} className="tech-steps__sparkle" style={{ '--spi': i } as React.CSSProperties} aria-hidden="true" />
       ))}
 
       {/* Diagonal scan-line */}
@@ -337,42 +327,32 @@ export default function AnimatedSteps({
             ornament="mark"
             align="center"
             color="var(--accent)"
-            style={{
-              "--eb-gap": "16px",
-              "--eb-size": "10px",
-              "--eb-spacing": "0.25em",
-              "--eb-line-w": "56px",
-              "--eb-line-bg": "linear-gradient(to right, transparent, var(--accent))",
-            } as React.CSSProperties}
-          >{""}</Eyebrow>
-          {title && (
-            <h2 className="section-head__title">{parse(decodeHtml(title))}</h2>
-          )}
-          {subtext && (
-            <div className="section-head__sub">{parse(decodeHtml(subtext))}</div>
-          )}
+            style={
+              {
+                '--eb-gap': '16px',
+                '--eb-size': '10px',
+                '--eb-spacing': '0.25em',
+                '--eb-line-w': '56px',
+                '--eb-line-bg': 'linear-gradient(to right, transparent, var(--accent))',
+              } as React.CSSProperties
+            }
+          >
+            {''}
+          </Eyebrow>
+          {title && <h2 className="section-head__title">{parse(decodeHtml(title))}</h2>}
+          {subtext && <div className="section-head__sub">{parse(decodeHtml(subtext))}</div>}
         </FadeIn>
       )}
 
       <div className="tech-steps__hint md:hidden" aria-hidden="true">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path
-            d="M2 7H12M8.5 3.5L12 7L8.5 10.5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          <path d="M2 7H12M8.5 3.5L12 7L8.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
 
       <div className="tech-steps__scroll-wrap">
         {steps.map((step, i) => (
-          <div
-            key={i}
-            className="tech-step"
-            style={{ "--si": i } as React.CSSProperties}
-          >
+          <div key={i} className="tech-step" style={{ '--si': i } as React.CSSProperties}>
             <div className="tech-step__bg-num" aria-hidden="true">
               {parseInt(step.number ?? String(i + 1)) || i + 1}
             </div>
@@ -386,16 +366,12 @@ export default function AnimatedSteps({
               </div>
             )}
             <div className="tech-step__body">
-              <span className="tech-step__num">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div className="tech-step__name">
-                {parse(decodeHtml(step.numtitle ?? ""))}
-              </div>
+              <span className="tech-step__num">{String(i + 1).padStart(2, '0')}</span>
+              <div className="tech-step__name">{parse(decodeHtml(step.numtitle ?? ''))}</div>
             </div>
           </div>
         ))}
       </div>
     </section>
-  );
+  )
 }

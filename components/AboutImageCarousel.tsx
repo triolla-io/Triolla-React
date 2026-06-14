@@ -1,27 +1,22 @@
-"use client";
+'use client'
 
-import React from "react";
-import { useRef } from "react";
-import { motion } from "motion/react";
-import { ShineImageCard } from "@/components/ui";
+import React from 'react'
+import { useRef } from 'react'
+import { motion } from 'motion/react'
+import { ShineImageCard } from '@/components/ui'
 
 interface AboutImageCarouselProps {
-  images: (string | null)[];
+  images: (string | null)[]
 }
 
 export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
-  const constraintsRef = useRef<HTMLDivElement>(null);
-  const validImages = images.filter((src): src is string => !!src);
-  if (validImages.length === 0) return null;
+  const constraintsRef = useRef<HTMLDivElement>(null)
+  const validImages = images.filter((src): src is string => !!src)
+  if (validImages.length === 0) return null
 
   return (
     <div className="aic-root" ref={constraintsRef}>
-      <motion.div
-        drag="x"
-        dragConstraints={constraintsRef}
-        dragElastic={0.08}
-        className="aic-track"
-      >
+      <motion.div drag="x" dragConstraints={constraintsRef} dragElastic={0.08} className="aic-track">
         {validImages.map((src, i) => (
           <ShineImageCard
             key={i}
@@ -32,10 +27,9 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
             imgScale={1.04}
             style={
               {
-                "--sc-lift": "0px",
-                "--sc-scale": "1",
-                boxShadow:
-                  "0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)",
+                '--sc-lift': '0px',
+                '--sc-scale': '1',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
               } as React.CSSProperties
             }
             className="w-[340px] h-[400px] shrink-0 max-md:w-[260px] max-md:h-[320px]"
@@ -46,13 +40,7 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
       {/* drag hint */}
       <div className="aic-hint" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path
-            d="M3 10H17M12 5L17 10L12 15"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          <path d="M3 10H17M12 5L17 10L12 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <span>Drag</span>
       </div>
@@ -98,5 +86,5 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
         }
       `}</style>
     </div>
-  );
+  )
 }

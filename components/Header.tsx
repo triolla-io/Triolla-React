@@ -1,81 +1,72 @@
-import { client } from "@/lib/apollo-client";
-import { GET_THEME_SETTINGS, GET_PRIMARY_MENU } from "@/lib/queries";
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import { HeaderClient } from "./HeaderClient";
-import type { NavItem } from "./HeaderClient";
-import type {
-  GetThemeSettingsData,
-  GetPrimaryMenuData,
-  MenuItemNode,
-  ThemeOptions,
-} from "@/lib/graphql-types";
+import { client } from '@/lib/apollo-client'
+import { GET_THEME_SETTINGS, GET_PRIMARY_MENU } from '@/lib/queries'
+import { gql } from '@apollo/client'
+import type { TypedDocumentNode } from '@apollo/client'
+import { HeaderClient } from './HeaderClient'
+import type { NavItem } from './HeaderClient'
+import type { GetThemeSettingsData, GetPrimaryMenuData, MenuItemNode, ThemeOptions } from '@/lib/graphql-types'
 
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
-`;
+`
 
 const PRIMARY_MENU_QUERY: TypedDocumentNode<GetPrimaryMenuData> = gql`
   ${GET_PRIMARY_MENU}
-`;
+`
 
 async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
-    return data?.themeSetting?.themeOptions ?? null;
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY })
+    return data?.themeSetting?.themeOptions ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
 function buildNavTree(flat: MenuItemNode[]): NavItem[] {
-  const roots = flat.filter((item) => !item.parentDatabaseId);
+  const roots = flat.filter((item) => !item.parentDatabaseId)
   return roots.map((item) => {
-    const directChildren = flat.filter(
-      (c) => c.parentDatabaseId === item.databaseId,
-    );
-    const children: { label: string; url: string }[] = [];
+    const directChildren = flat.filter((c) => c.parentDatabaseId === item.databaseId)
+    const children: { label: string; url: string }[] = []
 
     for (const child of directChildren) {
-      const grandchildren = flat.filter(
-        (gc) => gc.parentDatabaseId === child.databaseId,
-      );
+      const grandchildren = flat.filter((gc) => gc.parentDatabaseId === child.databaseId)
       if (grandchildren.length > 0) {
         // Intermediate grouping node — flatten its children up into the dropdown
         for (const gc of grandchildren) {
-          children.push({ label: gc.label || "", url: gc.url || "#" });
+          children.push({ label: gc.label || '', url: gc.url || '#' })
         }
-      } else if (child.url && child.url !== "#") {
-        children.push({ label: child.label || "", url: child.url });
+      } else if (child.url && child.url !== '#') {
+        children.push({ label: child.label || '', url: child.url })
       }
     }
 
-    return { label: item.label || "", url: item.url || "#", children };
-  });
+    return { label: item.label || '', url: item.url || '#', children }
+  })
 }
 
 async function getPrimaryMenu(): Promise<{
-  nav: NavItem[];
-  mobile: NavItem[];
+  nav: NavItem[]
+  mobile: NavItem[]
 }> {
   try {
-    const { data } = await client.query({ query: PRIMARY_MENU_QUERY });
-    const flatNav: MenuItemNode[] = data?.primaryMenu?.menuItems?.nodes ?? [];
-    return { nav: buildNavTree(flatNav), mobile: buildNavTree(flatNav) };
+    const { data } = await client.query({ query: PRIMARY_MENU_QUERY })
+    const flatNav: MenuItemNode[] = data?.primaryMenu?.menuItems?.nodes ?? []
+    return { nav: buildNavTree(flatNav), mobile: buildNavTree(flatNav) }
   } catch {
-    return { nav: [], mobile: [] };
+    return { nav: [], mobile: [] }
   }
 }
 
 export default async function Header() {
-  const [ts, menus] = await Promise.all([getThemeSettings(), getPrimaryMenu()]);
+  const [ts, menus] = await Promise.all([getThemeSettings(), getPrimaryMenu()])
 
   const whatsappHref = ts?.whatsappNumber
-    ? `https://wa.me/${ts.whatsappNumber}${ts.whatsappMessage ? `?text=${encodeURIComponent(ts.whatsappMessage)}` : ""}`
-    : "https://wa.me/+972525956644";
+    ? `https://wa.me/${ts.whatsappNumber}${ts.whatsappMessage ? `?text=${encodeURIComponent(ts.whatsappMessage)}` : ''}`
+    : 'https://wa.me/+972525956644'
 
-  const nav = menus.nav.length > 0 ? menus.nav : [];
-  const mobile = menus.mobile.length > 0 ? menus.mobile : nav;
+  const nav = menus.nav.length > 0 ? menus.nav : []
+  const mobile = menus.mobile.length > 0 ? menus.mobile : nav
 
   return (
     <HeaderClient
@@ -85,13 +76,10 @@ export default async function Header() {
       mobileNavItems={mobile}
       menuPromoImage={ts?.menuBackgroundImage?.node?.sourceUrl ?? null}
       whatsappHref={whatsappHref}
-      bookButtonText={ts?.bookButton ?? "Book a Call"}
-      bookButtonHref={
-        ts?.bookButtonLink ??
-        "https://calendly.com/triolla/pitangoux-introductory-meeting-clone"
-      }
-      contactButtonText={ts?.contactButton ?? "Contact Us"}
-      contactButtonHref={ts?.contactButtonLink ?? "/contact-us"}
+      bookButtonText={ts?.bookButton ?? 'Book a Call'}
+      bookButtonHref={ts?.bookButtonLink ?? 'https://calendly.com/triolla/pitangoux-introductory-meeting-clone'}
+      contactButtonText={ts?.contactButton ?? 'Contact Us'}
+      contactButtonHref={ts?.contactButtonLink ?? '/contact-us'}
     />
-  );
+  )
 }

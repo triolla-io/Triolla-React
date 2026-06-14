@@ -1,40 +1,40 @@
-"use client";
+'use client'
 
-import { useRef, useState, useEffect } from "react";
-import parse from "html-react-parser";
-import { GlowOrb } from "@/components/ui";
+import { useRef, useState, useEffect } from 'react'
+import parse from 'html-react-parser'
+import { GlowOrb } from '@/components/ui'
 
 function decodeHtml(html: string): string {
-  return (html ?? "")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&amp;/gi, "&")
+  return (html ?? '')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
     .replace(/&#039;/g, "'")
-    .replace(/&#8217;/g, "'");
+    .replace(/&#8217;/g, "'")
 }
 
 interface ContentItem {
-  threintitle: string | null;
-  threincontent: string | null;
-  tagList: string | null;
+  threintitle: string | null
+  threincontent: string | null
+  tagList: string | null
 }
 
 interface ContentPanel {
-  lftimage: { node: { sourceUrl: string } } | null;
-  threincontent: ContentItem[] | null;
+  lftimage: { node: { sourceUrl: string } } | null
+  threincontent: ContentItem[] | null
 }
 
 interface TechStickyFeatureProps {
-  fourmidTitle: string | null;
-  fourtitleone: string | null;
-  fourtitletwo: string | null;
-  fourtext: string | null;
-  threeConent: ContentPanel[] | null;
-  threbottomText: string | null;
-  threbottomLinkText: string | null;
-  threbottomButtonLink: string | null;
-  accentColor: string;
+  fourmidTitle: string | null
+  fourtitleone: string | null
+  fourtitletwo: string | null
+  fourtext: string | null
+  threeConent: ContentPanel[] | null
+  threbottomText: string | null
+  threbottomLinkText: string | null
+  threbottomButtonLink: string | null
+  accentColor: string
 }
 
 export function TechStickyFeature({
@@ -44,47 +44,47 @@ export function TechStickyFeature({
   threbottomButtonLink,
   accentColor,
 }: TechStickyFeatureProps) {
-  const panels = threeConent ?? [];
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [stmtVisible, setStmtVisible] = useState(false);
-  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const stmtRef = useRef<HTMLDivElement>(null);
+  const panels = threeConent ?? []
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [stmtVisible, setStmtVisible] = useState(false)
+  const panelRefs = useRef<(HTMLDivElement | null)[]>([])
+  const stmtRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
+    const observers: IntersectionObserver[] = []
     panelRefs.current.forEach((el, i) => {
-      if (!el) return;
+      if (!el) return
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) setActiveIndex(i);
+          if (entry.isIntersecting) setActiveIndex(i)
         },
-        { threshold: 0, rootMargin: "-38% 0px -38% 0px" },
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, [panels.length]);
+        { threshold: 0, rootMargin: '-38% 0px -38% 0px' },
+      )
+      obs.observe(el)
+      observers.push(obs)
+    })
+    return () => observers.forEach((o) => o.disconnect())
+  }, [panels.length])
 
   useEffect(() => {
-    const el = stmtRef.current;
-    if (!el) return;
+    const el = stmtRef.current
+    if (!el) return
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setStmtVisible(true);
-          obs.disconnect();
+          setStmtVisible(true)
+          obs.disconnect()
         }
       },
       { threshold: 0.1 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
-  if (!panels.length) return null;
+  if (!panels.length) return null
 
-  const words = threbottomText?.split(" ") ?? [];
+  const words = threbottomText?.split(' ') ?? []
 
   return (
     <>
@@ -197,10 +197,7 @@ export function TechStickyFeature({
 
       `}</style>
 
-      <section
-        className="border-t border-white/[0.07]"
-        style={{ "--accent": accentColor } as React.CSSProperties}
-      >
+      <section className="border-t border-white/[0.07]" style={{ '--accent': accentColor } as React.CSSProperties}>
         {/* ══════════════════════════════════════
             STICKY SPLIT LAYOUT
         ══════════════════════════════════════ */}
@@ -216,7 +213,7 @@ export function TechStickyFeature({
                       src={panel.lftimage.node.sourceUrl}
                       alt=""
                       aria-hidden="true"
-                      className={`tsf-img ${i === activeIndex ? "tsf-img-on" : "tsf-img-off"}`}
+                      className={`tsf-img ${i === activeIndex ? 'tsf-img-on' : 'tsf-img-off'}`}
                     />
                   ) : null,
                 )}
@@ -226,7 +223,7 @@ export function TechStickyFeature({
               <div
                 className="absolute inset-y-0 right-0 w-40 pointer-events-none z-10"
                 style={{
-                  background: "linear-gradient(to right, transparent, #080808)",
+                  background: 'linear-gradient(to right, transparent, #080808)',
                 }}
                 aria-hidden="true"
               />
@@ -234,7 +231,7 @@ export function TechStickyFeature({
               <div
                 className="absolute inset-x-0 bottom-0 h-32 pointer-events-none z-10"
                 style={{
-                  background: "linear-gradient(to top, #080808, transparent)",
+                  background: 'linear-gradient(to top, #080808, transparent)',
                 }}
                 aria-hidden="true"
               />
@@ -246,22 +243,17 @@ export function TechStickyFeature({
                     aria-label={`Panel ${i + 1}`}
                     onClick={() =>
                       panelRefs.current[i]?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
+                        behavior: 'smooth',
+                        block: 'center',
                       })
                     }
                     className="tsf-dot"
                     style={{
-                      width: i === activeIndex ? "10px" : "5px",
-                      height: i === activeIndex ? "10px" : "5px",
-                      background:
-                        i === activeIndex
-                          ? "var(--accent)"
-                          : "rgba(255,255,255,0.2)",
+                      width: i === activeIndex ? '10px' : '5px',
+                      height: i === activeIndex ? '10px' : '5px',
+                      background: i === activeIndex ? 'var(--accent)' : 'rgba(255,255,255,0.2)',
                       boxShadow:
-                        i === activeIndex
-                          ? "0 0 14px var(--accent), 0 0 28px color-mix(in srgb, var(--accent) 33%, transparent)"
-                          : "none",
+                        i === activeIndex ? '0 0 14px var(--accent), 0 0 28px color-mix(in srgb, var(--accent) 33%, transparent)' : 'none',
                     }}
                   />
                 ))}
@@ -269,20 +261,20 @@ export function TechStickyFeature({
               {/* Panel counter */}
               <div
                 className="absolute left-6 bottom-8 font-black tabular-nums select-none pointer-events-none leading-none z-20"
-                style={{ fontSize: "88px", color: "color-mix(in srgb, var(--accent) 13.3%, transparent)" }}
+                style={{ fontSize: '88px', color: 'color-mix(in srgb, var(--accent) 13.3%, transparent)' }}
                 aria-hidden="true"
               >
-                {String(activeIndex + 1).padStart(2, "0")}
+                {String(activeIndex + 1).padStart(2, '0')}
                 <span
                   className="block"
                   style={{
-                    fontSize: "16px",
-                    color: "color-mix(in srgb, var(--accent) 33%, transparent)",
-                    letterSpacing: "0.3em",
+                    fontSize: '16px',
+                    color: 'color-mix(in srgb, var(--accent) 33%, transparent)',
+                    letterSpacing: '0.3em',
                     fontWeight: 800,
                   }}
                 >
-                  / {String(panels.length).padStart(2, "0")}
+                  / {String(panels.length).padStart(2, '0')}
                 </span>
               </div>
             </div>
@@ -291,13 +283,13 @@ export function TechStickyFeature({
           {/* RIGHT — scrollable panels */}
           <div>
             {panels.map((panel, i) => {
-              const items = panel.threincontent ?? [];
-              const isActive = i === activeIndex;
+              const items = panel.threincontent ?? []
+              const isActive = i === activeIndex
               return (
                 <div
                   key={i}
                   ref={(el) => {
-                    panelRefs.current[i] = el;
+                    panelRefs.current[i] = el
                   }}
                   className="min-h-screen flex flex-col justify-center py-24 px-10 lg:px-16 relative border-b border-white/6 last:border-b-0"
                 >
@@ -305,24 +297,17 @@ export function TechStickyFeature({
                   <div
                     className="absolute top-0 right-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
                     style={{
-                      fontSize: "clamp(120px,20vw,240px)",
-                      color: "color-mix(in srgb, var(--accent) 2.7%, transparent)",
+                      fontSize: 'clamp(120px,20vw,240px)',
+                      color: 'color-mix(in srgb, var(--accent) 2.7%, transparent)',
                     }}
                     aria-hidden="true"
                   >
-                    {String(i + 1).padStart(2, "0")}
+                    {String(i + 1).padStart(2, '0')}
                   </div>
                   {/* Mobile image */}
                   {panel.lftimage?.node?.sourceUrl && (
-                    <div
-                      className="lg:hidden mb-10 rounded-[24px] overflow-hidden"
-                      style={{ aspectRatio: "16/9" }}
-                    >
-                      <img
-                        src={panel.lftimage.node.sourceUrl}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="lg:hidden mb-10 rounded-[24px] overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                      <img src={panel.lftimage.node.sourceUrl} alt="" className="w-full h-full object-cover" />
                     </div>
                   )}
                   <div className="relative z-10 max-w-[560px]">
@@ -331,48 +316,43 @@ export function TechStickyFeature({
                       <span
                         className="font-black tabular-nums leading-none"
                         style={{
-                          fontSize: "56px",
-                          color: "white",
-                          letterSpacing: "-0.04em",
+                          fontSize: '56px',
+                          color: 'white',
+                          letterSpacing: '-0.04em',
                         }}
                       >
-                        {String(i + 1).padStart(2, "0")}
+                        {String(i + 1).padStart(2, '0')}
                       </span>
                       <span
                         className="font-bold tabular-nums leading-none pb-2"
                         style={{
-                          fontSize: "13px",
-                          color: "rgba(255,255,255,0.25)",
-                          letterSpacing: "0.18em",
+                          fontSize: '13px',
+                          color: 'rgba(255,255,255,0.25)',
+                          letterSpacing: '0.18em',
                         }}
                       >
-                        / {String(panels.length).padStart(2, "0")}
+                        / {String(panels.length).padStart(2, '0')}
                       </span>
                       <div
                         className="h-[2px] flex-1 overflow-hidden rounded-full ml-2 mb-3"
-                        style={{ background: "rgba(255,255,255,0.06)" }}
+                        style={{ background: 'rgba(255,255,255,0.06)' }}
                       >
-                        {isActive && (
-                          <div
-                            className="tsf-bar h-full w-full rounded-full"
-                            style={{ background: "var(--accent)" }}
-                          />
-                        )}
+                        {isActive && <div className="tsf-bar h-full w-full rounded-full" style={{ background: 'var(--accent)' }} />}
                       </div>
                     </div>
 
                     {items.map((item, j) => (
                       <div
                         key={j}
-                        className={`tsf-item ${j > 0 ? "mt-12 pt-12 border-t border-white/6" : ""} ${isActive ? "tsf-item-on" : "tsf-item-off"}`}
+                        className={`tsf-item ${j > 0 ? 'mt-12 pt-12 border-t border-white/6' : ''} ${isActive ? 'tsf-item-on' : 'tsf-item-off'}`}
                         style={{
-                          transitionDelay: isActive ? `${j * 0.18}s` : "0s",
+                          transitionDelay: isActive ? `${j * 0.18}s` : '0s',
                         }}
                       >
                         {item.threintitle && (
                           <div
                             className="font-black tracking-[-0.03em] leading-[1.02] mb-6 text-white"
-                            style={{ fontSize: "clamp(30px,4.3vw,60px)" }}
+                            style={{ fontSize: 'clamp(30px,4.3vw,60px)' }}
                           >
                             {parse(decodeHtml(item.threintitle))}
                           </div>
@@ -381,8 +361,8 @@ export function TechStickyFeature({
                           <div
                             className="leading-[1.85] mb-7"
                             style={{
-                              fontSize: "18px",
-                              color: "rgba(255,255,255,0.55)",
+                              fontSize: '18px',
+                              color: 'rgba(255,255,255,0.55)',
                             }}
                           >
                             {parse(decodeHtml(item.threincontent))}
@@ -390,14 +370,14 @@ export function TechStickyFeature({
                         )}
                         {item.tagList && (
                           <div className="flex flex-wrap gap-2">
-                            {item.tagList.split(",").map((tag, ti) => (
+                            {item.tagList.split(',').map((tag, ti) => (
                               <span
                                 key={ti}
                                 className="tsf-tag"
                                 style={{
-                                  background: "color-mix(in srgb, var(--accent) 6.25%, transparent)",
-                                  color: "var(--accent)",
-                                  border: "1px solid color-mix(in srgb, var(--accent) 16.5%, transparent)",
+                                  background: 'color-mix(in srgb, var(--accent) 6.25%, transparent)',
+                                  color: 'var(--accent)',
+                                  border: '1px solid color-mix(in srgb, var(--accent) 16.5%, transparent)',
                                 }}
                               >
                                 {tag.trim()}
@@ -409,7 +389,7 @@ export function TechStickyFeature({
                     ))}
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
@@ -421,15 +401,8 @@ export function TechStickyFeature({
           <>
             {/* Wave: dark → cream */}
             <div className="tsf-wave" aria-hidden="true">
-              <svg
-                viewBox="0 0 1440 80"
-                preserveAspectRatio="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M0 0 L240 45 L480 10 L720 55 L960 8 L1200 48 L1440 12 L1440 80 L0 80 Z"
-                  fill="#F5F0E8"
-                />
+              <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0 L240 45 L480 10 L720 55 L960 8 L1200 48 L1440 12 L1440 80 L0 80 Z" fill="#F5F0E8" />
               </svg>
             </div>
 
@@ -452,50 +425,40 @@ export function TechStickyFeature({
                     <div
                       className="tsf-dline h-[1.5px] w-20 rounded-full"
                       style={{
-                        background: "linear-gradient(to right, transparent, var(--accent))",
+                        background: 'linear-gradient(to right, transparent, var(--accent))',
                       }}
                     />
-                    <span
-                      className="font-bold tracking-[0.4em] uppercase"
-                      style={{ fontSize: "11px", color: "var(--accent)" }}
-                    >
+                    <span className="font-bold tracking-[0.4em] uppercase" style={{ fontSize: '11px', color: 'var(--accent)' }}>
                       Our Promise
                     </span>
                     <div
                       className="tsf-dline tsf-dline-r h-[1.5px] w-20 rounded-full"
                       style={{
-                        background: "linear-gradient(to left, transparent, var(--accent))",
+                        background: 'linear-gradient(to left, transparent, var(--accent))',
                       }}
                     />
                   </div>
                 )}
 
                 {/* Giant statement — always visible */}
-                <p
-                  className="font-black leading-none tracking-tighter"
-                  style={{ fontSize: "clamp(44px,9vw,128px)", color: "#111" }}
-                >
+                <p className="font-black leading-none tracking-tighter" style={{ fontSize: 'clamp(44px,9vw,128px)', color: '#111' }}>
                   {words.map((word, wi) => {
-                    const clean = word.toLowerCase().replace(/[.,!?;:]/g, "");
-                    const isGold =
-                      clean === "you" ||
-                      (clean === "for" && wi === words.length - 2);
+                    const clean = word.toLowerCase().replace(/[.,!?;:]/g, '')
+                    const isGold = clean === 'you' || (clean === 'for' && wi === words.length - 2)
                     return (
                       <span
                         key={wi}
-                        className={`tsf-word ${stmtVisible ? "tsf-word--go" : ""}`}
+                        className={`tsf-word ${stmtVisible ? 'tsf-word--go' : ''}`}
                         style={{
-                          animationDelay: stmtVisible
-                            ? `${wi * 0.065}s`
-                            : undefined,
-                          color: isGold ? "var(--accent)" : "#111",
-                          marginRight: "0.22em",
-                          display: "inline-block",
+                          animationDelay: stmtVisible ? `${wi * 0.065}s` : undefined,
+                          color: isGold ? 'var(--accent)' : '#111',
+                          marginRight: '0.22em',
+                          display: 'inline-block',
                         }}
                       >
                         {word}
                       </span>
-                    );
+                    )
                   })}
                 </p>
 
@@ -503,8 +466,8 @@ export function TechStickyFeature({
                 <p
                   className="mt-8 font-medium"
                   style={{
-                    fontSize: "clamp(15px,1.5vw,19px)",
-                    color: "rgba(0,0,0,0.45)",
+                    fontSize: 'clamp(15px,1.5vw,19px)',
+                    color: 'rgba(0,0,0,0.45)',
                     animation: stmtVisible
                       ? `tsf-word-rise 0.7s cubic-bezier(0.16,1,0.3,1) ${words.length * 0.065 + 0.15}s both`
                       : undefined,
@@ -527,21 +490,15 @@ export function TechStickyFeature({
                       href={threbottomButtonLink}
                       className="tsf-stmt-cta inline-flex items-center gap-3 font-bold uppercase tracking-[0.08em] rounded-full"
                       style={{
-                        background: "#111",
-                        color: "#F5F0E8",
-                        padding: "18px 44px",
-                        fontSize: "14px",
-                        boxShadow: "0 12px 48px rgba(0,0,0,0.3)",
+                        background: '#111',
+                        color: '#F5F0E8',
+                        padding: '18px 44px',
+                        fontSize: '14px',
+                        boxShadow: '0 12px 48px rgba(0,0,0,0.3)',
                       }}
                     >
                       {threbottomLinkText}
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        aria-hidden="true"
-                      >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path
                           d="M3 8h10M9.5 4L13 8l-3.5 4"
                           stroke="currentColor"
@@ -558,20 +515,13 @@ export function TechStickyFeature({
 
             {/* Wave: cream → dark */}
             <div className="tsf-wave" aria-hidden="true">
-              <svg
-                viewBox="0 0 1440 80"
-                preserveAspectRatio="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M0 80 L240 35 L480 70 L720 25 L960 72 L1200 32 L1440 68 L1440 0 L0 0 Z"
-                  fill="#F5F0E8"
-                />
+              <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 80 L240 35 L480 70 L720 25 L960 72 L1200 32 L1440 68 L1440 0 L0 0 Z" fill="#F5F0E8" />
               </svg>
             </div>
           </>
         )}
       </section>
     </>
-  );
+  )
 }

@@ -1,20 +1,20 @@
-"use client";
+'use client'
 
-import { useRef } from "react";
-import { motion } from "motion/react";
+import { useRef } from 'react'
+import { motion } from 'motion/react'
 
 interface Slide {
-  learntext: string;
-  learnimage?: { node?: { sourceUrl?: string } };
-  learnvideo?: { node?: { mediaItemUrl?: string } };
+  learntext: string
+  learnimage?: { node?: { sourceUrl?: string } }
+  learnvideo?: { node?: { mediaItemUrl?: string } }
 }
 
 interface LearnCarouselProps {
-  slides: Slide[];
+  slides: Slide[]
 }
 
 export function LearnCarousel({ slides }: LearnCarouselProps) {
-  const constraintsRef = useRef<HTMLDivElement>(null);
+  const constraintsRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="relative overflow-hidden" ref={constraintsRef}>
@@ -23,7 +23,7 @@ export function LearnCarousel({ slides }: LearnCarouselProps) {
         dragConstraints={constraintsRef}
         dragElastic={0.1}
         className="flex gap-8 cursor-grab active:cursor-grabbing pb-16 px-10"
-        style={{ width: "max-content" }}
+        style={{ width: 'max-content' }}
       >
         {slides.map((slide, i) => (
           <div key={i} className="w-[220px] md:w-[260px] shrink-0 group">
@@ -43,12 +43,10 @@ export function LearnCarousel({ slides }: LearnCarouselProps) {
                 </div>
               )}
             </div>
-            <h4 className="text-2xl font-bold group-hover:text-yellow-400 transition-colors line-clamp-2">
-              {slide.learntext}
-            </h4>
+            <h4 className="text-2xl font-bold group-hover:text-yellow-400 transition-colors line-clamp-2">{slide.learntext}</h4>
           </div>
         ))}
       </motion.div>
     </div>
-  );
+  )
 }

@@ -1,23 +1,17 @@
-"use client";
+'use client'
 
-import { motion } from "motion/react";
+import { motion } from 'motion/react'
 
 interface HeroHeadlineProps {
-  headline: string;
-  subtext?: string;
-  headlineClassName?: string;
-  headlineStyle?: React.CSSProperties;
-  subtextClassName?: string;
+  headline: string
+  subtext?: string
+  headlineClassName?: string
+  headlineStyle?: React.CSSProperties
+  subtextClassName?: string
 }
 
-export function HeroHeadline({
-  headline,
-  subtext,
-  headlineClassName = "",
-  headlineStyle,
-  subtextClassName = "",
-}: HeroHeadlineProps) {
-  const words = headline.split(" ");
+export function HeroHeadline({ headline, subtext, headlineClassName = '', headlineStyle, subtextClassName = '' }: HeroHeadlineProps) {
+  const words = headline.split(' ')
 
   return (
     <>
@@ -27,7 +21,7 @@ export function HeroHeadline({
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: i * 0.08, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: i * 0.08, ease: 'easeOut' }}
             className="inline-block mr-[0.25em]"
           >
             {word}
@@ -45,5 +39,5 @@ export function HeroHeadline({
         </motion.p>
       )}
     </>
-  );
+  )
 }

@@ -1,38 +1,25 @@
-import parse, {
-  type HTMLReactParserOptions,
-  Element as ParserElement,
-} from "html-react-parser";
-import { GlowOrb } from "@/components/ui";
+import parse, { type HTMLReactParserOptions, Element as ParserElement } from 'html-react-parser'
+import { GlowOrb } from '@/components/ui'
 
 /** Strip interactive/script chrome from WP content — only the readable article
  *  (headings, paragraphs, lists, links) survives. Same allowlist approach the
  *  service-detail modal uses, kept consistent across the site. */
-const DROP_TAGS = new Set([
-  "script",
-  "style",
-  "form",
-  "input",
-  "button",
-  "textarea",
-  "select",
-  "iframe",
-  "noscript",
-]);
+const DROP_TAGS = new Set(['script', 'style', 'form', 'input', 'button', 'textarea', 'select', 'iframe', 'noscript'])
 
 const parseOptions: HTMLReactParserOptions = {
   replace: (node) => {
     if (node instanceof ParserElement && DROP_TAGS.has(node.name)) {
-      return <></>;
+      return <></>
     }
-    return undefined;
+    return undefined
   },
-};
+}
 
 interface LegalArticleProps {
-  title: string | null;
-  content: string | null;
+  title: string | null
+  content: string | null
   /** Small uppercase eyebrow above the title (e.g. "Legal"). */
-  eyebrow?: string | null;
+  eyebrow?: string | null
 }
 
 /**
@@ -41,12 +28,20 @@ interface LegalArticleProps {
  * nothing to show — never substitutes placeholder copy.
  */
 export function LegalArticle({ title, content, eyebrow }: LegalArticleProps) {
-  if (!title && !content) return null;
+  if (!title && !content) return null
 
   return (
     <main className="legal-root bg-[#080808] text-white overflow-x-clip relative">
       {/* Glow orb (brand hero accent) */}
-      <GlowOrb size={900} height={460} shape="ellipse" fade="70%" blur={40} color="rgba(250,204,21,0.07)" className="top-0 left-1/2 -translate-x-1/2 z-0" />
+      <GlowOrb
+        size={900}
+        height={460}
+        shape="ellipse"
+        fade="70%"
+        blur={40}
+        color="rgba(250,204,21,0.07)"
+        className="top-0 left-1/2 -translate-x-1/2 z-0"
+      />
 
       <article className="legal-inner">
         <header className="legal-head">
@@ -116,5 +111,5 @@ export function LegalArticle({ title, content, eyebrow }: LegalArticleProps) {
         }
       `}</style>
     </main>
-  );
+  )
 }

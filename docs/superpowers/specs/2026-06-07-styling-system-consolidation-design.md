@@ -18,6 +18,7 @@ The app currently **works and looks good** — zero visual regression is a hard 
 ## Goal
 
 Consolidate styling into a maintainable, idiomatic **Tailwind v4 hybrid** system:
+
 - Tailwind utilities for the trivial + arbitrary-value CSS (~70% of current CSS).
 - A small shared CSS layer for what genuinely cannot be a utility (~30%: keyframes,
   masks, CSS counters, complex pseudo-element cascades).
@@ -36,13 +37,13 @@ Consolidate styling into a maintainable, idiomatic **Tailwind v4 hybrid** system
 
 ## Key Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| End-state | Pragmatic hybrid | ~30% of CSS can't be clean utilities; forcing it produces unreadable arbitrary-value soup or is simply impossible (keyframes/counters/masks). |
-| Approach | Foundation + Home pilot, then rollout | No test suite exists; validate the system on the highest-value page before broad rollout. |
-| Dynamic theming | CSS custom properties | Technology pages inject `accentColor` via JS template strings today. Replace with `style={{ '--accent': color }}` + `var(--accent)` in the shared layer. Clean, performant, works with Tailwind v4 arbitrary values. |
-| Pilot page | Home (`app/page.tsx`) | Most-visited; exercises the most shared patterns (hero, orbs, eyebrow, awards, portfolio cards, buttons). Best real-world proof. |
-| Regression guard | Lightweight Playwright screenshot diffs | Catches accidental pixel shifts automatically given there is no test suite. |
+| Decision         | Choice                                  | Rationale                                                                                                                                                                                                            |
+| ---------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| End-state        | Pragmatic hybrid                        | ~30% of CSS can't be clean utilities; forcing it produces unreadable arbitrary-value soup or is simply impossible (keyframes/counters/masks).                                                                        |
+| Approach         | Foundation + Home pilot, then rollout   | No test suite exists; validate the system on the highest-value page before broad rollout.                                                                                                                            |
+| Dynamic theming  | CSS custom properties                   | Technology pages inject `accentColor` via JS template strings today. Replace with `style={{ '--accent': color }}` + `var(--accent)` in the shared layer. Clean, performant, works with Tailwind v4 arbitrary values. |
+| Pilot page       | Home (`app/page.tsx`)                   | Most-visited; exercises the most shared patterns (hero, orbs, eyebrow, awards, portfolio cards, buttons). Best real-world proof.                                                                                     |
+| Regression guard | Lightweight Playwright screenshot diffs | Catches accidental pixel shifts automatically given there is no test suite.                                                                                                                                          |
 
 ## Architecture: 3-Layer Styling System
 
@@ -63,6 +64,7 @@ Layer 3 — Page/feature components
 ```
 
 **Routing principle for every CSS rule encountered:**
+
 - Trivial (padding/flex/grid/color/simple hover) → Tailwind utility.
 - Arbitrary value (clamp type scale, gradient, custom shadow) → Tailwind arbitrary value,
   or a Layer-1 `@theme` token / `@utility` if it repeats.
@@ -73,17 +75,17 @@ Layer 3 — Page/feature components
 
 Derived from patterns observed repeating across the codebase:
 
-| Component | Replaces (occurrences) | Key props |
-|-----------|------------------------|-----------|
-| `GlowOrb` | radial-gradient blur orbs (7+ files) | `color`, `size`, `opacity`, `position`, `animation` |
-| `Eyebrow` | gold accent label w/ dot/lines (every page) | `children`, `align`, `variant` |
-| `GradientText` | gradient-clip shimmer headings (4+ files) | `as`, `animate` |
-| `Button` | primary/ghost/pill CTAs (6+ files) | `variant`, `size`, `as` (link/button) |
-| `SectionHeading` | eyebrow + title + subtitle blocks (services, about) | `eyebrow`, `title`, `subtitle`, `align` |
-| `Marquee` | infinite scroll strips (4 files) | `speed`, `direction`, `pauseOnHover` |
-| `ShineImageCard` | hover-zoom + shine cards (3 files) | `src`, `badge`, `tag` |
-| `GrainOverlay` | SVG fractal-noise overlay (4+ files) | `opacity?` |
-| `WaveDivider` | section wave SVG transitions (services, about) | `from`, `to` |
+| Component        | Replaces (occurrences)                              | Key props                                           |
+| ---------------- | --------------------------------------------------- | --------------------------------------------------- |
+| `GlowOrb`        | radial-gradient blur orbs (7+ files)                | `color`, `size`, `opacity`, `position`, `animation` |
+| `Eyebrow`        | gold accent label w/ dot/lines (every page)         | `children`, `align`, `variant`                      |
+| `GradientText`   | gradient-clip shimmer headings (4+ files)           | `as`, `animate`                                     |
+| `Button`         | primary/ghost/pill CTAs (6+ files)                  | `variant`, `size`, `as` (link/button)               |
+| `SectionHeading` | eyebrow + title + subtitle blocks (services, about) | `eyebrow`, `title`, `subtitle`, `align`             |
+| `Marquee`        | infinite scroll strips (4 files)                    | `speed`, `direction`, `pauseOnHover`                |
+| `ShineImageCard` | hover-zoom + shine cards (3 files)                  | `src`, `badge`, `tag`                               |
+| `GrainOverlay`   | SVG fractal-noise overlay (4+ files)                | `opacity?`                                          |
+| `WaveDivider`    | section wave SVG transitions (services, about)      | `from`, `to`                                        |
 
 Plus `lib/motion.ts` exporting shared easing curves (e.g. `EASE.smooth = [0.16,1,0.3,1]`)
 currently copy-pasted across components.
@@ -121,17 +123,20 @@ accent-agnostic.
 ## Phased Rollout
 
 ### Phase 0 — Foundation (no visual change)
+
 - Create `components/ui/` primitives (extracted from representative usages).
 - Extend `app/globals.css`: `@theme` tokens, `@utility` effects, deduped `@keyframes`.
 - Add `lib/motion.ts`.
 - Stand up Playwright harness; capture baselines for all routes.
 
 ### Phase 1 — Home pilot (`app/page.tsx`)
+
 - Full conversion using Phase-0 primitives. System gets battle-tested; primitive props
   finalized here. Any gap found becomes a Phase-0 fix.
 - Zero-diff reconcile against baseline.
 
 ### Phase 2 — Rollout (one file per step, screenshot-gated)
+
 1. `app/services` (sticky menus, marquees, `:nth-child`, waves)
 2. `app/about-us` (showcase carousel, tickers — largest file)
 3. `app/technology` + `TechStackSection` + `TechStickyFeature` (proves `--accent`)
@@ -152,10 +157,10 @@ accent-agnostic.
 
 ## Risks & Mitigations
 
-| Risk | Mitigation |
-|------|------------|
-| Subtle visual regression (no test suite) | Playwright screenshot diffs gate every file. |
-| Primitive API churns mid-rollout | Pilot the full Home page first to finalize props before broad rollout. |
-| Dynamic accent edge cases | Technology stack converted early (Phase 2 step 3) to surface `--accent` issues. |
+| Risk                                                               | Mitigation                                                                             |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Subtle visual regression (no test suite)                           | Playwright screenshot diffs gate every file.                                           |
+| Primitive API churns mid-rollout                                   | Pilot the full Home page first to finalize props before broad rollout.                 |
+| Dynamic accent edge cases                                          | Technology stack converted early (Phase 2 step 3) to surface `--accent` issues.        |
 | Scroll-driven / JS-mutated styles (parallax, 3D tilt, sticky sync) | These stay JS-driven; not forced into CSS/utilities. Documented as expected leftovers. |
-| Scope creep into behavior/visual changes | Explicit non-goals; refactor-only discipline; zero-diff requirement. |
+| Scope creep into behavior/visual changes                           | Explicit non-goals; refactor-only discipline; zero-diff requirement.                   |

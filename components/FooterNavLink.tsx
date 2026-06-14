@@ -1,15 +1,15 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { useFooterModal } from "@/components/FooterServiceModal";
+import Link from 'next/link'
+import { useFooterModal } from '@/components/FooterServiceModal'
 
 function isExternal(url: string): boolean {
-  return url.startsWith("http") && !url.includes("triolla.io");
+  return url.startsWith('http') && !url.includes('triolla.io')
 }
 
 function toHref(url: string): string {
-  if (isExternal(url)) return url;
-  return url.replace(/^https?:\/\/triolla\.io/, "") || "/";
+  if (isExternal(url)) return url
+  return url.replace(/^https?:\/\/triolla\.io/, '') || '/'
 }
 
 /**
@@ -18,17 +18,9 @@ function toHref(url: string): string {
  * a `<button>` that opens that modal (styled identically to a link via
  * `.footer-nav-link`). Otherwise it renders a normal internal/external link.
  */
-export function FooterNavLink({
-  label,
-  url,
-  serviceIndex,
-}: {
-  label: string;
-  url: string;
-  serviceIndex: number | null;
-}) {
-  const modal = useFooterModal();
-  const cls = "footer-nav-link";
+export function FooterNavLink({ label, url, serviceIndex }: { label: string; url: string; serviceIndex: number | null }) {
+  const modal = useFooterModal()
+  const cls = 'footer-nav-link'
 
   if (serviceIndex != null && modal) {
     return (
@@ -41,10 +33,10 @@ export function FooterNavLink({
       >
         {label}
       </button>
-    );
+    )
   }
 
-  const href = toHref(url);
+  const href = toHref(url)
   return isExternal(url) ? (
     <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
       {label}
@@ -53,5 +45,5 @@ export function FooterNavLink({
     <Link href={href} className={cls}>
       {label}
     </Link>
-  );
+  )
 }

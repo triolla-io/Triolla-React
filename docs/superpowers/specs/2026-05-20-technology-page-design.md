@@ -16,10 +16,10 @@ The page uses the same dark design language as `cyber-security` and `app/page.ts
 
 ## 2. Files
 
-| File | Action |
-|---|---|
-| `lib/queries.ts` | Add `GET_TECHNOLOGY_PAGE` query constant |
-| `app/technology/page.tsx` | New Server Component — data fetching + page JSX |
+| File                               | Action                                                               |
+| ---------------------------------- | -------------------------------------------------------------------- |
+| `lib/queries.ts`                   | Add `GET_TECHNOLOGY_PAGE` query constant                             |
+| `app/technology/page.tsx`          | New Server Component — data fetching + page JSX                      |
 | `components/TechStickyFeature.tsx` | New Client Component — scroll-driven sticky split-screen (section 4) |
 
 No existing files are modified except `lib/queries.ts`.
@@ -40,25 +40,63 @@ query GetTechnologyPage {
           headerSubText
           buttonText
           headerBgColor
-          headerBgOverlayLayer { node { sourceUrl } }
+          headerBgOverlayLayer {
+            node {
+              sourceUrl
+            }
+          }
 
-          companyList { companyName }
+          companyList {
+            companyName
+          }
 
           midImageRightTitle
-          midImageOne   { node { sourceUrl } }
-          midImageTwo   { node { sourceUrl } }
+          midImageOne {
+            node {
+              sourceUrl
+            }
+          }
+          midImageTwo {
+            node {
+              sourceUrl
+            }
+          }
           midImageTwoTitle
-          midImageThree { node { sourceUrl } }
+          midImageThree {
+            node {
+              sourceUrl
+            }
+          }
           midImageThreeTitle
-          midImageFour  { node { sourceUrl } }
+          midImageFour {
+            node {
+              sourceUrl
+            }
+          }
           midImageFourTitle
-          midImageFive  { node { sourceUrl } }
+          midImageFive {
+            node {
+              sourceUrl
+            }
+          }
           midImageFiveTitle
-          midImageSix   { node { sourceUrl } }
+          midImageSix {
+            node {
+              sourceUrl
+            }
+          }
           midImageSixTitle
-          midImageSeven { node { sourceUrl } }
+          midImageSeven {
+            node {
+              sourceUrl
+            }
+          }
           midImageSevenTitle
-          midImageEight { node { sourceUrl } }
+          midImageEight {
+            node {
+              sourceUrl
+            }
+          }
           midImageEightTitle
 
           fourmidTitle
@@ -67,7 +105,11 @@ query GetTechnologyPage {
           fourtext
 
           threeConent {
-            lftimage { node { sourceUrl } }
+            lftimage {
+              node {
+                sourceUrl
+              }
+            }
             threincontent {
               threintitle
               threincontent
@@ -78,7 +120,10 @@ query GetTechnologyPage {
           threbottomLinkText
           threbottomButtonLink
 
-          numberList { number numtitle }
+          numberList {
+            number
+            numtitle
+          }
 
           qatitle
           qatext
@@ -121,6 +166,7 @@ Server Component. Pattern identical to `app/cyber-security/page.tsx`:
 **Layout:** Full viewport (`min-h-screen`), `flex flex-col justify-end`, `pb-20 pt-32`
 
 **Background layer (z-0):**
+
 - `headerBgOverlayLayer` image fills the entire section via `position: absolute; inset: 0; object-fit: cover`
 - Ken Burns animation: `animation: techKenBurns 20s ease-out forwards` — slow scale from 1.08 to 1.0, giving a cinematic zoom-in-then-settle feel
 - Dark overlay: `rgba(0,0,0,0.55)` absolute layer above the image
@@ -128,6 +174,7 @@ Server Component. Pattern identical to `app/cyber-security/page.tsx`:
 - Two ambient gold orbs (same `.hero-orb` pattern from homepage)
 
 **Content layer (z-10), `max-w-[1400px] mx-auto px-6 lg:px-10`:**
+
 - Eyebrow: `headerSubText` in a gold pill badge (`FadeIn delay=0.05`)
 - Headline: `headerTitle` at `text-[clamp(68px,11vw,180px)] font-black tracking-[-0.03em] leading-[0.88]` with `textShimmer` gradient animation (`FadeIn delay=0.12`)
 - CTA row (right-aligned, below a `border-t border-white/10`): gold pill button with `buttonText` + arrow SVG (`FadeIn delay=0.22`)
@@ -165,6 +212,7 @@ On hover: item color transitions to `accentColor` (0.2s)
 **Grid:** `midImageTwo` through `midImageEight` (up to 7 cards) in a `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6` using `SectionReveal` for stagger.
 
 Each grid card:
+
 - `rounded-[20px] overflow-hidden relative` with `aspect-[4/3]` image fill
 - Title in an overlay bar at the bottom: absolute bottom with a gradient scrim `linear-gradient(to top, rgba(0,0,0,0.8), transparent)`
 - Hover: `translateY(-8px)`, gold glow border, image scales `1.06`
@@ -179,28 +227,30 @@ Cards with no image are skipped (`null` guard on `sourceUrl`).
 This is the WOW centerpiece. Implemented as `components/TechStickyFeature.tsx` (`"use client"`).
 
 **Props:**
+
 ```ts
 interface TechStickyFeatureProps {
-  fourmidTitle: string | null;
-  fourtitleone: string | null;
-  fourtitletwo: string | null;
-  fourtext: string | null;
+  fourmidTitle: string | null
+  fourtitleone: string | null
+  fourtitletwo: string | null
+  fourtext: string | null
   threeConent: Array<{
-    lftimage: { node: { sourceUrl: string } } | null;
+    lftimage: { node: { sourceUrl: string } } | null
     threincontent: Array<{
-      threintitle: string | null;
-      threincontent: string | null;
-      tagList: string | null;
-    }> | null;
-  }> | null;
-  threbottomText: string | null;
-  threbottomLinkText: string | null;
-  threbottomButtonLink: string | null;
-  accentColor: string;
+      threintitle: string | null
+      threincontent: string | null
+      tagList: string | null
+    }> | null
+  }> | null
+  threbottomText: string | null
+  threbottomLinkText: string | null
+  threbottomButtonLink: string | null
+  accentColor: string
 }
 ```
 
 **Section header** (above the split layout):
+
 - `fourmidTitle` — large heading `clamp(36px,5vw,72px) font-black`
 - `fourtitleone` + `fourtitletwo` — two-column label strip, `text-sm font-bold tracking-widest uppercase text-gray-500`
 - `fourtext` — WP WYSIWYG HTML, rendered via `dangerouslySetInnerHTML`. Content originates solely from the trusted WP backend (same pattern used throughout the codebase in `cyber-security/page.tsx` and `FAQSection.tsx`). No user input reaches this field.
@@ -208,12 +258,14 @@ interface TechStickyFeatureProps {
 **Split layout (desktop `lg:flex`, mobile stacked):**
 
 Left column (`lg:w-[45%] lg:sticky lg:top-[120px] lg:self-start`):
+
 - Renders the `lftimage` of the currently active `threeConent` entry
 - Image styled `rounded-[28px] overflow-hidden aspect-[3/4] w-full object-cover`
 - Cross-fade: controlled by `activeIndex` state. Both images are rendered with `position: absolute`; the active one has `opacity: 1`, inactive ones `opacity: 0`. Transition: `opacity 0.45s ease`.
 - A gold glow orb behind the image (`position: absolute; blur: 120px; accentColor + opacity 0.12`)
 
 Right column (`lg:w-[55%]`):
+
 - Each `threeConent` entry is a panel. A `ref` is attached to each panel. An `IntersectionObserver` (threshold: 0.4) watches all panel refs. When a panel enters view, `setActiveIndex(i)` is called, triggering the left image cross-fade.
 - Each panel: `py-16 border-b border-white/[0.07]`
 - Each `threincontent` item within the panel:
@@ -222,6 +274,7 @@ Right column (`lg:w-[55%]`):
   - `tagList` — split on comma, each token rendered as a gold pill chip
 
 **Footer CTA** (below the split layout):
+
 - `threbottomText` as a subheading
 - `threbottomLinkText` as a gold pill button linking to `threbottomButtonLink`
 - Rendered only when all three fields are non-null
@@ -237,6 +290,7 @@ Identical markup and styles to the clients section in `app/page.tsx`. No new com
 **Data:** `ts.clientsLogos` to `clientLogos[]`, split into `logoRow1` (first half) + `logoRow2` (second half).
 
 **Renders:**
+
 - `ts.ourClientsHeading` eyebrow with flanking lines
 - `ts.ourClientBigText` large heading
 - Dual marquee rows: row 1 scrolls left (`.marquee-track`), row 2 scrolls right (`.marquee-track--reverse`)
@@ -256,6 +310,7 @@ Identical markup and styles to the clients section in `app/page.tsx`. No new com
 **Desktop:** Horizontal scrollable `flex overflow-x-auto pb-12 hide-scrollbar gap-8 px-10 snap-x` inside a `SectionReveal`.
 
 Each step card (`min-w-[260px] shrink-0 snap-center`):
+
 - Ghost number: `number` field at `120px font-weight-900 opacity-[0.025]` positioned absolute top-left behind
 - Gold dot (14px circle with gold box-shadow) + connecting line (same pattern as cyber-security `cs-timeline-item__dot` + `__line`)
 - `numtitle` as `text-xl font-bold mt-8` — passed through `htmlToLines` to handle any `<br>` tags
@@ -270,11 +325,7 @@ Each step card (`min-w-[260px] shrink-0 snap-center`):
 Uses the existing `FAQSection` component without any modification.
 
 ```tsx
-<FAQSection
-  heading={tp.qatitle ?? null}
-  subtext={tp.qatext ? stripHtml(tp.qatext) : null}
-  items={faqItems}
-/>
+<FAQSection heading={tp.qatitle ?? null} subtext={tp.qatext ? stripHtml(tp.qatext) : null} items={faqItems} />
 ```
 
 `faqItems = (tp.qaList ?? []).filter(q => q?.question).map(q => ({ faqQuestion: q.question as string, faqAnswer: q.answer ?? "" }))`
@@ -311,16 +362,16 @@ Identical to all other pages.
 
 ## 7. Animation Inventory
 
-| Name | Where | Technique |
-|---|---|---|
-| `techKenBurns` | Hero bg image | CSS keyframe: scale 1.08 to 1.0, 20s forwards |
-| `textShimmer` | Hero headline | Reuse existing from `app/page.tsx` |
-| `techMarquee` | Section 2 | CSS keyframe: translateX 0 to -50%, 40s linear infinite |
-| `techCardFloat` | Section 3 grid cards | CSS keyframe: translateY 0 to -6px, staggered per card |
-| Image cross-fade | Section 4 left image | React state + CSS opacity transition 0.45s |
-| IntersectionObserver | Section 4 right panels | Drives `activeIndex` state |
-| `FadeIn` / `SectionReveal` | All sections | Existing components, whileInView once: true |
-| `CountUpNumber` | Section 6 ghost numbers | Existing component |
+| Name                       | Where                   | Technique                                               |
+| -------------------------- | ----------------------- | ------------------------------------------------------- |
+| `techKenBurns`             | Hero bg image           | CSS keyframe: scale 1.08 to 1.0, 20s forwards           |
+| `textShimmer`              | Hero headline           | Reuse existing from `app/page.tsx`                      |
+| `techMarquee`              | Section 2               | CSS keyframe: translateX 0 to -50%, 40s linear infinite |
+| `techCardFloat`            | Section 3 grid cards    | CSS keyframe: translateY 0 to -6px, staggered per card  |
+| Image cross-fade           | Section 4 left image    | React state + CSS opacity transition 0.45s              |
+| IntersectionObserver       | Section 4 right panels  | Drives `activeIndex` state                              |
+| `FadeIn` / `SectionReveal` | All sections            | Existing components, whileInView once: true             |
+| `CountUpNumber`            | Section 6 ghost numbers | Existing component                                      |
 
 ---
 
@@ -328,16 +379,16 @@ Identical to all other pages.
 
 Every section has an explicit guard:
 
-| Section | Guard condition |
-|---|---|
-| Hero | Always renders; fields default to empty string |
-| Marquee | `companyList.length > 0` |
-| Tech Grid | At least one image field is non-null |
-| Sticky Feature | `threeConent.length > 0` |
-| Clients | `clientLogos.length > 0` |
-| Steps | `numberList.length > 0` |
-| FAQ | `faqItems.length > 0` (handled by `FAQSection`) |
-| Contact | Always renders (theme settings) |
+| Section        | Guard condition                                 |
+| -------------- | ----------------------------------------------- |
+| Hero           | Always renders; fields default to empty string  |
+| Marquee        | `companyList.length > 0`                        |
+| Tech Grid      | At least one image field is non-null            |
+| Sticky Feature | `threeConent.length > 0`                        |
+| Clients        | `clientLogos.length > 0`                        |
+| Steps          | `numberList.length > 0`                         |
+| FAQ            | `faqItems.length > 0` (handled by `FAQSection`) |
+| Contact        | Always renders (theme settings)                 |
 
 ---
 
@@ -360,6 +411,7 @@ app/technology/page.tsx          <- Server Component
 ## 10. No Hardcoded Content
 
 The following are explicitly not hardcoded:
+
 - Page heading text
 - Company names in the marquee
 - Any section heading or body copy

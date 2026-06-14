@@ -44,14 +44,14 @@ This is a `"use client"` wrapper that staggers its direct children into view. Ea
 - [ ] **Step 1: Create `components/SectionReveal.tsx`**
 
 ```tsx
-"use client";
+'use client'
 
-import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { motion } from 'framer-motion'
+import { ReactNode } from 'react'
 
 interface SectionRevealProps {
-  children: ReactNode | ReactNode[];
-  className?: string;
+  children: ReactNode | ReactNode[]
+  className?: string
 }
 
 const container = {
@@ -61,32 +61,23 @@ const container = {
       staggerChildren: 0.12,
     },
   },
-};
+}
 
 const item = {
   hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+}
 
-export function SectionReveal({
-  children,
-  className = "",
-}: SectionRevealProps) {
+export function SectionReveal({ children, className = '' }: SectionRevealProps) {
   return (
-    <motion.div
-      className={className}
-      variants={container}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: "-80px" }}
-    >
+    <motion.div className={className} variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
       {(Array.isArray(children) ? children : [children]).map((child, i) => (
         <motion.div key={i} variants={item}>
           {child}
         </motion.div>
       ))}
     </motion.div>
-  );
+  )
 }
 ```
 
@@ -118,23 +109,23 @@ git commit -m "feat: add SectionReveal staggered scroll animation component"
 - [ ] **Step 1: Create `components/FAQAccordion.tsx`**
 
 ```tsx
-"use client";
+'use client'
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface FAQItem {
-  faqQuestion: string;
-  faqAnswer: string;
+  faqQuestion: string
+  faqAnswer: string
 }
 
 interface FAQAccordionProps {
-  items: FAQItem[];
-  className?: string;
+  items: FAQItem[]
+  className?: string
 }
 
-export function FAQAccordion({ items, className = "" }: FAQAccordionProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+export function FAQAccordion({ items, className = '' }: FAQAccordionProps) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
     <div className={className}>
@@ -144,22 +135,10 @@ export function FAQAccordion({ items, className = "" }: FAQAccordionProps) {
             className="w-full flex justify-between items-center py-6 text-left gap-4"
             onClick={() => setOpenIndex(openIndex === i ? null : i)}
           >
-            <span className="text-[22px] font-semibold">
-              {item.faqQuestion}
-            </span>
-            <motion.div
-              animate={{ rotate: openIndex === i ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="shrink-0"
-            >
+            <span className="text-[22px] font-semibold">{item.faqQuestion}</span>
+            <motion.div animate={{ rotate: openIndex === i ? 180 : 0 }} transition={{ duration: 0.2 }} className="shrink-0">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M5 7.5L10 12.5L15 7.5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </motion.div>
           </button>
@@ -167,22 +146,19 @@ export function FAQAccordion({ items, className = "" }: FAQAccordionProps) {
             {openIndex === i && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
+                animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                style={{ overflow: "hidden" }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                style={{ overflow: 'hidden' }}
               >
-                <div
-                  className="text-gray-400 text-[18px] leading-relaxed pb-6"
-                  dangerouslySetInnerHTML={{ __html: item.faqAnswer }}
-                />
+                <div className="text-gray-400 text-[18px] leading-relaxed pb-6" dangerouslySetInnerHTML={{ __html: item.faqAnswer }} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       ))}
     </div>
-  );
+  )
 }
 ```
 
@@ -214,23 +190,20 @@ Responsive logo grid. Each logo is grayscale by default, full-color on hover. Us
 - [ ] **Step 1: Create `components/ClientLogoStrip.tsx`**
 
 ```tsx
-import { SectionReveal } from "./SectionReveal";
+import { SectionReveal } from './SectionReveal'
 
 interface Logo {
-  sourceUrl: string;
-  name: string;
+  sourceUrl: string
+  name: string
 }
 
 interface ClientLogoStripProps {
-  logos: Logo[];
-  className?: string;
+  logos: Logo[]
+  className?: string
 }
 
-export function ClientLogoStrip({
-  logos,
-  className = "",
-}: ClientLogoStripProps) {
-  if (!logos || logos.length === 0) return null;
+export function ClientLogoStrip({ logos, className = '' }: ClientLogoStripProps) {
+  if (!logos || logos.length === 0) return null
 
   return (
     <div className={className}>
@@ -246,7 +219,7 @@ export function ClientLogoStrip({
         ))}
       </SectionReveal>
     </div>
-  );
+  )
 }
 ```
 
@@ -276,24 +249,19 @@ git commit -m "feat: add ClientLogoStrip logo grid component"
 - [ ] **Step 1: Create `components/HeroHeadline.tsx`**
 
 ```tsx
-"use client";
+'use client'
 
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion'
 
 interface HeroHeadlineProps {
-  headline: string;
-  subtext?: string;
-  headlineClassName?: string;
-  subtextClassName?: string;
+  headline: string
+  subtext?: string
+  headlineClassName?: string
+  subtextClassName?: string
 }
 
-export function HeroHeadline({
-  headline,
-  subtext,
-  headlineClassName = "",
-  subtextClassName = "",
-}: HeroHeadlineProps) {
-  const words = headline.split(" ");
+export function HeroHeadline({ headline, subtext, headlineClassName = '', subtextClassName = '' }: HeroHeadlineProps) {
+  const words = headline.split(' ')
 
   return (
     <>
@@ -303,7 +271,7 @@ export function HeroHeadline({
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: i * 0.08, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: i * 0.08, ease: 'easeOut' }}
             className="inline-block mr-[0.25em]"
           >
             {word}
@@ -321,7 +289,7 @@ export function HeroHeadline({
         </motion.p>
       )}
     </>
-  );
+  )
 }
 ```
 
@@ -351,41 +319,35 @@ git commit -m "feat: add HeroHeadline word-by-word stagger animation component"
 - [ ] **Step 1: Create `components/CountUpNumber.tsx`**
 
 ```tsx
-"use client";
+'use client'
 
-import { useEffect, useRef, useState } from "react";
-import { useInView } from "framer-motion";
+import { useEffect, useRef, useState } from 'react'
+import { useInView } from 'framer-motion'
 
 interface CountUpNumberProps {
-  target: number;
-  prefix?: string;
-  suffix?: string;
-  duration?: number;
-  className?: string;
+  target: number
+  prefix?: string
+  suffix?: string
+  duration?: number
+  className?: string
 }
 
-export function CountUpNumber({
-  target,
-  prefix = "",
-  suffix = "",
-  duration = 1500,
-  className = "",
-}: CountUpNumberProps) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+export function CountUpNumber({ target, prefix = '', suffix = '', duration = 1500, className = '' }: CountUpNumberProps) {
+  const [count, setCount] = useState(0)
+  const ref = useRef<HTMLSpanElement>(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   useEffect(() => {
-    if (!isInView) return;
-    const start = performance.now();
+    if (!isInView) return
+    const start = performance.now()
     const tick = (now: number) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      setCount(Math.floor(progress * target));
-      if (progress < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [isInView, target, duration]);
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      setCount(Math.floor(progress * target))
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [isInView, target, duration])
 
   return (
     <span ref={ref} className={className}>
@@ -393,7 +355,7 @@ export function CountUpNumber({
       {count}
       {suffix}
     </span>
-  );
+  )
 }
 ```
 
@@ -423,23 +385,23 @@ git commit -m "feat: add CountUpNumber viewport-triggered count-up animation"
 - [ ] **Step 1: Create `components/LearnCarousel.tsx`**
 
 ```tsx
-"use client";
+'use client'
 
-import { useRef } from "react";
-import { motion } from "framer-motion";
+import { useRef } from 'react'
+import { motion } from 'framer-motion'
 
 interface Slide {
-  learntext: string;
-  learnimage?: { node?: { sourceUrl?: string } };
-  learnvideo?: { node?: { mediaItemUrl?: string } };
+  learntext: string
+  learnimage?: { node?: { sourceUrl?: string } }
+  learnvideo?: { node?: { mediaItemUrl?: string } }
 }
 
 interface LearnCarouselProps {
-  slides: Slide[];
+  slides: Slide[]
 }
 
 export function LearnCarousel({ slides }: LearnCarouselProps) {
-  const constraintsRef = useRef<HTMLDivElement>(null);
+  const constraintsRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="relative overflow-hidden" ref={constraintsRef}>
@@ -448,7 +410,7 @@ export function LearnCarousel({ slides }: LearnCarouselProps) {
         dragConstraints={constraintsRef}
         dragElastic={0.1}
         className="flex gap-8 cursor-grab active:cursor-grabbing pb-16 px-10"
-        style={{ width: "max-content" }}
+        style={{ width: 'max-content' }}
       >
         {slides.map((slide, i) => (
           <div key={i} className="w-[220px] md:w-[260px] shrink-0 group">
@@ -468,14 +430,12 @@ export function LearnCarousel({ slides }: LearnCarouselProps) {
                 </div>
               )}
             </div>
-            <h4 className="text-2xl font-bold group-hover:text-yellow-400 transition-colors line-clamp-2">
-              {slide.learntext}
-            </h4>
+            <h4 className="text-2xl font-bold group-hover:text-yellow-400 transition-colors line-clamp-2">{slide.learntext}</h4>
           </div>
         ))}
       </motion.div>
     </div>
-  );
+  )
 }
 ```
 
@@ -562,8 +522,8 @@ git commit -m "feat: add faqItems and clientLogos fields to services and about p
 Add to the top of `components/Header.tsx`:
 
 ```tsx
-import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from 'next/navigation'
+import { AnimatePresence, motion } from 'framer-motion'
 ```
 
 - [ ] **Step 2: Add pathname and navLinks inside the component**
@@ -571,13 +531,13 @@ import { AnimatePresence, motion } from "framer-motion";
 After `const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);`, add:
 
 ```tsx
-const pathname = usePathname();
+const pathname = usePathname()
 const navLinks = [
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/services", label: "Services" },
-  { href: "/technology", label: "Technology" },
-  { href: "/about-us", label: "The Company" },
-];
+  { href: '/portfolio', label: 'Portfolio' },
+  { href: '/services', label: 'Services' },
+  { href: '/technology', label: 'Technology' },
+  { href: '/about-us', label: 'The Company' },
+]
 ```
 
 - [ ] **Step 3: Replace desktop nav with active-state version**
@@ -590,12 +550,10 @@ Replace the entire `<nav className="hidden lg:flex space-x-10">` block:
     <Link
       key={href}
       href={href}
-      className={`relative text-[15px] font-medium transition-colors hover:text-yellow-400 ${pathname === href ? "text-yellow-400" : ""}`}
+      className={`relative text-[15px] font-medium transition-colors hover:text-yellow-400 ${pathname === href ? 'text-yellow-400' : ''}`}
     >
       {label}
-      {pathname === href && (
-        <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-yellow-400 rounded-full" />
-      )}
+      {pathname === href && <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-yellow-400 rounded-full" />}
     </Link>
   ))}
 </nav>
@@ -612,7 +570,7 @@ Replace the `{isMobileMenuOpen && ( <div ...> )}` block at the bottom of the Hea
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className="lg:hidden absolute top-full left-0 w-full bg-black border-t border-white/10 p-4 shadow-xl"
     >
       <nav className="flex flex-col space-y-4">
@@ -620,16 +578,13 @@ Replace the `{isMobileMenuOpen && ( <div ...> )}` block at the bottom of the Hea
           <Link
             key={href}
             href={href}
-            className={`text-lg font-medium transition-colors hover:text-yellow-400 ${pathname === href ? "text-yellow-400" : ""}`}
+            className={`text-lg font-medium transition-colors hover:text-yellow-400 ${pathname === href ? 'text-yellow-400' : ''}`}
           >
             {label}
           </Link>
         ))}
         <hr className="border-white/20" />
-        <Link
-          href="/contact-us"
-          className="text-center bg-white text-black py-2 rounded-full font-medium"
-        >
+        <Link href="/contact-us" className="text-center bg-white text-black py-2 rounded-full font-medium">
           Contact Us
         </Link>
       </nav>
@@ -666,9 +621,9 @@ The homepage is a Server Component. All animation components are client componen
 At the top of `app/page.tsx`, add:
 
 ```tsx
-import { HeroHeadline } from "@/components/HeroHeadline";
-import { SectionReveal } from "@/components/SectionReveal";
-import { CountUpNumber } from "@/components/CountUpNumber";
+import { HeroHeadline } from '@/components/HeroHeadline'
+import { SectionReveal } from '@/components/SectionReveal'
+import { CountUpNumber } from '@/components/CountUpNumber'
 ```
 
 - [ ] **Step 2: Replace hero h1 + h2 with HeroHeadline**
@@ -723,17 +678,13 @@ With (keep all 6 child divs unchanged, just change the outer wrapper):
 In the "About Section", replace:
 
 ```tsx
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-  {/* 4 card divs */}
-</div>
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">{/* 4 card divs */}</div>
 ```
 
 With:
 
 ```tsx
-<SectionReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-  {[card1JSX, card2JSX, card3JSX, card4JSX]}
-</SectionReveal>
+<SectionReveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">{[card1JSX, card2JSX, card3JSX, card4JSX]}</SectionReveal>
 ```
 
 - [ ] **Step 5: Replace awards static numbers with CountUpNumber**
@@ -744,23 +695,23 @@ In the Awards section, replace the 3 number divs:
 {
   /* was: <div className="text-yellow-400 text-6xl font-black mb-4">#1</div> */
 }
-<div className="text-yellow-400 text-6xl font-black mb-4">
+;<div className="text-yellow-400 text-6xl font-black mb-4">
   #<CountUpNumber target={1} duration={800} />
-</div>;
+</div>
 
 {
   /* second #1 card */
 }
-<div className="text-yellow-400 text-6xl font-black mb-4">
+;<div className="text-yellow-400 text-6xl font-black mb-4">
   #<CountUpNumber target={1} duration={800} />
-</div>;
+</div>
 
 {
   /* #2 card */
 }
-<div className="text-yellow-400 text-6xl font-black mb-4">
+;<div className="text-yellow-400 text-6xl font-black mb-4">
   #<CountUpNumber target={2} duration={1000} />
-</div>;
+</div>
 ```
 
 - [ ] **Step 6: Wrap process timeline with SectionReveal**
@@ -862,9 +813,9 @@ git commit -m "feat: add hero stagger, section reveals, and count-up animations 
 At the top of `app/services/page.tsx`, add:
 
 ```tsx
-import { SectionReveal } from "@/components/SectionReveal";
-import { ClientLogoStrip } from "@/components/ClientLogoStrip";
-import { FAQAccordion } from "@/components/FAQAccordion";
+import { SectionReveal } from '@/components/SectionReveal'
+import { ClientLogoStrip } from '@/components/ClientLogoStrip'
+import { FAQAccordion } from '@/components/FAQAccordion'
 ```
 
 - [ ] **Step 2: Map clientLogos and faqItems**
@@ -872,16 +823,13 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 In `ServicesPage`, after the `brandImages` declaration, add:
 
 ```tsx
-const faqItems: { faqQuestion: string; faqAnswer: string }[] =
-  sp.faqItems ?? [];
-const clientLogos: { sourceUrl: string; name: string }[] = (
-  sp.clientLogos ?? []
-)
+const faqItems: { faqQuestion: string; faqAnswer: string }[] = sp.faqItems ?? []
+const clientLogos: { sourceUrl: string; name: string }[] = (sp.clientLogos ?? [])
   .map((l: any) => ({
-    sourceUrl: l.logoImage?.node?.sourceUrl ?? "",
-    name: l.logoName ?? "",
+    sourceUrl: l.logoImage?.node?.sourceUrl ?? '',
+    name: l.logoName ?? '',
   }))
-  .filter((l: { sourceUrl: string }) => l.sourceUrl);
+  .filter((l: { sourceUrl: string }) => l.sourceUrl)
 ```
 
 - [ ] **Step 3: Wrap Product Design section title+text with SectionReveal**
@@ -890,13 +838,8 @@ In the Product Design section, replace:
 
 ```tsx
 <div className="mb-20">
-  <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">
-    {sp.prodtitle}
-  </h3>
-  <div
-    className="text-[22px] leading-relaxed text-gray-400 max-w-3xl"
-    dangerouslySetInnerHTML={{ __html: sp.proddtxt }}
-  />
+  <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">{sp.prodtitle}</h3>
+  <div className="text-[22px] leading-relaxed text-gray-400 max-w-3xl" dangerouslySetInnerHTML={{ __html: sp.proddtxt }} />
 </div>
 ```
 
@@ -905,13 +848,8 @@ With:
 ```tsx
 <SectionReveal className="mb-20">
   {[
-    <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">
-      {sp.prodtitle}
-    </h3>,
-    <div
-      className="text-[22px] leading-relaxed text-gray-400 max-w-3xl"
-      dangerouslySetInnerHTML={{ __html: sp.proddtxt }}
-    />,
+    <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">{sp.prodtitle}</h3>,
+    <div className="text-[22px] leading-relaxed text-gray-400 max-w-3xl" dangerouslySetInnerHTML={{ __html: sp.proddtxt }} />,
   ]}
 </SectionReveal>
 ```
@@ -922,13 +860,8 @@ Replace:
 
 ```tsx
 <div className="mb-20 relative z-10">
-  <h3 className="text-[60px] font-bold mb-6 tracking-tighter">
-    {sp.brandtitle}
-  </h3>
-  <div
-    className="text-[22px] leading-relaxed text-gray-600 max-w-3xl"
-    dangerouslySetInnerHTML={{ __html: sp.brandtext }}
-  />
+  <h3 className="text-[60px] font-bold mb-6 tracking-tighter">{sp.brandtitle}</h3>
+  <div className="text-[22px] leading-relaxed text-gray-600 max-w-3xl" dangerouslySetInnerHTML={{ __html: sp.brandtext }} />
 </div>
 ```
 
@@ -937,13 +870,8 @@ With:
 ```tsx
 <SectionReveal className="mb-20 relative z-10">
   {[
-    <h3 className="text-[60px] font-bold mb-6 tracking-tighter">
-      {sp.brandtitle}
-    </h3>,
-    <div
-      className="text-[22px] leading-relaxed text-gray-600 max-w-3xl"
-      dangerouslySetInnerHTML={{ __html: sp.brandtext }}
-    />,
+    <h3 className="text-[60px] font-bold mb-6 tracking-tighter">{sp.brandtitle}</h3>,
+    <div className="text-[22px] leading-relaxed text-gray-600 max-w-3xl" dangerouslySetInnerHTML={{ __html: sp.brandtext }} />,
   ]}
 </SectionReveal>
 ```
@@ -954,13 +882,8 @@ Replace:
 
 ```tsx
 <div className="mb-20 max-w-4xl">
-  <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">
-    {sp.devtitle}
-  </h3>
-  <div
-    className="text-[22px] leading-relaxed text-gray-400"
-    dangerouslySetInnerHTML={{ __html: sp.devtext }}
-  />
+  <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">{sp.devtitle}</h3>
+  <div className="text-[22px] leading-relaxed text-gray-400" dangerouslySetInnerHTML={{ __html: sp.devtext }} />
 </div>
 ```
 
@@ -969,13 +892,8 @@ With:
 ```tsx
 <SectionReveal className="mb-20 max-w-4xl">
   {[
-    <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">
-      {sp.devtitle}
-    </h3>,
-    <div
-      className="text-[22px] leading-relaxed text-gray-400"
-      dangerouslySetInnerHTML={{ __html: sp.devtext }}
-    />,
+    <h3 className="text-[60px] font-bold mb-6 text-white tracking-tighter">{sp.devtitle}</h3>,
+    <div className="text-[22px] leading-relaxed text-gray-400" dangerouslySetInnerHTML={{ __html: sp.devtext }} />,
   ]}
 </SectionReveal>
 ```
@@ -988,12 +906,10 @@ After the closing `</section>` of the Technology section (the last section befor
 {
   clientLogos.length > 0 && (
     <section className="py-24 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/10">
-      <h3 className="text-[40px] font-bold mb-16 text-center tracking-tighter">
-        Our Clients
-      </h3>
+      <h3 className="text-[40px] font-bold mb-16 text-center tracking-tighter">Our Clients</h3>
       <ClientLogoStrip logos={clientLogos} />
     </section>
-  );
+  )
 }
 ```
 
@@ -1003,12 +919,10 @@ After the closing `</section>` of the Technology section (the last section befor
 {
   faqItems.length > 0 && (
     <section className="py-24 max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8">
-      <h3 className="text-[50px] font-bold mb-16 tracking-tighter">
-        Frequently Asked Questions
-      </h3>
+      <h3 className="text-[50px] font-bold mb-16 tracking-tighter">Frequently Asked Questions</h3>
       <FAQAccordion items={faqItems} />
     </section>
-  );
+  )
 }
 ```
 
@@ -1038,10 +952,10 @@ git commit -m "feat: add section reveals, ClientLogoStrip, and FAQAccordion to s
 At the top of `app/about-us/page.tsx`, add:
 
 ```tsx
-import { SectionReveal } from "@/components/SectionReveal";
-import { ClientLogoStrip } from "@/components/ClientLogoStrip";
-import { FAQAccordion } from "@/components/FAQAccordion";
-import { LearnCarousel } from "@/components/LearnCarousel";
+import { SectionReveal } from '@/components/SectionReveal'
+import { ClientLogoStrip } from '@/components/ClientLogoStrip'
+import { FAQAccordion } from '@/components/FAQAccordion'
+import { LearnCarousel } from '@/components/LearnCarousel'
 ```
 
 - [ ] **Step 2: Map clientLogos and faqItems**
@@ -1049,16 +963,13 @@ import { LearnCarousel } from "@/components/LearnCarousel";
 After `const ap = await getAboutData();`, add:
 
 ```tsx
-const faqItems: { faqQuestion: string; faqAnswer: string }[] =
-  ap.faqItems ?? [];
-const clientLogos: { sourceUrl: string; name: string }[] = (
-  ap.clientLogos ?? []
-)
+const faqItems: { faqQuestion: string; faqAnswer: string }[] = ap.faqItems ?? []
+const clientLogos: { sourceUrl: string; name: string }[] = (ap.clientLogos ?? [])
   .map((l: any) => ({
-    sourceUrl: l.logoImage?.node?.sourceUrl ?? "",
-    name: l.logoName ?? "",
+    sourceUrl: l.logoImage?.node?.sourceUrl ?? '',
+    name: l.logoName ?? '',
   }))
-  .filter((l: { sourceUrl: string }) => l.sourceUrl);
+  .filter((l: { sourceUrl: string }) => l.sourceUrl)
 ```
 
 - [ ] **Step 3: Wrap hero content with SectionReveal**
@@ -1083,9 +994,7 @@ With:
       {ap.headerTitle}
     </h1>,
     <div className="text-[26px] font-bold mb-4 text-black">{ap.boldText}</div>,
-    <p className="text-[26px] leading-[1.3] text-black/80 mb-8 max-w-3xl mx-auto">
-      {ap.shortText}
-    </p>,
+    <p className="text-[26px] leading-[1.3] text-black/80 mb-8 max-w-3xl mx-auto">{ap.shortText}</p>,
     <div
       className="text-black/70 leading-relaxed text-[17px] max-w-4xl mx-auto text-center"
       dangerouslySetInnerHTML={{ __html: ap.moreText }}
@@ -1101,10 +1010,7 @@ In the Services section, replace:
 ```tsx
 <div className="flex flex-col gap-12">
   {ap.servlist?.map((serv: any, i: number) => (
-    <div
-      key={i}
-      className="flex flex-col md:flex-row border-b border-white/10 pb-12 ..."
-    >
+    <div key={i} className="flex flex-col md:flex-row border-b border-white/10 pb-12 ...">
       ...
     </div>
   ))}
@@ -1116,20 +1022,15 @@ With:
 ```tsx
 <SectionReveal className="flex flex-col gap-12">
   {(ap.servlist ?? []).map((serv: any, i: number) => (
-    <div
-      key={i}
-      className="flex flex-col md:flex-row border-b border-white/10 pb-12 last:border-b-0 last:pb-0"
-    >
-      <div className="md:w-1/3 text-[32px] font-bold text-white mb-6 md:mb-0">
-        {serv.servlleftText}
-      </div>
+    <div key={i} className="flex flex-col md:flex-row border-b border-white/10 pb-12 last:border-b-0 last:pb-0">
+      <div className="md:w-1/3 text-[32px] font-bold text-white mb-6 md:mb-0">{serv.servlleftText}</div>
       <div className="md:w-2/3">
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
           {serv.servrightList?.map((item: any, idx: number) => (
             <li key={idx}>
               <Link
-                href={item.itemLink || "#"}
-                target={item.linkTarget || "_self"}
+                href={item.itemLink || '#'}
+                target={item.linkTarget || '_self'}
                 className="text-[20px] text-gray-400 hover:text-yellow-400 transition-colors flex items-center gap-3 group"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-yellow-400 transition-colors"></span>
@@ -1164,11 +1065,7 @@ With:
       className="bg-[#111] p-8 rounded-3xl border border-white/10 hover:border-yellow-400/50 transition-colors group relative overflow-hidden"
     >
       <div className="absolute -right-10 -bottom-10 opacity-5 group-hover:opacity-10 transition-opacity">
-        <img
-          src={item.abthreimage?.node?.sourceUrl}
-          alt=""
-          className="w-64 h-64 object-contain"
-        />
+        <img src={item.abthreimage?.node?.sourceUrl} alt="" className="w-64 h-64 object-contain" />
       </div>
       <div className="mb-12 h-20">
         <img
@@ -1177,14 +1074,8 @@ With:
           className="h-full object-contain group-hover:scale-110 transition-transform duration-500"
         />
       </div>
-      <h5
-        className="text-2xl font-bold mb-4 relative z-10"
-        dangerouslySetInnerHTML={{ __html: item.abteintitle }}
-      />
-      <p
-        className="text-gray-400 text-lg leading-relaxed relative z-10"
-        dangerouslySetInnerHTML={{ __html: item.abthreintext }}
-      />
+      <h5 className="text-2xl font-bold mb-4 relative z-10" dangerouslySetInnerHTML={{ __html: item.abteintitle }} />
+      <p className="text-gray-400 text-lg leading-relaxed relative z-10" dangerouslySetInnerHTML={{ __html: item.abthreintext }} />
     </div>
   ))}
 </SectionReveal>
@@ -1216,12 +1107,10 @@ After the closing `</section>` of the Learn section:
 {
   clientLogos.length > 0 && (
     <section className="py-24 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-      <h3 className="text-[40px] font-bold mb-16 text-center tracking-tighter">
-        Our Clients
-      </h3>
+      <h3 className="text-[40px] font-bold mb-16 text-center tracking-tighter">Our Clients</h3>
       <ClientLogoStrip logos={clientLogos} />
     </section>
-  );
+  )
 }
 ```
 
@@ -1231,12 +1120,10 @@ After the closing `</section>` of the Learn section:
 {
   faqItems.length > 0 && (
     <section className="py-24 max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8">
-      <h3 className="text-[50px] font-bold mb-16 tracking-tighter">
-        Frequently Asked Questions
-      </h3>
+      <h3 className="text-[50px] font-bold mb-16 tracking-tighter">Frequently Asked Questions</h3>
       <FAQAccordion items={faqItems} />
     </section>
-  );
+  )
 }
 ```
 

@@ -1,105 +1,100 @@
-import Link from "next/link";
-import { HeroHeadline } from "@/components/HeroHeadline";
-import { SectionReveal } from "@/components/SectionReveal";
-import { FadeIn } from "@/components/FadeIn";
-import { CountUpNumber } from "@/components/CountUpNumber";
-import { PortfolioGrid } from "@/components/PortfolioGrid";
-import { FAQSection } from "@/components/FAQSection";
-import { GridImageSection } from "@/components/GridImageSection";
-import { WannaChatSection } from "@/components/WannaChatSection";
-import { WhyUsSection } from "@/components/WhyUsSection";
-import AnimatedSteps from "@/components/AnimatedSteps";
-import { ClientsSection } from "@/components/ClientsSection";
-import { GrainOverlay, GlowOrb, Eyebrow } from "@/components/ui";
-import { client } from "@/lib/apollo-client";
-import { GET_HOME_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import type {
-  GetHomePageData,
-  GetThemeSettingsData,
-  HomePageFields,
-  ThemeOptions,
-} from "@/lib/graphql-types";
+import Link from 'next/link'
+import { HeroHeadline } from '@/components/HeroHeadline'
+import { SectionReveal } from '@/components/SectionReveal'
+import { FadeIn } from '@/components/FadeIn'
+import { CountUpNumber } from '@/components/CountUpNumber'
+import { PortfolioGrid } from '@/components/PortfolioGrid'
+import { FAQSection } from '@/components/FAQSection'
+import { GridImageSection } from '@/components/GridImageSection'
+import { WannaChatSection } from '@/components/WannaChatSection'
+import { WhyUsSection } from '@/components/WhyUsSection'
+import AnimatedSteps from '@/components/AnimatedSteps'
+import { ClientsSection } from '@/components/ClientsSection'
+import { GrainOverlay, GlowOrb, Eyebrow } from '@/components/ui'
+import { client } from '@/lib/apollo-client'
+import { GET_HOME_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
+import { gql } from '@apollo/client'
+import type { TypedDocumentNode } from '@apollo/client'
+import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOptions } from '@/lib/graphql-types'
 
 const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
   ${GET_HOME_PAGE}
-`;
+`
 
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
-`;
+`
 
 /* ── WP content helpers ──────────────────────────── */
 
 function stripHtml(html: string): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .trim();
+  return (html ?? '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
 }
 
 function parseAward(wboxTitle: string): { rank: number; label: string } {
-  const rankMatch = wboxTitle.match(/#(\d+)/);
-  const rank = rankMatch ? parseInt(rankMatch[1]) : 1;
+  const rankMatch = wboxTitle.match(/#(\d+)/)
+  const rank = rankMatch ? parseInt(rankMatch[1]) : 1
   const label = wboxTitle
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/#\d+\s*/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  return { rank, label };
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/#\d+\s*/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return { rank, label }
 }
 
 /* ── Data fetching ───────────────────────────────── */
 
 async function getHomeData(): Promise<HomePageFields> {
   try {
-    const { data } = await client.query({ query: HOME_PAGE_QUERY });
-    return data?.page?.template?.homePage ?? ({} as HomePageFields);
+    const { data } = await client.query({ query: HOME_PAGE_QUERY })
+    return data?.page?.template?.homePage ?? ({} as HomePageFields)
   } catch {
-    return {} as HomePageFields;
+    return {} as HomePageFields
   }
 }
 
 async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
-    return data?.themeSetting?.themeOptions ?? null;
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY })
+    return data?.themeSetting?.themeOptions ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
 /* ── Page ────────────────────────────────────────── */
 
 export default async function Home() {
-  const [hp, ts] = await Promise.all([getHomeData(), getThemeSettings()]);
+  const [hp, ts] = await Promise.all([getHomeData(), getThemeSettings()])
 
-  const heroHeadline = stripHtml(hp.topsectitle ?? "");
-  const heroSubtext = stripHtml(hp.toptext ?? "");
+  const heroHeadline = stripHtml(hp.topsectitle ?? '')
+  const heroSubtext = stripHtml(hp.toptext ?? '')
 
-  const winTitle = hp.winTitle ?? "";
-  const winSubtext = hp.winSubtitle ?? "";
+  const winTitle = hp.winTitle ?? ''
+  const winSubtext = hp.winSubtitle ?? ''
 
   const awards = (hp.wboxes ?? []).map((b: any) => ({
-    ...parseAward(b.wboxTitle ?? ""),
+    ...parseAward(b.wboxTitle ?? ''),
     imgUrl: b.winImg?.node?.sourceUrl ?? null,
-  }));
+  }))
 
-  const whyTitle = stripHtml(hp.abthretitle ?? "");
-  const whyText = stripHtml(hp.abtthretext ?? "");
-  const serviceCards: any[] = hp.abthrelist ?? [];
+  const whyTitle = stripHtml(hp.abthretitle ?? '')
+  const whyText = stripHtml(hp.abtthretext ?? '')
+  const serviceCards: any[] = hp.abthrelist ?? []
 
   const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
     .map((item: any) => ({
-      url: item.cLogo?.node?.sourceUrl ?? "",
-      alt: item.cLogo?.node?.altText ?? "",
+      url: item.cLogo?.node?.sourceUrl ?? '',
+      alt: item.cLogo?.node?.altText ?? '',
     }))
-    .filter((l: { url: string }) => l.url);
+    .filter((l: { url: string }) => l.url)
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
@@ -113,27 +108,25 @@ export default async function Home() {
       ? {
           label: ts.cTlvLabel,
           value: ts.cTlvNumber,
-          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
     ts?.cNyLabel && ts?.cNyNumber
       ? {
           label: ts.cNyLabel,
           value: ts.cNyNumber,
-          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
-    ts?.cAddressLabel && ts?.cAddress
-      ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined }
-      : null,
-  ].filter((x): x is NonNullable<typeof x> => x !== null);
+    ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null)
 
   const faqItems = (ts?.questionAnswerList ?? [])
     .filter((q: any) => q?.fQuestion)
     .map((q: any) => ({
       faqQuestion: q.fQuestion as string,
-      faqAnswer: (q.fAnswer ?? "") as string,
-    }));
+      faqAnswer: (q.fAnswer ?? '') as string,
+    }))
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
@@ -147,18 +140,32 @@ export default async function Home() {
         {/* Ambient orb cluster */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <GlowOrb
-            size={900} height={500} shape="ellipse" fade="70%" blur={80}
-            color="rgba(250,204,21,0.14)" animation="pulse" duration={8}
+            size={900}
+            height={500}
+            shape="ellipse"
+            fade="70%"
+            blur={80}
+            color="rgba(250,204,21,0.14)"
+            animation="pulse"
+            duration={8}
             className="bottom-[-10%] left-1/2 -translate-x-1/2 max-md:w-[560px] max-md:h-[320px]"
           />
           <GlowOrb
-            size={600} fade="65%" blur={80}
-            color="rgba(251,146,60,0.06)" animation="pulse-rev" duration={11}
+            size={600}
+            fade="65%"
+            blur={80}
+            color="rgba(251,146,60,0.06)"
+            animation="pulse-rev"
+            duration={11}
             className="top-[-5%] left-[-10%] max-md:w-[400px] max-md:h-[400px] max-md:top-0 max-md:left-[-20%]"
           />
           <GlowOrb
-            size={500} fade="65%" blur={80}
-            color="rgba(250,204,21,0.05)" animation="pulse" duration={14}
+            size={500}
+            fade="65%"
+            blur={80}
+            color="rgba(250,204,21,0.05)"
+            animation="pulse"
+            duration={14}
             className="top-[10%] right-[-8%] max-md:w-[320px] max-md:h-[320px]"
           />
           <div className="hero-grid" />
@@ -169,7 +176,7 @@ export default async function Home() {
           <Eyebrow
             ornament="dot"
             align="center"
-            style={{ "--eb-spacing": "0.25em", "--eb-mb": "28px", "--eb-weight": "600" } as React.CSSProperties}
+            style={{ '--eb-spacing': '0.25em', '--eb-mb': '28px', '--eb-weight': '600' } as React.CSSProperties}
           >
             Product UX/UI design for
           </Eyebrow>
@@ -199,21 +206,12 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           WHY US SECTION
       ══════════════════════════════════════════════ */}
-      <WhyUsSection
-        title={whyTitle}
-        text={whyText}
-        cards={serviceCards}
-        ctaText="Partner with us"
-        ctaLink="/contact-us"
-      />
+      <WhyUsSection title={whyTitle} text={whyText} cards={serviceCards} ctaText="Partner with us" ctaLink="/contact-us" />
 
       {/* ══════════════════════════════════════════════
           AWARDS SECTION
       ══════════════════════════════════════════════ */}
-      <section
-        id="winners-section"
-        className="winners-section mb-16 md:mb-32 relative overflow-hidden"
-      >
+      <section id="winners-section" className="winners-section mb-16 md:mb-32 relative overflow-hidden">
         {/* Ambient light orbs */}
         <div className="winners-orb winners-orb--tl" aria-hidden="true" />
         <div className="winners-orb winners-orb--br" aria-hidden="true" />
@@ -221,12 +219,7 @@ export default async function Home() {
 
         {/* Floating sparkles */}
         {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="winners-sparkle"
-            style={{ "--si": i } as React.CSSProperties}
-            aria-hidden="true"
-          />
+          <div key={i} className="winners-sparkle" style={{ '--si': i } as React.CSSProperties} aria-hidden="true" />
         ))}
 
         <div className="max-w-6xl mx-auto px-6 relative z-10">
@@ -236,40 +229,24 @@ export default async function Home() {
           </FadeIn>
 
           <SectionReveal className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {awards.map(
-              (
-                award: { rank: number; label: string; imgUrl: string | null },
-                i: number,
-              ) => (
-                <div
-                  key={i}
-                  className="award-card group"
-                  style={{ "--ai": i } as React.CSSProperties}
-                >
-                  <div className="award-medal-wrap">
-                    {award.imgUrl ? (
-                      <img
-                        src={award.imgUrl}
-                        alt={award.label}
-                        className="award-medal-img"
-                      />
-                    ) : (
-                      <div className="award-medal-fallback">
-                        #
-                        <CountUpNumber
-                          target={award.rank}
-                          duration={900 + i * 200}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className="award-label">
-                    <span className="award-label__rank">#{award.rank}</span>
-                    <span>{award.label}</span>
-                  </div>
+            {awards.map((award: { rank: number; label: string; imgUrl: string | null }, i: number) => (
+              <div key={i} className="award-card group" style={{ '--ai': i } as React.CSSProperties}>
+                <div className="award-medal-wrap">
+                  {award.imgUrl ? (
+                    <img src={award.imgUrl} alt={award.label} className="award-medal-img" />
+                  ) : (
+                    <div className="award-medal-fallback">
+                      #
+                      <CountUpNumber target={award.rank} duration={900 + i * 200} />
+                    </div>
+                  )}
                 </div>
-              ),
-            )}
+                <div className="award-label">
+                  <span className="award-label__rank">#{award.rank}</span>
+                  <span>{award.label}</span>
+                </div>
+              </div>
+            ))}
           </SectionReveal>
         </div>
       </section>
@@ -290,7 +267,7 @@ export default async function Home() {
       <AnimatedSteps
         steps={(hp.designType ?? []).map((item: any, i: number) => ({
           number: String(i + 1),
-          numtitle: item.dName ?? "",
+          numtitle: item.dName ?? '',
         }))}
         title={hp.uDesignHeading ?? null}
         subtext={hp.uSortText ?? null}
@@ -299,11 +276,7 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           FAQ SECTION
       ══════════════════════════════════════════════ */}
-      <FAQSection
-        heading={ts?.faqHeading ?? null}
-        subtext={ts?.faqShortText ?? null}
-        items={faqItems}
-      />
+      <FAQSection heading={ts?.faqHeading ?? null} subtext={ts?.faqShortText ?? null} items={faqItems} />
 
       {/* ══════════════════════════════════════════════
           GRID IMAGE SECTION
@@ -321,14 +294,12 @@ export default async function Home() {
         leftHeading={
           ts?.cLeftHeading
             ? ts.cLeftHeading
-                .replace(/<br\s*\/?>/gi, "\n")
-                .replace(/<[^>]+>/g, "")
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
                 .trim()
             : null
         }
-        formHeading={
-          ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null
-        }
+        formHeading={ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null}
         submitLabel={ts?.cButton ?? null}
         callUsLabel={ts?.cCallUsLabel ?? null}
         fallbackEmail={ts?.cEmailAddress ?? null}
@@ -544,5 +515,5 @@ export default async function Home() {
 
       `}</style>
     </main>
-  );
+  )
 }

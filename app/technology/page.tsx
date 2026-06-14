@@ -1,77 +1,72 @@
-import { client } from "@/lib/apollo-client";
-import { GET_TECHNOLOGY_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import { FadeIn } from "@/components/FadeIn";
-import { FAQSection } from "@/components/FAQSection";
-import { WannaChatSection } from "@/components/WannaChatSection";
-import { TechStickyFeature } from "@/components/TechStickyFeature";
-import { TechStackSection } from "@/components/TechStackSection";
-import AnimatedSteps from "@/components/AnimatedSteps";
-import { ClientsSection } from "@/components/ClientsSection";
-import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from "@/components/ui";
-import type {
-  GetTechnologyPageData,
-  GetThemeSettingsData,
-  TechnologyPageFields,
-  ThemeOptions,
-} from "@/lib/graphql-types";
+import { client } from '@/lib/apollo-client'
+import { GET_TECHNOLOGY_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
+import { gql } from '@apollo/client'
+import type { TypedDocumentNode } from '@apollo/client'
+import { FadeIn } from '@/components/FadeIn'
+import { FAQSection } from '@/components/FAQSection'
+import { WannaChatSection } from '@/components/WannaChatSection'
+import { TechStickyFeature } from '@/components/TechStickyFeature'
+import { TechStackSection } from '@/components/TechStackSection'
+import AnimatedSteps from '@/components/AnimatedSteps'
+import { ClientsSection } from '@/components/ClientsSection'
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from '@/components/ui'
+import type { GetTechnologyPageData, GetThemeSettingsData, TechnologyPageFields, ThemeOptions } from '@/lib/graphql-types'
 
 const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
   ${GET_TECHNOLOGY_PAGE}
-`;
+`
 
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
-`;
+`
 
 function stripHtml(html: string): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
+  return (html ?? '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
     .replace(/&#8217;/g, "'")
-    .trim();
+    .trim()
 }
 
 function decodeHtml(html: string): string {
-  return (html ?? "")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&amp;/gi, "&")
+  return (html ?? '')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
     .replace(/&#039;/g, "'")
-    .replace(/&#8217;/g, "'");
+    .replace(/&#8217;/g, "'")
 }
 
 async function getTechData(): Promise<TechnologyPageFields> {
   try {
-    const { data } = await client.query({ query: TECH_PAGE_QUERY });
-    return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields);
+    const { data } = await client.query({ query: TECH_PAGE_QUERY })
+    return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields)
   } catch {
-    return {} as TechnologyPageFields;
+    return {} as TechnologyPageFields
   }
 }
 
 async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
-    return data?.themeSetting?.themeOptions ?? null;
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY })
+    return data?.themeSetting?.themeOptions ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
 export default async function TechnologyPage() {
-  const [tp, ts] = await Promise.all([getTechData(), getThemeSettings()]);
+  const [tp, ts] = await Promise.all([getTechData(), getThemeSettings()])
 
   /* Brand yellow — CMS headerBgColor resolved dark, making accent elements
      (eyebrow lines, hover labels, CTA pill) invisible. Hardcode brand color. */
-  const accentColor: string = "#facc15";
+  const accentColor: string = '#facc15'
 
-  const companies: any[] = tp.companyList ?? [];
+  const companies: any[] = tp.companyList ?? []
 
   const gridImages = [
     {
@@ -102,33 +97,29 @@ export default async function TechnologyPage() {
       url: tp.midImageEight?.node?.sourceUrl ?? null,
       title: tp.midImageEightTitle ?? null,
     },
-  ].filter((item) => item.url);
+  ].filter((item) => item.url)
 
-  const steps: any[] = tp.numberList ?? [];
+  const steps: any[] = tp.numberList ?? []
 
   /* ── All 8 Tech Stack Images ── */
-  const allStackImages = [
-    { url: tp.midImageOne?.node?.sourceUrl ?? null, title: null },
-    ...gridImages,
-  ];
+  const allStackImages = [{ url: tp.midImageOne?.node?.sourceUrl ?? null, title: null }, ...gridImages]
 
   /* ── Bottom portfolio grid image ── */
-  const bottomGridImage: string | null =
-    ts?.commonGridOneImage?.node?.sourceUrl ?? null;
+  const bottomGridImage: string | null = ts?.commonGridOneImage?.node?.sourceUrl ?? null
 
   const faqItems = (tp.qaList ?? [])
     .filter((q: any) => q?.question)
     .map((q: any) => ({
       faqQuestion: q.question as string,
-      faqAnswer: q.answer ?? "",
-    }));
+      faqAnswer: q.answer ?? '',
+    }))
 
   const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
     .map((item: any) => ({
-      url: item.cLogo?.node?.sourceUrl ?? "",
-      alt: item.cLogo?.node?.altText ?? "",
+      url: item.cLogo?.node?.sourceUrl ?? '',
+      alt: item.cLogo?.node?.altText ?? '',
     }))
-    .filter((l: { url: string }) => l.url);
+    .filter((l: { url: string }) => l.url)
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
@@ -142,26 +133,21 @@ export default async function TechnologyPage() {
       ? {
           label: ts.cTlvLabel,
           value: ts.cTlvNumber,
-          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
     ts?.cNyLabel && ts?.cNyNumber
       ? {
           label: ts.cNyLabel,
           value: ts.cNyNumber,
-          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
-    ts?.cAddressLabel && ts?.cAddress
-      ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined }
-      : null,
-  ].filter((x): x is NonNullable<typeof x> => x !== null);
+    ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null)
 
   return (
-    <main
-      className="overflow-x-clip bg-[#080808] text-white"
-      style={{ "--accent": accentColor } as React.CSSProperties}
-    >
+    <main className="overflow-x-clip bg-[#080808] text-white" style={{ '--accent': accentColor } as React.CSSProperties}>
       <style>{`
         /* ─── Hero ──────────────────────────────────────── */
         .tech-hero-bg {
@@ -305,12 +291,7 @@ export default async function TechnologyPage() {
         {/* Background */}
         {tp.headerBgOverlayLayer?.node?.sourceUrl ? (
           <>
-            <img
-              src={tp.headerBgOverlayLayer.node.sourceUrl}
-              alt=""
-              className="tech-hero-bg"
-              aria-hidden="true"
-            />
+            <img src={tp.headerBgOverlayLayer.node.sourceUrl} alt="" className="tech-hero-bg" aria-hidden="true" />
             <div className="tech-hero-overlay" aria-hidden="true" />
           </>
         ) : (
@@ -340,37 +321,25 @@ export default async function TechnologyPage() {
 
         {/* Editorial frame — corner indices */}
         <div className="absolute top-8 left-6 lg:left-12 z-10 hidden sm:flex items-center gap-4">
-          <span
-            className="text-[11px] font-black tabular-nums tracking-[0.36em]"
-            style={{ color: "var(--accent)" }}
-          >
+          <span className="text-[11px] font-black tabular-nums tracking-[0.36em]" style={{ color: 'var(--accent)' }}>
             01
           </span>
           <span
             aria-hidden="true"
             className="block h-px w-20"
             style={{
-              background: "linear-gradient(to right, color-mix(in srgb, var(--accent) 40%, transparent), transparent)",
+              background: 'linear-gradient(to right, color-mix(in srgb, var(--accent) 40%, transparent), transparent)',
             }}
           />
         </div>
         <div className="absolute top-8 right-6 lg:right-12 z-10 hidden sm:flex items-center gap-3">
           <span aria-hidden="true" className="block h-px w-14 bg-white/25" />
-          <span
-            className="block w-1.5 h-1.5 rounded-full"
-            style={{ background: "var(--accent)" }}
-          />
+          <span className="block w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
         </div>
         <div className="absolute bottom-8 left-6 lg:left-12 z-10 hidden sm:flex items-center gap-3">
           <span className="relative inline-flex w-1.5 h-1.5">
-            <span
-              className="absolute inset-0 rounded-full"
-              style={{ background: "var(--accent)" }}
-            />
-            <span
-              className="absolute inset-0 rounded-full animate-ping"
-              style={{ background: "var(--accent)" }}
-            />
+            <span className="absolute inset-0 rounded-full" style={{ background: 'var(--accent)' }} />
+            <span className="absolute inset-0 rounded-full animate-ping" style={{ background: 'var(--accent)' }} />
           </span>
           <span aria-hidden="true" className="block h-px w-16 bg-white/20" />
         </div>
@@ -379,7 +348,7 @@ export default async function TechnologyPage() {
           <span
             aria-hidden="true"
             className="block w-1.5 h-1.5 rotate-45 border-l border-t"
-            style={{ borderColor: "color-mix(in srgb, var(--accent) 67%, transparent)" }}
+            style={{ borderColor: 'color-mix(in srgb, var(--accent) 67%, transparent)' }}
           />
         </div>
 
@@ -393,8 +362,8 @@ export default async function TechnologyPage() {
                 pill
                 style={
                   {
-                    "--eb-pill-bg": "color-mix(in srgb, var(--accent) 9.4%, transparent)",
-                    "--eb-mb": "32px",
+                    '--eb-pill-bg': 'color-mix(in srgb, var(--accent) 9.4%, transparent)',
+                    '--eb-mb': '32px',
                   } as React.CSSProperties
                 }
               >
@@ -415,21 +384,11 @@ export default async function TechnologyPage() {
                 <span
                   aria-hidden="true"
                   className="hidden sm:block h-px w-10"
-                  style={{ background: "color-mix(in srgb, var(--accent) 53%, transparent)" }}
+                  style={{ background: 'color-mix(in srgb, var(--accent) 53%, transparent)' }}
                 />
-                <a
-                  href="#contact"
-                  className="tech-cta-pill"
-                  style={{ background: "var(--accent)", color: "#000" }}
-                >
+                <a href="#contact" className="tech-cta-pill" style={{ background: 'var(--accent)', color: '#000' }}>
                   {tp.buttonText}
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                  >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                     <path
                       d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5"
                       stroke="currentColor"
@@ -442,7 +401,7 @@ export default async function TechnologyPage() {
                 <span
                   aria-hidden="true"
                   className="hidden sm:block h-px w-10"
-                  style={{ background: "color-mix(in srgb, var(--accent) 53%, transparent)" }}
+                  style={{ background: 'color-mix(in srgb, var(--accent) 53%, transparent)' }}
                 />
               </div>
             </FadeIn>
@@ -452,7 +411,7 @@ export default async function TechnologyPage() {
         {/* Scroll cue */}
         <div className="tech-scroll-cue" aria-hidden="true">
           <div className="tech-scroll-cue__line" />
-          <span className="tech-scroll-cue__label">{"Scroll"}</span>
+          <span className="tech-scroll-cue__label">{'Scroll'}</span>
         </div>
       </section>
 
@@ -471,11 +430,7 @@ export default async function TechnologyPage() {
             renderItem={(c: any, i: number) => (
               <span key={i} className="tech-marquee-item">
                 <span className="tech-marquee-name">{c.companyName}</span>
-                <span
-                  className="tech-marquee-sep"
-                  style={{ color: "var(--accent)" }}
-                  aria-hidden="true"
-                >
+                <span className="tech-marquee-sep" style={{ color: 'var(--accent)' }} aria-hidden="true">
                   ✦
                 </span>
               </span>
@@ -525,21 +480,12 @@ export default async function TechnologyPage() {
       {/* ════════════════════════════════════════════
           STEPS — ANIMATED NUMBER TICKER
       ════════════════════════════════════════════ */}
-      <AnimatedSteps
-        steps={steps}
-        title={tp.fivetitle ?? null}
-        subtext={tp.fivetext ?? null}
-        accentColor={accentColor}
-      />
+      <AnimatedSteps steps={steps} title={tp.fivetitle ?? null} subtext={tp.fivetext ?? null} accentColor={accentColor} />
 
       {/* ════════════════════════════════════════════
           FAQ
       ════════════════════════════════════════════ */}
-      <FAQSection
-        heading={tp.qatitle ?? null}
-        subtext={tp.qatext ? stripHtml(tp.qatext) : null}
-        items={faqItems}
-      />
+      <FAQSection heading={tp.qatitle ?? null} subtext={tp.qatext ? stripHtml(tp.qatext) : null} items={faqItems} />
 
       {/* ════════════════════════════════════════════
           BOTTOM PORTFOLIO GRID IMAGE
@@ -550,8 +496,8 @@ export default async function TechnologyPage() {
             <div
               className="relative rounded-[28px] overflow-hidden"
               style={{
-                border: "1px solid rgba(255,255,255,0.06)",
-                boxShadow: "0 32px 80px rgba(0,0,0,0.5)",
+                border: '1px solid rgba(255,255,255,0.06)',
+                boxShadow: '0 32px 80px rgba(0,0,0,0.5)',
               }}
             >
               <img
@@ -559,7 +505,7 @@ export default async function TechnologyPage() {
                 alt=""
                 className="w-full h-auto block"
                 style={{
-                  transition: "transform 0.8s cubic-bezier(.23,1,.32,1)",
+                  transition: 'transform 0.8s cubic-bezier(.23,1,.32,1)',
                 }}
               />
             </div>
@@ -576,19 +522,17 @@ export default async function TechnologyPage() {
           leftHeading={
             ts?.cLeftHeading
               ? ts.cLeftHeading
-                  .replace(/<br\s*\/?>/gi, "\n")
-                  .replace(/<[^>]+>/g, "")
+                  .replace(/<br\s*\/?>/gi, '\n')
+                  .replace(/<[^>]+>/g, '')
                   .trim()
               : null
           }
-          formHeading={
-            ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null
-          }
+          formHeading={ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null}
           submitLabel={ts?.cButton ?? null}
           callUsLabel={ts?.cCallUsLabel ?? null}
           fallbackEmail={ts?.cEmailAddress ?? null}
         />
       </div>
     </main>
-  );
+  )
 }

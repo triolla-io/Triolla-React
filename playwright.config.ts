@@ -1,34 +1,34 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
-  testDir: "./tests/visual",
+  testDir: './tests/visual',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: [["html", { open: "never" }]],
+  reporter: [['html', { open: 'never' }]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: 'http://localhost:3000',
     // Freeze animations at frame 0 so live timing differences never flake the diff.
     // The static rendered frame is what we gate on.
   },
   expect: {
     // Allow sub-pixel AA noise but catch real layout/color shifts.
     toHaveScreenshot: {
-      animations: "disabled",
-      caret: "hide",
+      animations: 'disabled',
+      caret: 'hide',
       maxDiffPixelRatio: 0.01,
-      scale: "css",
+      scale: 'css',
     },
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
-    { name: "mobile", use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 } } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
+    { name: 'mobile', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } } },
   ],
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
-});
+})

@@ -1,25 +1,22 @@
-"use client";
+'use client'
 
-import { SectionReveal } from "@/components/SectionReveal";
-import {
-  useServiceModal,
-  type ServiceDetail,
-} from "@/components/ServiceDetailModal";
+import { SectionReveal } from '@/components/SectionReveal'
+import { useServiceModal, type ServiceDetail } from '@/components/ServiceDetailModal'
 
 export interface TechGroup {
   /** Detail fetched from the heading's WP link. `hasDetail` decides whether the
    *  heading is a modal trigger, a plain link, or plain text. `label` is the
    *  heading text. */
-  detail: ServiceDetail;
+  detail: ServiceDetail
   /** Optional sub-copy under the heading (only the first group has one today). */
-  copy: string | null;
-  chips: string[];
+  copy: string | null
+  chips: string[]
 }
 
 interface ServiceTechGroupsProps {
-  groups: TechGroup[];
-  ctaText?: string | null;
-  ctaLink?: string | null;
+  groups: TechGroup[]
+  ctaText?: string | null
+  ctaLink?: string | null
 }
 
 /**
@@ -28,23 +25,19 @@ interface ServiceTechGroupsProps {
  * a plain link or plain text. The chips below are never links. prev/next cycles
  * through the resolved headings, mirroring the menu sections.
  */
-export function ServiceTechGroups({
-  groups,
-  ctaText,
-  ctaLink,
-}: ServiceTechGroupsProps) {
-  const services = groups.map((g) => g.detail);
+export function ServiceTechGroups({ groups, ctaText, ctaLink }: ServiceTechGroupsProps) {
+  const services = groups.map((g) => g.detail)
   const { open, setTriggerRef, modal } = useServiceModal(services, {
     ctaText,
     ctaLink,
-  });
+  })
 
   return (
     <>
       <SectionReveal className="svc-dev__lists">
         {groups.map((g, i) => {
-          const { detail, copy, chips } = g;
-          if (!detail.label) return null;
+          const { detail, copy, chips } = g
+          if (!detail.label) return null
           return (
             <div key={i} className="svc-tech-group">
               <h4 className="svc-tech-group__title">
@@ -77,7 +70,7 @@ export function ServiceTechGroups({
                 </ul>
               )}
             </div>
-          );
+          )
         })}
       </SectionReveal>
 
@@ -97,5 +90,5 @@ export function ServiceTechGroups({
         }
       `}</style>
     </>
-  );
+  )
 }

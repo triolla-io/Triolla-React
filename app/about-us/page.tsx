@@ -1,85 +1,79 @@
-import { client } from "@/lib/apollo-client";
-import { GET_ABOUT_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import Link from "next/link";
-import { FadeIn } from "@/components/FadeIn";
-import { FAQAccordion } from "@/components/FAQAccordion";
-import { AboutImageCarousel } from "@/components/AboutImageCarousel";
-import { WhyUsSection } from "@/components/WhyUsSection";
-import AnimatedSteps from "@/components/AnimatedSteps";
-import { ClientsSection } from "@/components/ClientsSection";
-import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from "@/components/ui";
-import parse from "html-react-parser";
-import type {
-  GetAboutPageData,
-  GetThemeSettingsData,
-  AboutPageFields,
-  ThemeOptions,
-} from "@/lib/graphql-types";
+import { client } from '@/lib/apollo-client'
+import { GET_ABOUT_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
+import { gql } from '@apollo/client'
+import type { TypedDocumentNode } from '@apollo/client'
+import Link from 'next/link'
+import { FadeIn } from '@/components/FadeIn'
+import { FAQAccordion } from '@/components/FAQAccordion'
+import { AboutImageCarousel } from '@/components/AboutImageCarousel'
+import { WhyUsSection } from '@/components/WhyUsSection'
+import AnimatedSteps from '@/components/AnimatedSteps'
+import { ClientsSection } from '@/components/ClientsSection'
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
+import parse from 'html-react-parser'
+import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOptions } from '@/lib/graphql-types'
 
 const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
   ${GET_ABOUT_PAGE}
-`;
+`
 
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
-`;
+`
 
 function stripHtml(html: string): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .trim();
+  return (html ?? '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
 }
 
 async function getAboutData(): Promise<AboutPageFields> {
   try {
-    const { data } = await client.query({ query: ABOUT_PAGE_QUERY });
-    return data?.page?.template?.aboutPage ?? ({} as AboutPageFields);
+    const { data } = await client.query({ query: ABOUT_PAGE_QUERY })
+    return data?.page?.template?.aboutPage ?? ({} as AboutPageFields)
   } catch {
-    return {} as AboutPageFields;
+    return {} as AboutPageFields
   }
 }
 
 async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
-    return data?.themeSetting?.themeOptions ?? null;
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY })
+    return data?.themeSetting?.themeOptions ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
 export default async function AboutUsPage() {
-  const [ap, ts] = await Promise.all([getAboutData(), getThemeSettings()]);
+  const [ap, ts] = await Promise.all([getAboutData(), getThemeSettings()])
 
-  const faqItems: { faqQuestion: string; faqAnswer: string }[] =
-    ap.faqItems ?? [];
+  const faqItems: { faqQuestion: string; faqAnswer: string }[] = ap.faqItems ?? []
   const clientLogos: { url: string; alt: string }[] = (ap.clientLogos ?? [])
     .map((l: any) => ({
-      url: l.logoImage?.node?.sourceUrl ?? "",
-      alt: l.logoName ?? "",
+      url: l.logoImage?.node?.sourceUrl ?? '',
+      alt: l.logoName ?? '',
     }))
-    .filter((l: { url: string }) => l.url);
+    .filter((l: { url: string }) => l.url)
 
-  const heroTitle = stripHtml(ap.headerTitle ?? "");
+  const heroTitle = stripHtml(ap.headerTitle ?? '')
 
   // Showcase images for the carousel directly below the hero
   const showcaseImages = [
     ap.abtopleftImageTop?.node?.sourceUrl,
     ap.abtopleftImageTwo?.node?.sourceUrl,
     ap.leftImageTopThree?.node?.sourceUrl,
-  ].filter(Boolean) as string[];
+  ].filter(Boolean) as string[]
 
   // Category strip at bottom of hero — derived from why-us card titles
   const heroStripWords = (ap.abthrelist ?? [])
-    .map((c: any) => stripHtml(c.abteintitle ?? ""))
+    .map((c: any) => stripHtml(c.abteintitle ?? ''))
     .filter(Boolean)
-    .slice(0, 6);
+    .slice(0, 6)
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
@@ -89,34 +83,22 @@ export default async function AboutUsPage() {
       {/* ══ HERO ══ */}
       <section className="about-hero">
         <GlowOrb
-          size={900} height={480} shape="ellipse" fade="70%" blur={80}
+          size={900}
+          height={480}
+          shape="ellipse"
+          fade="70%"
+          blur={80}
           color="rgba(250,204,21,0.14)"
           className="bottom-[-12%] left-1/2 -translate-x-1/2 z-0 opacity-85"
         />
-        <GlowOrb
-          size={640} fade="65%" blur={80}
-          color="rgba(251,146,60,0.06)"
-          className="top-[-8%] left-[-12%] z-0 opacity-60"
-        />
+        <GlowOrb size={640} fade="65%" blur={80} color="rgba(251,146,60,0.06)" className="top-[-8%] left-[-12%] z-0 opacity-60" />
         <div className="about-hero__grid" aria-hidden="true" />
 
         {/* Corner frame brackets */}
-        <div
-          className="about-hero__corner about-hero__corner--tl"
-          aria-hidden="true"
-        />
-        <div
-          className="about-hero__corner about-hero__corner--tr"
-          aria-hidden="true"
-        />
-        <div
-          className="about-hero__corner about-hero__corner--bl"
-          aria-hidden="true"
-        />
-        <div
-          className="about-hero__corner about-hero__corner--br"
-          aria-hidden="true"
-        />
+        <div className="about-hero__corner about-hero__corner--tl" aria-hidden="true" />
+        <div className="about-hero__corner about-hero__corner--tr" aria-hidden="true" />
+        <div className="about-hero__corner about-hero__corner--bl" aria-hidden="true" />
+        <div className="about-hero__corner about-hero__corner--br" aria-hidden="true" />
 
         {/* Ghost number */}
         <div className="about-hero__ghost" aria-hidden="true">
@@ -140,7 +122,7 @@ export default async function AboutUsPage() {
               <Eyebrow
                 ornament="dot"
                 align="center"
-                style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em", "--eb-dot": "5px" } as React.CSSProperties}
+                style={{ '--eb-gap': '14px', '--eb-size': '10px', '--eb-spacing': '0.32em', '--eb-dot': '5px' } as React.CSSProperties}
               >
                 {ap.headerSubText}
               </Eyebrow>
@@ -151,7 +133,7 @@ export default async function AboutUsPage() {
             <FadeIn yOffset={70} delay={0.1} duration={1}>
               <h1
                 className="gradient-text gradient-text--animate text-[clamp(3.6rem,11vw,128px)] font-black leading-[0.88] tracking-[-0.055em] mb-12 [word-break:break-word]"
-                style={{ "--gt-gradient": "linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)" } as React.CSSProperties}
+                style={{ '--gt-gradient': 'linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)' } as React.CSSProperties}
               >
                 {heroTitle}
               </h1>
@@ -186,11 +168,23 @@ export default async function AboutUsPage() {
                   <Button
                     href="/contact-us"
                     variant="primary"
-                    style={{ "--btn-pad": "16px 34px", "--btn-gap": "10px", boxShadow: "0 4px 28px rgba(250,204,21,0.24)" } as React.CSSProperties}
+                    style={
+                      {
+                        '--btn-pad': '16px 34px',
+                        '--btn-gap': '10px',
+                        boxShadow: '0 4px 28px rgba(250,204,21,0.24)',
+                      } as React.CSSProperties
+                    }
                   >
                     {ap.buttonText}
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                      <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </Button>
                 </FadeIn>
@@ -227,7 +221,11 @@ export default async function AboutUsPage() {
       {showcaseImages.length > 0 && (
         <section className="about-showcase">
           <GlowOrb
-            size={1100} height={600} shape="ellipse" fade="65%" blur={100}
+            size={1100}
+            height={600}
+            shape="ellipse"
+            fade="65%"
+            blur={100}
             color="rgba(250,204,21,0.05)"
             className="top-[10%] left-1/2 -translate-x-1/2 z-0"
           />
@@ -235,41 +233,24 @@ export default async function AboutUsPage() {
           <FadeIn yOffset={40} duration={0.9}>
             <div className="about-showcase__stage">
               <div className="about-showcase__card about-showcase__card--left">
-                <img
-                  src={showcaseImages[1] ?? showcaseImages[0]}
-                  alt=""
-                  className="about-showcase__img"
-                />
+                <img src={showcaseImages[1] ?? showcaseImages[0]} alt="" className="about-showcase__img" />
                 <div className="about-showcase__shine" aria-hidden="true" />
               </div>
 
               <div className="about-showcase__card about-showcase__card--main">
-                <img
-                  src={showcaseImages[0]}
-                  alt=""
-                  className="about-showcase__img"
-                />
+                <img src={showcaseImages[0]} alt="" className="about-showcase__img" />
                 <div className="about-showcase__shine" aria-hidden="true" />
                 <span className="about-showcase__tag">— Inside Triolla —</span>
               </div>
 
               <div className="about-showcase__card about-showcase__card--right">
-                <img
-                  src={showcaseImages[2] ?? showcaseImages[0]}
-                  alt=""
-                  className="about-showcase__img"
-                />
+                <img src={showcaseImages[2] ?? showcaseImages[0]} alt="" className="about-showcase__img" />
                 <div className="about-showcase__shine" aria-hidden="true" />
               </div>
 
               {/* Decorative spark dots */}
               {[...Array(6)].map((_, i) => (
-                <span
-                  key={i}
-                  className="about-showcase__spark"
-                  style={{ "--si": i } as React.CSSProperties}
-                  aria-hidden="true"
-                />
+                <span key={i} className="about-showcase__spark" style={{ '--si': i } as React.CSSProperties} aria-hidden="true" />
               ))}
             </div>
           </FadeIn>
@@ -299,13 +280,28 @@ export default async function AboutUsPage() {
         <div className="about-crafting__inner">
           <FadeIn yOffset={40}>
             <div className="section-head">
-              <Eyebrow ornament="line" align="center" color="#facc15" style={{ "--eb-line-bg": "#facc15", "--eb-line-opacity": "0.7", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
+              <Eyebrow
+                ornament="line"
+                align="center"
+                color="#facc15"
+                style={
+                  {
+                    '--eb-line-bg': '#facc15',
+                    '--eb-line-opacity': '0.7',
+                    '--eb-gap': '14px',
+                    '--eb-size': '10px',
+                    '--eb-spacing': '0.32em',
+                  } as React.CSSProperties
+                }
+              >
                 — 02 —
               </Eyebrow>
               {ap.toprightTitle && <h2 className="section-head__title">{ap.toprightTitle}</h2>}
               {ap.toprightext && (
                 /* WP-sourced HTML — trusted backend only */
-                <div className="section-head__sub" style={{ "--sh-sub-max": "620px" } as React.CSSProperties}>{parse(ap.toprightext)}</div>
+                <div className="section-head__sub" style={{ '--sh-sub-max': '620px' } as React.CSSProperties}>
+                  {parse(ap.toprightext)}
+                </div>
               )}
             </div>
           </FadeIn>
@@ -316,24 +312,14 @@ export default async function AboutUsPage() {
                 <FadeIn key={idx} delay={idx * 0.12} yOffset={20}>
                   <div className="about-partner">
                     <div className="about-partner__head">
-                      {item.imageText && (
-                        <span className="about-partner__label">
-                          {item.imageText}
-                        </span>
-                      )}
+                      {item.imageText && <span className="about-partner__label">{item.imageText}</span>}
                       {item.topimages?.node?.sourceUrl && (
-                        <img
-                          src={item.topimages.node.sourceUrl}
-                          alt=""
-                          className="about-partner__logo"
-                        />
+                        <img src={item.topimages.node.sourceUrl} alt="" className="about-partner__logo" />
                       )}
                     </div>
                     {item.topabtext && (
                       /* WP-sourced HTML — trusted backend only */
-                      <div className="about-partner__body">
-                        {parse(item.topabtext)}
-                      </div>
+                      <div className="about-partner__body">{parse(item.topabtext)}</div>
                     )}
                   </div>
                 </FadeIn>
@@ -351,13 +337,32 @@ export default async function AboutUsPage() {
         <div className="about-services__dots" aria-hidden="true" />
         <div className="about-services__inner">
           <FadeIn className="section-head">
-            <Eyebrow ornament="line" align="center" color="rgba(0,0,0,0.45)" style={{ "--eb-line-bg": "rgba(0,0,0,0.35)", "--eb-line-opacity": "1", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
+            <Eyebrow
+              ornament="line"
+              align="center"
+              color="rgba(0,0,0,0.45)"
+              style={
+                {
+                  '--eb-line-bg': 'rgba(0,0,0,0.35)',
+                  '--eb-line-opacity': '1',
+                  '--eb-gap': '14px',
+                  '--eb-size': '10px',
+                  '--eb-spacing': '0.32em',
+                } as React.CSSProperties
+              }
+            >
               — 03 —
             </Eyebrow>
-            {ap.servtitle && <h2 className="section-head__title" style={{ color: "#0a0a0a" }}>{ap.servtitle}</h2>}
+            {ap.servtitle && (
+              <h2 className="section-head__title" style={{ color: '#0a0a0a' }}>
+                {ap.servtitle}
+              </h2>
+            )}
             {ap.servtext && (
               /* WP-sourced HTML — trusted backend only */
-              <div className="section-head__sub" style={{ "--sh-sub-max": "620px", color: "#4b5563" } as React.CSSProperties}>{parse(ap.servtext)}</div>
+              <div className="section-head__sub" style={{ '--sh-sub-max': '620px', color: '#4b5563' } as React.CSSProperties}>
+                {parse(ap.servtext)}
+              </div>
             )}
           </FadeIn>
 
@@ -366,35 +371,24 @@ export default async function AboutUsPage() {
               <FadeIn key={i} delay={i * 0.08} yOffset={20}>
                 <div className="about-srow">
                   <div className="about-srow__left">
-                    <div className="about-srow__num">
-                      {(i + 1).toString().padStart(2, "0")}
-                    </div>
+                    <div className="about-srow__num">{(i + 1).toString().padStart(2, '0')}</div>
                     <h3 className="about-srow__cat">{serv.servlleftText}</h3>
                   </div>
                   <div className="about-srow__right">
                     <p className="about-srow__items">
-                      {(serv.servrightList ?? []).map(
-                        (item: any, j: number) => (
-                          <span key={j}>
-                            <Link
-                              href={item.itemLink || "#"}
-                              target={item.linkTarget || "_self"}
-                              className="about-sitem"
-                            >
-                              {item.listItem}
-                            </Link>
-                            {j < (serv.servrightList?.length ?? 0) - 1 && (
-                              <span
-                                className="about-sitem__sep"
-                                aria-hidden="true"
-                              >
-                                {" "}
-                                |{" "}
-                              </span>
-                            )}
-                          </span>
-                        ),
-                      )}
+                      {(serv.servrightList ?? []).map((item: any, j: number) => (
+                        <span key={j}>
+                          <Link href={item.itemLink || '#'} target={item.linkTarget || '_self'} className="about-sitem">
+                            {item.listItem}
+                          </Link>
+                          {j < (serv.servrightList?.length ?? 0) - 1 && (
+                            <span className="about-sitem__sep" aria-hidden="true">
+                              {' '}
+                              |{' '}
+                            </span>
+                          )}
+                        </span>
+                      ))}
                     </p>
                   </div>
                 </div>
@@ -409,8 +403,8 @@ export default async function AboutUsPage() {
 
       {/* ══ WHY US ══ */}
       <WhyUsSection
-        title={ap.abthretitle ?? ""}
-        text={ap.abtthretext ?? ""}
+        title={ap.abthretitle ?? ''}
+        text={ap.abtthretext ?? ''}
         cards={ap.abthrelist ?? []}
         ctaText={ap.abthrebuttonText}
         ctaLink={ap.abthrebuttonLink}
@@ -419,7 +413,7 @@ export default async function AboutUsPage() {
       {/* ══ DESIGN PROCESS ══ */}
       <AnimatedSteps
         steps={(ap.designType ?? []).map((item: any) => ({
-          numtitle: item.dName ?? "",
+          numtitle: item.dName ?? '',
         }))}
         title={ap.uDesignHeading ?? null}
         subtext={ap.uSortText ?? null}
@@ -429,27 +423,34 @@ export default async function AboutUsPage() {
       {/* ══ LEARN ══ */}
       {(ap.learnslider ?? []).length > 0 && (
         <section className="about-learn">
-          <GlowOrb
-            size={600} fade="65%" blur={90}
-            color="rgba(250,204,21,0.04)"
-            className="top-[-8%] left-[-4%] z-0"
-          />
+          <GlowOrb size={600} fade="65%" blur={90} color="rgba(250,204,21,0.04)" className="top-[-8%] left-[-4%] z-0" />
           <div className="about-learn__inner">
             <FadeIn className="section-head">
-              <Eyebrow ornament="line" align="center" color="#facc15" style={{ "--eb-line-bg": "#facc15", "--eb-line-opacity": "0.7", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
+              <Eyebrow
+                ornament="line"
+                align="center"
+                color="#facc15"
+                style={
+                  {
+                    '--eb-line-bg': '#facc15',
+                    '--eb-line-opacity': '0.7',
+                    '--eb-gap': '14px',
+                    '--eb-size': '10px',
+                    '--eb-spacing': '0.32em',
+                  } as React.CSSProperties
+                }
+              >
                 — 05 —
               </Eyebrow>
               {ap.learntitle && <h2 className="section-head__title">{ap.learntitle}</h2>}
               {ap.learntext && (
                 /* WP-sourced HTML — trusted backend only */
-                <div className="section-head__sub" style={{ "--sh-sub-max": "620px" } as React.CSSProperties}>{parse(ap.learntext)}</div>
+                <div className="section-head__sub" style={{ '--sh-sub-max': '620px' } as React.CSSProperties}>
+                  {parse(ap.learntext)}
+                </div>
               )}
             </FadeIn>
-            <AboutImageCarousel
-              images={(ap.learnslider ?? []).map(
-                (s: any) => s.learnimage?.node?.sourceUrl ?? null,
-              )}
-            />
+            <AboutImageCarousel images={(ap.learnslider ?? []).map((s: any) => s.learnimage?.node?.sourceUrl ?? null)} />
           </div>
         </section>
       )}
@@ -467,7 +468,19 @@ export default async function AboutUsPage() {
         <section className="about-faq">
           <div className="about-faq__inner">
             <FadeIn>
-              <Eyebrow ornament="line" color="#facc15" style={{ "--eb-line-bg": "#facc15", "--eb-line-opacity": "0.7", "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}>
+              <Eyebrow
+                ornament="line"
+                color="#facc15"
+                style={
+                  {
+                    '--eb-line-bg': '#facc15',
+                    '--eb-line-opacity': '0.7',
+                    '--eb-gap': '14px',
+                    '--eb-size': '10px',
+                    '--eb-spacing': '0.32em',
+                  } as React.CSSProperties
+                }
+              >
                 Got Questions
               </Eyebrow>
               <h2 className="about-faq__title">Frequently Asked Questions</h2>
@@ -863,5 +876,5 @@ export default async function AboutUsPage() {
         }
       `}</style>
     </main>
-  );
+  )
 }

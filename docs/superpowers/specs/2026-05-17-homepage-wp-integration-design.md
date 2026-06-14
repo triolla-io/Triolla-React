@@ -1,4 +1,5 @@
 # Homepage WP Integration — Design Spec
+
 _Date: 2026-05-17_
 
 ## Goal
@@ -26,6 +27,7 @@ Out of scope: other pages (`/about-us`, `/services`), contact form wiring, new W
 All global site data (logos, phones, socials, mentions, WhatsApp, buttons, FAQ, contact info) lives in the WP ACF "Theme Setting" Options page. The GraphQL type is `ThemeSetting`.
 
 **WP admin step required (done once):**
+
 - ACF → Options Pages → "Theme Setting" → enable **Show in GraphQL**
 - Set GraphQL field name (e.g. `themeSettings`)
 - After saving, regenerate `schema.graphql`:
@@ -35,11 +37,13 @@ All global site data (logos, phones, socials, mentions, WhatsApp, buttons, FAQ, 
 - Confirm root query path in WP GraphQL IDE before writing queries
 
 The root query path will be something like:
+
 ```graphql
 acfOptionsThemeSetting {
   themeSetting { ... }
 }
 ```
+
 Exact path must be verified from the regenerated schema.
 
 ### Navigation data source: WP Menus
@@ -53,6 +57,7 @@ Exact path must be verified from the regenerated schema.
 ## Queries (`lib/queries.ts`)
 
 ### Delete
+
 - `GET_FOOTER_OPTIONS` — uses `themeGeneralSettings > footerOptions` which doesn't exist in the schema. Replaced by `GET_THEME_SETTINGS`.
 
 ### Add: `GET_THEME_SETTINGS`
@@ -135,29 +140,33 @@ mobileMenu: menu(id: "MOBILE_HEADER_MENU", idType: LOCATION) {
 ## Header Component
 
 ### Problem
+
 `Header.tsx` is a single `"use client"` component — can't `await` WP data inside it.
 
 ### Solution: Server/Client split
 
 **`components/Header.tsx`** — async Server Component
+
 - Calls `GET_THEME_SETTINGS` and `GET_PRIMARY_MENU`
 - Extracts: logo URL, ticker text, nav items, mobile nav items, WhatsApp config, book/contact button config
 - Renders `<HeaderClient>` with all data as props
 - On fetch failure: passes empty/null props; HeaderClient hides sections gracefully
 
 **`components/HeaderClient.tsx`** — `"use client"` component
+
 - Receives all data as typed props (no WP fetching inside)
 - Owns: sticky scroll behavior, mobile menu toggle, Framer Motion animations, active link detection
 - Hardcoded removal: no more `CONTACT.whatsapp`, no Calendly URL constant, no `"Pitangoux is now Triolla"` string, no hardcoded nav links
 
 **Props interface (HeaderClient):**
+
 ```ts
 interface HeaderClientProps {
   logoUrl: string | null
   ticker: string | null
   navItems: { label: string; url: string }[]
   mobileNavItems: { label: string; url: string }[]
-  whatsappHref: string | null   // built from whatsappNumber + whatsappMessage
+  whatsappHref: string | null // built from whatsappNumber + whatsappMessage
   bookButtonText: string | null
   bookButtonHref: string | null
   contactButtonText: string | null
@@ -166,6 +175,7 @@ interface HeaderClientProps {
 ```
 
 **URL construction (in Header.tsx server component):**
+
 ```ts
 const whatsappHref = ts.whatsappNumber
   ? `https://wa.me/${ts.whatsappNumber}${ts.whatsappMessage ? `?text=${encodeURIComponent(ts.whatsappMessage)}` : ''}`
@@ -179,6 +189,7 @@ const whatsappHref = ts.whatsappNumber
 ### Changes to `components/Footer.tsx`
 
 **Remove entirely:**
+
 - `CONTACT` constant (lines 14–20)
 - `SOCIALS` constant (lines 22–29)
 - `MENTIONS` constant (lines 31–38)
@@ -188,30 +199,31 @@ const whatsappHref = ts.whatsappNumber
 
 **Replace with WP data from `GET_THEME_SETTINGS`:**
 
-| Was hardcoded | Now from ThemeSetting |
-|---|---|
-| Contact email | `emailAddress` |
-| TLV phone | `tlvOfficesPhone` / `tlvOfficesLabel` |
-| NY phone | `nyOfficesPhone` / `nyOfficesLabel` |
-| WhatsApp URL | built from `whatsappNumber` + `whatsappMessage` |
-| Calendly/book URL | `bookButtonLink` |
-| Social links array | `socialMenuItems` repeater |
-| Media mentions array | `mentionsLogos` repeater |
-| "Featured In" label | `footerMentionsLabel` |
-| Sqlink URL | `sqlink` |
-| Footer logo | `footerLogo` |
-| Triolla logo (bottom bar) | `siteLogo` |
-| Privacy text + link | `footerPrivacyText` + `footerPrivacyLink` |
-| Terms text + link | `footerTermText` + `footerTermLink` |
-| Menu column headings | `footmenuTitleOne`–`footmenuTitleFive` |
+| Was hardcoded             | Now from ThemeSetting                           |
+| ------------------------- | ----------------------------------------------- |
+| Contact email             | `emailAddress`                                  |
+| TLV phone                 | `tlvOfficesPhone` / `tlvOfficesLabel`           |
+| NY phone                  | `nyOfficesPhone` / `nyOfficesLabel`             |
+| WhatsApp URL              | built from `whatsappNumber` + `whatsappMessage` |
+| Calendly/book URL         | `bookButtonLink`                                |
+| Social links array        | `socialMenuItems` repeater                      |
+| Media mentions array      | `mentionsLogos` repeater                        |
+| "Featured In" label       | `footerMentionsLabel`                           |
+| Sqlink URL                | `sqlink`                                        |
+| Footer logo               | `footerLogo`                                    |
+| Triolla logo (bottom bar) | `siteLogo`                                      |
+| Privacy text + link       | `footerPrivacyText` + `footerPrivacyLink`       |
+| Terms text + link         | `footerTermText` + `footerTermLink`             |
+| Menu column headings      | `footmenuTitleOne`–`footmenuTitleFive`          |
 
 **Menu columns:** `MENU_COLUMNS` fallback items (the `url`/`label` arrays) stay in code as last-resort UX fallbacks when WP menu returns empty. Column headings are replaced with ThemeSetting values.
 
 **Both queries called in Footer:**
+
 ```ts
 const [ts, wpMenus] = await Promise.all([
-  getThemeSettings(),   // GET_THEME_SETTINGS
-  getFooterMenus(),     // GET_FOOTER_DATA (existing)
+  getThemeSettings(), // GET_THEME_SETTINGS
+  getFooterMenus(), // GET_FOOTER_DATA (existing)
 ])
 ```
 
@@ -223,13 +235,13 @@ const [ts, wpMenus] = await Promise.all([
 
 The right-side contact info cards are hardcoded with wrong values. Replace with ThemeSetting contact fields (fetched via `GET_THEME_SETTINGS`):
 
-| Current hardcoded | Replace with |
-|---|---|
-| `"Email Us"` / `contact@triolla.io` | `cEmailLabel` / `cEmailAddress` |
-| `"Call Us (TLV)"` / `+972-73-744-3322` | `cTlvLabel` / `cTlvNumber` |
-| Missing NY phone | `cNyLabel` / `cNyNumber` |
-| `"Drop By"` / `Yigal Alon St 98, Tel Aviv-Yafo` | `cAddressLabel` / `cAddress` |
-| `"Leave your details..."` subtext | no WP field; keep as-is or remove |
+| Current hardcoded                               | Replace with                      |
+| ----------------------------------------------- | --------------------------------- |
+| `"Email Us"` / `contact@triolla.io`             | `cEmailLabel` / `cEmailAddress`   |
+| `"Call Us (TLV)"` / `+972-73-744-3322`          | `cTlvLabel` / `cTlvNumber`        |
+| Missing NY phone                                | `cNyLabel` / `cNyNumber`          |
+| `"Drop By"` / `Yigal Alon St 98, Tel Aviv-Yafo` | `cAddressLabel` / `cAddress`      |
+| `"Leave your details..."` subtext               | no WP field; keep as-is or remove |
 
 "Give us a call:" heading on the right column: `cCallUsLabel`.
 
@@ -244,16 +256,19 @@ Insert after the "Our unique Design Process" section (the `uDesignHeading` / `uS
 - FAQ items: `ThemeSetting.questionAnswerList` → map `{ fQuestion, fAnswer }` to `{ faqQuestion, faqAnswer }` for `FAQAccordion`
 
 ```tsx
-{faqItems.length > 0 && (
-  <section>
-    <h2>{ts.faqHeading}</h2>
-    {ts.faqShortText && <p>{ts.faqShortText}</p>}
-    <FAQAccordion items={faqItems} />
-  </section>
-)}
+{
+  faqItems.length > 0 && (
+    <section>
+      <h2>{ts.faqHeading}</h2>
+      {ts.faqShortText && <p>{ts.faqShortText}</p>}
+      <FAQAccordion items={faqItems} />
+    </section>
+  )
+}
 ```
 
 Field name remap (schema → FAQAccordion props):
+
 - `fQuestion` → `faqQuestion`
 - `fAnswer` → `faqAnswer`
 
@@ -267,8 +282,8 @@ Empty the hardcoded fallback strings for `heroHeadline` and `heroSubtext`. If WP
 
 ```ts
 const [homeData, themeSettings] = await Promise.all([
-  getHomeData(),        // existing
-  getThemeSettings(),   // new
+  getHomeData(), // existing
+  getThemeSettings(), // new
 ])
 ```
 
@@ -282,14 +297,14 @@ All WP fetches wrapped in `try/catch` returning `null` or `{}` on failure. Compo
 
 ## Files changed
 
-| File | Change |
-|---|---|
-| `lib/queries.ts` | Delete `GET_FOOTER_OPTIONS`; add `GET_THEME_SETTINGS`, `GET_PRIMARY_MENU` |
-| `components/Header.tsx` | Rewrite as async Server Component; fetches data; renders HeaderClient |
-| `components/HeaderClient.tsx` | New file; `"use client"`; all interactivity; receives data as props |
-| `components/Footer.tsx` | Remove CTA band + hardcoded constants; fetch ThemeSetting; use WP data |
-| `app/page.tsx` | Add ThemeSetting fetch; fix contact section; add FAQ section; empty hero fallbacks |
-| `schema.graphql` | Regenerate after WP admin ThemeSetting config change |
+| File                          | Change                                                                             |
+| ----------------------------- | ---------------------------------------------------------------------------------- |
+| `lib/queries.ts`              | Delete `GET_FOOTER_OPTIONS`; add `GET_THEME_SETTINGS`, `GET_PRIMARY_MENU`          |
+| `components/Header.tsx`       | Rewrite as async Server Component; fetches data; renders HeaderClient              |
+| `components/HeaderClient.tsx` | New file; `"use client"`; all interactivity; receives data as props                |
+| `components/Footer.tsx`       | Remove CTA band + hardcoded constants; fetch ThemeSetting; use WP data             |
+| `app/page.tsx`                | Add ThemeSetting fetch; fix contact section; add FAQ section; empty hero fallbacks |
+| `schema.graphql`              | Regenerate after WP admin ThemeSetting config change                               |
 
 ---
 

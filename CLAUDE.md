@@ -51,13 +51,13 @@ All pages share a consistent visual language — do not invent new patterns.
 
 **Typography**
 
-| Role | Classes |
-|------|---------|
-| Hero title | `text-[clamp(2.2rem,10vw,110px)] font-bold tracking-tighter leading-none` |
-| Section heading | `text-[clamp(2rem,8vw,5rem)] md:text-7xl font-bold tracking-tighter` |
-| Lead text | `text-xl md:text-2xl text-gray-400 leading-relaxed font-light` |
-| Body | `text-[17px] md:text-[22px] text-gray-300 leading-relaxed` |
-| Accent label | `text-yellow-400 font-bold` |
+| Role            | Classes                                                                   |
+| --------------- | ------------------------------------------------------------------------- |
+| Hero title      | `text-[clamp(2.2rem,10vw,110px)] font-bold tracking-tighter leading-none` |
+| Section heading | `text-[clamp(2rem,8vw,5rem)] md:text-7xl font-bold tracking-tighter`      |
+| Lead text       | `text-xl md:text-2xl text-gray-400 leading-relaxed font-light`            |
+| Body            | `text-[17px] md:text-[22px] text-gray-300 leading-relaxed`                |
+| Accent label    | `text-yellow-400 font-bold`                                               |
 
 **Layout:** Padding `py-16 md:py-24` (standard) / `py-24`–`py-32` (hero). Between sections: `mb-16 md:mb-32`. Container: `max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8` (standard) / `max-w-[1600px] mx-auto px-4` (wide).
 

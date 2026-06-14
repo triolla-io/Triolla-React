@@ -1,10 +1,7 @@
-"use client";
+'use client'
 
-import { createContext, useContext, type ReactNode } from "react";
-import {
-  useServiceModal,
-  type ServiceDetail,
-} from "@/components/ServiceDetailModal";
+import { createContext, useContext, type ReactNode } from 'react'
+import { useServiceModal, type ServiceDetail } from '@/components/ServiceDetailModal'
 
 /**
  * Footer-wide service modal. The footer links to several service pages that no
@@ -18,11 +15,11 @@ import {
  */
 
 interface FooterModalContextValue {
-  open: (i: number) => void;
-  setTriggerRef: (i: number) => (el: HTMLElement | null) => void;
+  open: (i: number) => void
+  setTriggerRef: (i: number) => (el: HTMLElement | null) => void
 }
 
-const FooterModalContext = createContext<FooterModalContextValue | null>(null);
+const FooterModalContext = createContext<FooterModalContextValue | null>(null)
 
 export function FooterModalProvider({
   services,
@@ -30,24 +27,24 @@ export function FooterModalProvider({
   ctaLink,
   children,
 }: {
-  services: ServiceDetail[];
-  ctaText?: string | null;
-  ctaLink?: string | null;
-  children: ReactNode;
+  services: ServiceDetail[]
+  ctaText?: string | null
+  ctaLink?: string | null
+  children: ReactNode
 }) {
   const { open, setTriggerRef, modal } = useServiceModal(services, {
     ctaText,
     ctaLink,
-  });
+  })
 
   return (
     <FooterModalContext.Provider value={{ open, setTriggerRef }}>
       {children}
       {modal}
     </FooterModalContext.Provider>
-  );
+  )
 }
 
 export function useFooterModal() {
-  return useContext(FooterModalContext);
+  return useContext(FooterModalContext)
 }

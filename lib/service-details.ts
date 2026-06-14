@@ -1,31 +1,27 @@
-import { client } from "@/lib/apollo-client";
-import { GET_SERVICES_PAGE, buildServiceDetailsQuery } from "@/lib/queries";
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import type { ServiceDetail } from "@/components/ServiceDetailModal";
-import type {
-  GetServicesPageData,
-  GetServiceDetailsData,
-  ServicesPageFields,
-} from "@/lib/graphql-types";
+import { client } from '@/lib/apollo-client'
+import { GET_SERVICES_PAGE, buildServiceDetailsQuery } from '@/lib/queries'
+import { gql } from '@apollo/client'
+import type { TypedDocumentNode } from '@apollo/client'
+import type { ServiceDetail } from '@/components/ServiceDetailModal'
+import type { GetServicesPageData, GetServiceDetailsData, ServicesPageFields } from '@/lib/graphql-types'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
-`;
+`
 
 /** Turn a WP link ("https://triolla.io/services/x/" or "/services/x") into a
  *  URI path ("services/x") suitable for `page(idType: URI)` — and for matching
  *  one link against another. Returns null if there's nothing usable. */
 export function deriveUri(link: string): string | null {
-  if (!link) return null;
-  let path = link;
+  if (!link) return null
+  let path = link
   try {
-    path = new URL(link).pathname;
+    path = new URL(link).pathname
   } catch {
     // already a relative path
   }
-  const trimmed = path.replace(/^\/+|\/+$/g, "");
-  return trimmed || null;
+  const trimmed = path.replace(/^\/+|\/+$/g, '')
+  return trimmed || null
 }
 
 /** Prefetch the detail pages for a list of `{ label, link }` menu items in one
@@ -33,45 +29,45 @@ export function deriveUri(link: string): string | null {
  *  to resolve keeps `hasDetail: false`, so callers render it as a plain link —
  *  never a modal with fabricated content. The whole fetch is wrapped so a
  *  backend failure degrades every item to a plain link rather than throwing. */
-export async function enrichServiceDetails(
-  menu: Array<{ label?: string | null; link?: string | null }>
-): Promise<ServiceDetail[]> {
+export async function enrichServiceDetails(menu: Array<{ label?: string | null; link?: string | null }>): Promise<ServiceDetail[]> {
   const enriched: ServiceDetail[] = (menu ?? []).map((item) => ({
     label: item?.label ?? null,
     link: item?.link ?? null,
     title: null,
     image: null,
-    altText: "",
+    altText: '',
     boldText: null,
     content: null,
     hasDetail: false,
-  }));
+  }))
 
   const queryable = enriched
-    .map((e, index) => ({ e, index, uri: deriveUri(e.link ?? "") }))
-    .filter((q): q is { e: ServiceDetail; index: number; uri: string } => !!q.uri);
+    .map((e, index) => ({ e, index, uri: deriveUri(e.link ?? '') }))
+    .filter((q): q is { e: ServiceDetail; index: number; uri: string } => !!q.uri)
 
-  if (queryable.length === 0) return enriched;
+  if (queryable.length === 0) return enriched
 
   try {
-    const detailQuery: TypedDocumentNode<GetServiceDetailsData> = gql`${buildServiceDetailsQuery(queryable.map((q) => q.uri))}`;
-    const { data } = await client.query({ query: detailQuery });
+    const detailQuery: TypedDocumentNode<GetServiceDetailsData> = gql`
+      ${buildServiceDetailsQuery(queryable.map((q) => q.uri))}
+    `
+    const { data } = await client.query({ query: detailQuery })
     queryable.forEach((q, i) => {
-      const page = data?.[`s${i}`];
-      if (!page) return; // unresolved → stays a plain link
-      const e = enriched[q.index];
-      e.title = page.title ?? null;
-      e.image = page.featuredImage?.node?.sourceUrl ?? null;
-      e.altText = page.featuredImage?.node?.altText ?? "";
-      e.boldText = page.template?.postFields?.topBoldText ?? null;
-      e.content = page.content ?? null;
-      e.hasDetail = true;
-    });
+      const page = data?.[`s${i}`]
+      if (!page) return // unresolved → stays a plain link
+      const e = enriched[q.index]
+      e.title = page.title ?? null
+      e.image = page.featuredImage?.node?.sourceUrl ?? null
+      e.altText = page.featuredImage?.node?.altText ?? ''
+      e.boldText = page.template?.postFields?.topBoldText ?? null
+      e.content = page.content ?? null
+      e.hasDetail = true
+    })
   } catch {
-    return enriched; // backend failure → all plain links
+    return enriched // backend failure → all plain links
   }
 
-  return enriched;
+  return enriched
 }
 
 /** Fetch the Services page ACF and return every service across Product,
@@ -81,12 +77,12 @@ export async function enrichServiceDetails(
  *  instead of navigating to a page that no longer exists. On any failure it
  *  returns `[]`, so the footer simply keeps its plain links. */
 export async function getAllServices(): Promise<ServiceDetail[]> {
-  let sp: ServicesPageFields = {} as ServicesPageFields;
+  let sp: ServicesPageFields = {} as ServicesPageFields
   try {
-    const { data } = await client.query({ query: SERVICES_PAGE_QUERY });
-    sp = data?.page?.template?.servicePage ?? ({} as ServicesPageFields);
+    const { data } = await client.query({ query: SERVICES_PAGE_QUERY })
+    sp = data?.page?.template?.servicePage ?? ({} as ServicesPageFields)
   } catch {
-    return [];
+    return []
   }
 
   const menu = [
@@ -101,7 +97,7 @@ export async function getAllServices(): Promise<ServiceDetail[]> {
     { label: sp.devrightMenuToptitle ?? null, link: sp.devrightMenuToptitleLink ?? null },
     { label: sp.devrightMenuBottitle ?? null, link: sp.devrightMenuBottitleLink ?? null },
     { label: sp.rightMenuThreeTitle ?? null, link: sp.rightMenuThreeTitleLink ?? null },
-  ];
+  ]
 
-  return enrichServiceDetails(menu);
+  return enrichServiceDetails(menu)
 }

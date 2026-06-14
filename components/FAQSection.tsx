@@ -1,67 +1,80 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import parse from "html-react-parser";
-import { GlowOrb, GradientText } from "@/components/ui";
-
+import { useState } from 'react'
+import parse from 'html-react-parser'
+import { GlowOrb, GradientText } from '@/components/ui'
 
 interface FAQItem {
-  faqQuestion: string;
-  faqAnswer: string;
+  faqQuestion: string
+  faqAnswer: string
 }
 
 interface FAQSectionProps {
-  heading?: string | null;
-  subtext?: string | null;
-  items: FAQItem[];
+  heading?: string | null
+  subtext?: string | null
+  items: FAQItem[]
 }
 
-
 export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(null)
 
-  if (!items.length) return null;
+  if (!items.length) return null
 
   return (
     <>
       <section className="fq-root">
         <div className="fq-card">
-          <GlowOrb animation="none" size={640} fade="60%" blur={100} color="rgba(250,204,21,0.09)" className="top-[-20%] right-[-8%] opacity-[0.85]" />
-          <GlowOrb animation="none" size={500} fade="60%" blur={100} color="rgba(251,146,60,0.06)" className="bottom-[-15%] left-[-6%] opacity-[0.85]" />
-          <GlowOrb animation="none" size={320} fade="60%" blur={100} color="rgba(250,204,21,0.03)" className="top-[50%] left-[30%] opacity-[0.85]" />
+          <GlowOrb
+            animation="none"
+            size={640}
+            fade="60%"
+            blur={100}
+            color="rgba(250,204,21,0.09)"
+            className="top-[-20%] right-[-8%] opacity-[0.85]"
+          />
+          <GlowOrb
+            animation="none"
+            size={500}
+            fade="60%"
+            blur={100}
+            color="rgba(251,146,60,0.06)"
+            className="bottom-[-15%] left-[-6%] opacity-[0.85]"
+          />
+          <GlowOrb
+            animation="none"
+            size={320}
+            fade="60%"
+            blur={100}
+            color="rgba(250,204,21,0.03)"
+            className="top-[50%] left-[30%] opacity-[0.85]"
+          />
           <div className="fq-grid" />
 
           <div className="fq-layout">
-
             {/* LEFT — sticky heading */}
             <div className="fq-col-left">
               <div className="fq-left-inner">
                 {heading && <h2 className="fq-heading">{heading}</h2>}
-                {subtext  && <p className="fq-subtext">{subtext}</p>}
+                {subtext && <p className="fq-subtext">{subtext}</p>}
                 <div className="fq-rule" />
                 <GradientText as="span" gradient="linear-gradient(128deg,#facc15,#f59e0b)" className="fq-count" aria-hidden="true">
-                  {String(items.length).padStart(2, "0")}
+                  {String(items.length).padStart(2, '0')}
                   <span className="fq-count__label">questions</span>
                 </GradientText>
               </div>
-              <div className="fq-deco" aria-hidden="true">?</div>
+              <div className="fq-deco" aria-hidden="true">
+                ?
+              </div>
             </div>
 
             {/* RIGHT — accordion */}
             <div className="fq-col-right">
               {items.map((item, i) => {
-                const isOpen = open === i;
+                const isOpen = open === i
                 return (
-                  <div
-                    key={i}
-                    className={`fq-item${isOpen ? " fq-item--open" : ""}`}
-                  >
-                    <button
-                      className="fq-item__btn"
-                      onClick={() => setOpen(isOpen ? null : i)}
-                      aria-expanded={isOpen}
-                    >
-                      <span className="fq-item__num">{String(i + 1).padStart(2, "0")}</span>
+                  <div key={i} className={`fq-item${isOpen ? ' fq-item--open' : ''}`}>
+                    <button className="fq-item__btn" onClick={() => setOpen(isOpen ? null : i)} aria-expanded={isOpen}>
+                      <span className="fq-item__num">{String(i + 1).padStart(2, '0')}</span>
                       <span className="fq-item__q">{item.faqQuestion}</span>
                       <span className="fq-item__icon" aria-hidden="true">
                         <span className="fq-item__icon-h" />
@@ -76,10 +89,9 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
-
           </div>
         </div>
       </section>
@@ -437,5 +449,5 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
         }
       `}</style>
     </>
-  );
+  )
 }

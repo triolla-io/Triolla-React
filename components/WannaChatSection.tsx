@@ -1,108 +1,124 @@
-"use client";
+'use client'
 
-import { useRef, useState } from "react";
-import { GlowOrb } from "@/components/ui";
-import { submitContactForm } from "@/app/actions/contact";
-import {
-  initialContactState,
-  type ContactFormState,
-} from "@/lib/contact-form";
+import { useRef, useState } from 'react'
+import { GlowOrb } from '@/components/ui'
+import { submitContactForm } from '@/app/actions/contact'
+import { initialContactState, type ContactFormState } from '@/lib/contact-form'
 
 interface ContactItem {
-  label: string;
-  value: string;
-  href?: string;
+  label: string
+  value: string
+  href?: string
 }
 
 interface WannaChatSectionProps {
-  contactItems: ContactItem[];
-  leftHeading?: string | null;
-  formHeading?: string | null;
-  submitLabel?: string | null;
-  callUsLabel?: string | null;
+  contactItems: ContactItem[]
+  leftHeading?: string | null
+  formHeading?: string | null
+  submitLabel?: string | null
+  callUsLabel?: string | null
   /** Address used for the direct-email fallback shown when no delivery
    *  provider is configured yet. From WP theme settings (cEmailAddress). */
-  fallbackEmail?: string | null;
+  fallbackEmail?: string | null
 }
 
 const FORM_FIELDS = [
-  { key: "name",  type: "text",  label: "Full Name",    required: true  },
-  { key: "phone", type: "tel",   label: "Phone",        required: false },
-  { key: "email", type: "email", label: "Email",        required: true  },
-] as const;
+  { key: 'name', type: 'text', label: 'Full Name', required: true },
+  { key: 'phone', type: 'tel', label: 'Phone', required: false },
+  { key: 'email', type: 'email', label: 'Email', required: true },
+] as const
 
-export function WannaChatSection({ contactItems, leftHeading, formHeading, submitLabel, callUsLabel, fallbackEmail }: WannaChatSectionProps) {
-  const [state, setState] = useState<ContactFormState>(initialContactState);
-  const [pending, setPending] = useState(false);
-  const [fields, setFields] = useState({ name: "", phone: "", email: "" });
-  const [focused, setFocused] = useState<string | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+export function WannaChatSection({
+  contactItems,
+  leftHeading,
+  formHeading,
+  submitLabel,
+  callUsLabel,
+  fallbackEmail,
+}: WannaChatSectionProps) {
+  const [state, setState] = useState<ContactFormState>(initialContactState)
+  const [pending, setPending] = useState(false)
+  const [fields, setFields] = useState({ name: '', phone: '', email: '' })
+  const [focused, setFocused] = useState<string | null>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   // Server Action invoked from the client: dispatch, store the typed result,
   // and clear inputs only on a confirmed send. setState lives in this async
   // handler (an event), not an effect — values survive validation errors.
   async function handleAction(formData: FormData) {
-    setPending(true);
-    const result = await submitContactForm(state, formData);
-    setState(result);
-    if (result.status === "sent") setFields({ name: "", phone: "", email: "" });
-    setPending(false);
+    setPending(true)
+    const result = await submitContactForm(state, formData)
+    setState(result)
+    if (result.status === 'sent') setFields({ name: '', phone: '', email: '' })
+    setPending(false)
   }
 
   // Direct-email fallback (mailto) prefilled with whatever the visitor typed —
   // used when delivery isn't wired up yet, so the lead is never lost.
   const mailtoHref = fallbackEmail
-    ? `mailto:${fallbackEmail}?subject=${encodeURIComponent(
-        `Website enquiry — ${fields.name}`.trim(),
-      )}&body=${encodeURIComponent(
+    ? `mailto:${fallbackEmail}?subject=${encodeURIComponent(`Website enquiry — ${fields.name}`.trim())}&body=${encodeURIComponent(
         `Name: ${fields.name}\nEmail: ${fields.email}\nPhone: ${fields.phone}`,
       )}`
-    : null;
+    : null
 
   /* 3-D tilt on the form card */
   const onCardMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const card = cardRef.current;
-    if (!card) return;
-    card.style.transition = "none";
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    card.style.transform = `perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateZ(10px)`;
-  };
+    const card = cardRef.current
+    if (!card) return
+    card.style.transition = 'none'
+    const r = card.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width - 0.5
+    const y = (e.clientY - r.top) / r.height - 0.5
+    card.style.transform = `perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateZ(10px)`
+  }
   const onCardLeave = () => {
-    const card = cardRef.current;
-    if (!card) return;
-    card.style.transition = "transform 0.65s cubic-bezier(.23,1,.32,1)";
-    card.style.transform = "perspective(900px) rotateY(0deg) rotateX(0deg) translateZ(0)";
-  };
+    const card = cardRef.current
+    if (!card) return
+    card.style.transition = 'transform 0.65s cubic-bezier(.23,1,.32,1)'
+    card.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) translateZ(0)'
+  }
 
   return (
     <>
       <section className="wc-root">
         <div className="wc-card">
           {/* ── background layers ── */}
-          <GlowOrb size={720} fade="60%" blur={96} color="rgba(250,204,21,0.11)"
-            className="top-[-25%] left-[-10%] opacity-80 max-md:w-[260px] max-md:h-[260px] max-md:top-[-15%] max-md:left-[-15%]" />
-          <GlowOrb size={560} fade="60%" blur={96} color="rgba(251,146,60,0.08)"
-            className="bottom-[-20%] right-[-8%] opacity-80 max-md:w-[200px] max-md:h-[200px] max-md:bottom-[-10%] max-md:right-[-10%]" />
-          <GlowOrb size={380} fade="60%" blur={96} color="rgba(250,204,21,0.04)"
-            className="top-[35%] left-[42%] opacity-80 max-md:hidden" />
+          <GlowOrb
+            size={720}
+            fade="60%"
+            blur={96}
+            color="rgba(250,204,21,0.11)"
+            className="top-[-25%] left-[-10%] opacity-80 max-md:w-[260px] max-md:h-[260px] max-md:top-[-15%] max-md:left-[-15%]"
+          />
+          <GlowOrb
+            size={560}
+            fade="60%"
+            blur={96}
+            color="rgba(251,146,60,0.08)"
+            className="bottom-[-20%] right-[-8%] opacity-80 max-md:w-[200px] max-md:h-[200px] max-md:bottom-[-10%] max-md:right-[-10%]"
+          />
+          <GlowOrb
+            size={380}
+            fade="60%"
+            blur={96}
+            color="rgba(250,204,21,0.04)"
+            className="top-[35%] left-[42%] opacity-80 max-md:hidden"
+          />
           <div className="wc-grid" />
 
           {/* floating particles */}
           {Array.from({ length: 9 }).map((_, i) => (
-            <span key={i} className="wc-dot" style={{ "--i": i } as React.CSSProperties} />
+            <span key={i} className="wc-dot" style={{ '--i': i } as React.CSSProperties} />
           ))}
 
           {/* ── layout ── */}
           <div className="wc-layout">
-
             {/* LEFT — heading + info */}
             <div className="wc-left">
               {leftHeading && (
                 <h2 className="wc-heading">
-                  {leftHeading.split("\n").map((line, i) => (
-                    <span key={i} className={i === 0 ? "wc-heading__white" : "wc-heading__gold"}>
+                  {leftHeading.split('\n').map((line, i) => (
+                    <span key={i} className={i === 0 ? 'wc-heading__white' : 'wc-heading__gold'}>
                       {line}
                     </span>
                   ))}
@@ -118,7 +134,9 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
                     <div key={i} className="wc-item">
                       <span className="wc-item__lbl">{item.label}</span>
                       {item.href ? (
-                        <a href={item.href} className="wc-item__val wc-item__val--link">{item.value}</a>
+                        <a href={item.href} className="wc-item__val wc-item__val--link">
+                          {item.value}
+                        </a>
                       ) : (
                         <span className="wc-item__val">{item.value}</span>
                       )}
@@ -130,21 +148,16 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
 
             {/* RIGHT — form card */}
             <div className="wc-right">
-              <div
-                ref={cardRef}
-                className="wc-form"
-                onMouseMove={onCardMove}
-                onMouseLeave={onCardLeave}
-              >
+              <div ref={cardRef} className="wc-form" onMouseMove={onCardMove} onMouseLeave={onCardLeave}>
                 <div className="wc-form__glow" />
                 <div className="wc-form__sweep" />
 
                 {/* corner decoration */}
                 <div className="wc-corner" aria-hidden="true">
                   <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                    <path d="M60 0 L60 60 L0 60" stroke="rgba(250,204,21,0.12)" strokeWidth="1" fill="none"/>
-                    <path d="M60 12 L60 60 L12 60" stroke="rgba(250,204,21,0.07)" strokeWidth="1" fill="none"/>
-                    <path d="M60 24 L60 60 L24 60" stroke="rgba(250,204,21,0.04)" strokeWidth="1" fill="none"/>
+                    <path d="M60 0 L60 60 L0 60" stroke="rgba(250,204,21,0.12)" strokeWidth="1" fill="none" />
+                    <path d="M60 12 L60 60 L12 60" stroke="rgba(250,204,21,0.07)" strokeWidth="1" fill="none" />
+                    <path d="M60 24 L60 60 L24 60" stroke="rgba(250,204,21,0.04)" strokeWidth="1" fill="none" />
                   </svg>
                 </div>
 
@@ -152,24 +165,18 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
 
                 <form action={handleAction} noValidate>
                   {/* Honeypot — hidden from users, catches bots. */}
-                  <input
-                    type="text"
-                    name="company"
-                    tabIndex={-1}
-                    autoComplete="off"
-                    aria-hidden="true"
-                    className="wc-honeypot"
-                  />
+                  <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="wc-honeypot" />
 
                   <div className="wc-fields">
                     {FORM_FIELDS.map((f) => {
-                      const val = fields[f.key];
-                      const up  = focused === f.key || val.length > 0;
-                      const err = state.errors[f.key as keyof typeof state.errors];
+                      const val = fields[f.key]
+                      const up = focused === f.key || val.length > 0
+                      const err = state.errors[f.key as keyof typeof state.errors]
                       return (
-                        <div key={f.key} className={`wc-field${up ? " wc-field--up" : ""}`}>
+                        <div key={f.key} className={`wc-field${up ? ' wc-field--up' : ''}`}>
                           <label className="wc-field__lbl" htmlFor={`wc-${f.key}`}>
-                            {f.label}{f.required && <i className="wc-req">*</i>}
+                            {f.label}
+                            {f.required && <i className="wc-req">*</i>}
                           </label>
                           <input
                             id={`wc-${f.key}`}
@@ -177,7 +184,7 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
                             type={f.type}
                             className="wc-field__inp"
                             value={val}
-                            onChange={e => setFields(p => ({ ...p, [f.key]: e.target.value }))}
+                            onChange={(e) => setFields((p) => ({ ...p, [f.key]: e.target.value }))}
                             onFocus={() => setFocused(f.key)}
                             onBlur={() => setFocused(null)}
                             autoComplete={f.key}
@@ -191,27 +198,37 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
                             </span>
                           )}
                         </div>
-                      );
+                      )
                     })}
                   </div>
 
                   <button
                     type="submit"
-                    className={`wc-btn${pending ? " wc-btn--busy" : ""}${state.status === "sent" ? " wc-btn--done" : ""}`}
-                    disabled={pending || state.status === "sent"}
+                    className={`wc-btn${pending ? ' wc-btn--busy' : ''}${state.status === 'sent' ? ' wc-btn--done' : ''}`}
+                    disabled={pending || state.status === 'sent'}
                   >
                     <span className="wc-btn__sweep" />
-                    <span className="wc-btn__txt">
-                      {state.status === "sent" ? "✓" : pending ? "…" : (submitLabel ?? "")}
-                    </span>
-                    {!pending && state.status !== "sent" && (
+                    <span className="wc-btn__txt">{state.status === 'sent' ? '✓' : pending ? '…' : (submitLabel ?? '')}</span>
+                    {!pending && state.status !== 'sent' && (
                       <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
-                        <path d="M2 8.5H15M11 4L15.5 8.5L11 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path
+                          d="M2 8.5H15M11 4L15.5 8.5L11 13"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     )}
-                    {state.status === "sent" && (
+                    {state.status === 'sent' && (
                       <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
-                        <path d="M2.5 9L7 13.5L14.5 4.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path
+                          d="M2.5 9L7 13.5L14.5 4.5"
+                          stroke="currentColor"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     )}
                     {pending && <span className="wc-btn__spin" />}
@@ -219,24 +236,20 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
 
                   {/* Status / fallback region */}
                   <div className="wc-status" role="status" aria-live="polite">
-                    {state.status === "sent" && (
-                      <p className="wc-status__ok">Thanks — we’ll be in touch shortly.</p>
-                    )}
-                    {state.status === "error" && state.message && (
-                      <p className="wc-status__err">{state.message}</p>
-                    )}
-                    {state.status === "unconfigured" && (
+                    {state.status === 'sent' && <p className="wc-status__ok">Thanks — we’ll be in touch shortly.</p>}
+                    {state.status === 'error' && state.message && <p className="wc-status__err">{state.message}</p>}
+                    {state.status === 'unconfigured' && (
                       <p className="wc-status__err">
                         {mailtoHref ? (
                           <>
-                            We couldn’t send that automatically yet. Please{" "}
+                            We couldn’t send that automatically yet. Please{' '}
                             <a href={mailtoHref} className="wc-status__link">
                               email us directly
-                            </a>{" "}
+                            </a>{' '}
                             and we’ll get right back to you.
                           </>
                         ) : (
-                          "We couldn’t send that automatically yet. Please reach us using the contact details on this page."
+                          'We couldn’t send that automatically yet. Please reach us using the contact details on this page.'
                         )}
                       </p>
                     )}
@@ -244,7 +257,6 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
                 </form>
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -721,5 +733,5 @@ export function WannaChatSection({ contactItems, leftHeading, formHeading, submi
         }
       `}</style>
     </>
-  );
+  )
 }

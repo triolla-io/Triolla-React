@@ -67,7 +67,7 @@ export const GET_SERVICES_PAGE = `
       }
     }
   }
-`;
+`
 
 /**
  * Build a single batched query that fetches every service detail page in one
@@ -88,16 +88,11 @@ export function buildServiceDetailsQuery(uris: string[]): string {
       ... on Template_ServiceDetailPage {
         postFields { topBoldText }
       }
-    }`;
+    }`
 
-  const selections = uris
-    .map(
-      (uri, i) =>
-        `    s${i}: page(id: ${JSON.stringify(uri)}, idType: URI) {${fields}\n    }`
-    )
-    .join("\n");
+  const selections = uris.map((uri, i) => `    s${i}: page(id: ${JSON.stringify(uri)}, idType: URI) {${fields}\n    }`).join('\n')
 
-  return `query GetServiceDetails {\n${selections}\n}`;
+  return `query GetServiceDetails {\n${selections}\n}`
 }
 
 export const GET_HOME_PAGE = `
@@ -126,7 +121,7 @@ export const GET_HOME_PAGE = `
       }
     }
   }
-`;
+`
 
 export const GET_CONTACT_PAGE = `
   query GetContactPage {
@@ -150,7 +145,7 @@ export const GET_CONTACT_PAGE = `
       }
     }
   }
-`;
+`
 
 // Generic fetch for simple/legal content pages (privacy-policy, terms-of-use,
 // accessibility-statement, …). These render the WP page title + post content
@@ -162,7 +157,7 @@ export const GET_CONTENT_PAGE = `
       content
     }
   }
-`;
+`
 
 export const GET_FOOTER_DATA = `
   query GetFooterData {
@@ -179,7 +174,7 @@ export const GET_FOOTER_DATA = `
       }
     }
   }
-`;
+`
 
 export const GET_THEME_SETTINGS = `
   query GetThemeSettings {
@@ -252,7 +247,7 @@ export const GET_THEME_SETTINGS = `
       }
     }
   }
-`;
+`
 
 export const GET_PRIMARY_MENU = `
   query GetPrimaryMenu {
@@ -267,7 +262,7 @@ export const GET_PRIMARY_MENU = `
       }
     }
   }
-`;
+`
 
 export const GET_PORTFOLIO_SLUGS = `
   query GetPortfolioSlugs {
@@ -280,7 +275,7 @@ export const GET_PORTFOLIO_SLUGS = `
       }
     }
   }
-`;
+`
 
 export const GET_PORTFOLIO_PAGE = `
   query GetPortfolioPage($uri: ID!) {
@@ -320,7 +315,7 @@ export const GET_PORTFOLIO_PAGE = `
       }
     }
   }
-`;
+`
 
 export const GET_ABOUT_PAGE = `
   query GetAboutPage {
@@ -381,7 +376,7 @@ export const GET_ABOUT_PAGE = `
       }
     }
   }
-`;
+`
 
 export const GET_TECHNOLOGY_PAGE = `
   query GetTechnologyPage {
@@ -463,4 +458,4 @@ export const GET_TECHNOLOGY_PAGE = `
       }
     }
   }
-`;
+`

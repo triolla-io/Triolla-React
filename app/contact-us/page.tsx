@@ -1,68 +1,59 @@
-import React from "react";
-import type { Metadata } from "next";
-import { client } from "@/lib/apollo-client";
-import { GET_CONTACT_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import { FadeIn } from "@/components/FadeIn";
-import { WannaChatSection } from "@/components/WannaChatSection";
-import { GlowOrb, Eyebrow } from "@/components/ui";
-import type {
-  GetContactPageData,
-  GetThemeSettingsData,
-  ContactFields,
-  ThemeOptions,
-} from "@/lib/graphql-types";
+import React from 'react'
+import type { Metadata } from 'next'
+import { client } from '@/lib/apollo-client'
+import { GET_CONTACT_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
+import { gql } from '@apollo/client'
+import type { TypedDocumentNode } from '@apollo/client'
+import { FadeIn } from '@/components/FadeIn'
+import { WannaChatSection } from '@/components/WannaChatSection'
+import { GlowOrb, Eyebrow } from '@/components/ui'
+import type { GetContactPageData, GetThemeSettingsData, ContactFields, ThemeOptions } from '@/lib/graphql-types'
 
 const CONTACT_PAGE_QUERY: TypedDocumentNode<GetContactPageData> = gql`
   ${GET_CONTACT_PAGE}
-`;
+`
 
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
-`;
+`
 
 function stripHtml(html: string): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&#8217;/g, "’")
-    .replace(/&nbsp;/g, " ")
-    .trim();
+  return (html ?? '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&#8217;/g, '’')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
 }
 
 async function getContactData(): Promise<{ title: string | null; fields: ContactFields | null }> {
   try {
-    const { data } = await client.query({ query: CONTACT_PAGE_QUERY });
+    const { data } = await client.query({ query: CONTACT_PAGE_QUERY })
     return {
       title: data?.page?.title ?? null,
       fields: data?.page?.template?.contactFields ?? null,
-    };
+    }
   } catch {
-    return { title: null, fields: null };
+    return { title: null, fields: null }
   }
 }
 
 async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
-    return data?.themeSetting?.themeOptions ?? null;
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY })
+    return data?.themeSetting?.themeOptions ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
 export const metadata: Metadata = {
-  title: "Contact Us | Triolla",
-  description:
-    "Get in touch with Triolla — product design & development for tech, gaming, medical, cyber, IoT and SaaS.",
-};
+  title: 'Contact Us | Triolla',
+  description: 'Get in touch with Triolla — product design & development for tech, gaming, medical, cyber, IoT and SaaS.',
+}
 
 export default async function ContactUsPage() {
-  const [{ title, fields }, ts] = await Promise.all([
-    getContactData(),
-    getThemeSettings(),
-  ]);
+  const [{ title, fields }, ts] = await Promise.all([getContactData(), getThemeSettings()])
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
@@ -76,20 +67,18 @@ export default async function ContactUsPage() {
       ? {
           label: ts.cTlvLabel,
           value: ts.cTlvNumber,
-          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
     ts?.cNyLabel && ts?.cNyNumber
       ? {
           label: ts.cNyLabel,
           value: ts.cNyNumber,
-          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, "")}`,
+          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, '')}`,
         }
       : null,
-    ts?.cAddressLabel && ts?.cAddress
-      ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined }
-      : null,
-  ].filter((x): x is NonNullable<typeof x> => x !== null);
+    ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
+  ].filter((x): x is NonNullable<typeof x> => x !== null)
 
   // Two-office detail straight from the Contact page ACF group.
   const offices = [
@@ -107,21 +96,31 @@ export default async function ContactUsPage() {
           phone: fields?.contactNumberCopy ?? null,
         }
       : null,
-  ].filter((x): x is NonNullable<typeof x> => x !== null);
+  ].filter((x): x is NonNullable<typeof x> => x !== null)
 
-  const heroTitle = stripHtml(title ?? "");
-  const heroLead = stripHtml(fields?.contactTitle ?? "");
+  const heroTitle = stripHtml(title ?? '')
+  const heroLead = stripHtml(fields?.contactTitle ?? '')
 
   return (
     <main className="bg-[#080808] text-white overflow-x-clip relative pb-32">
       {/* ══ HERO ══ */}
       <section className="cu-hero">
-        <GlowOrb size={900} height={480} shape="ellipse" fade="70%" blur={60} color="rgba(250,204,21,0.1)" className="top-[-10%] left-1/2 -translate-x-1/2 z-0" />
+        <GlowOrb
+          size={900}
+          height={480}
+          shape="ellipse"
+          fade="70%"
+          blur={60}
+          color="rgba(250,204,21,0.1)"
+          className="top-[-10%] left-1/2 -translate-x-1/2 z-0"
+        />
         <div className="cu-hero__grid" aria-hidden="true" />
 
         <div className="cu-hero__content">
           <FadeIn yOffset={20} duration={0.7}>
-            <Eyebrow ornament="dot" style={{ "--eb-weight": "600", "--eb-mb": "26px" } as React.CSSProperties}>Contact</Eyebrow>
+            <Eyebrow ornament="dot" style={{ '--eb-weight': '600', '--eb-mb': '26px' } as React.CSSProperties}>
+              Contact
+            </Eyebrow>
           </FadeIn>
 
           {heroTitle && (
@@ -144,10 +143,7 @@ export default async function ContactUsPage() {
                     {o.title && <span className="cu-office__title">{o.title}</span>}
                     {o.address && <span className="cu-office__addr">{o.address}</span>}
                     {o.phone && (
-                      <a
-                        href={`tel:${o.phone.replace(/[^+\d]/g, "")}`}
-                        className="cu-office__phone"
-                      >
+                      <a href={`tel:${o.phone.replace(/[^+\d]/g, '')}`} className="cu-office__phone">
                         {o.phone}
                       </a>
                     )}
@@ -165,8 +161,8 @@ export default async function ContactUsPage() {
         leftHeading={
           ts?.cLeftHeading
             ? ts.cLeftHeading
-                .replace(/<br\s*\/?>/gi, "\n")
-                .replace(/<[^>]+>/g, "")
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
                 .trim()
             : null
         }
@@ -234,5 +230,5 @@ export default async function ContactUsPage() {
         }
       `}</style>
     </main>
-  );
+  )
 }

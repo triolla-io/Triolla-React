@@ -1,88 +1,77 @@
-"use client";
+'use client'
 
-import { useRef, useEffect, useState } from "react";
-import parse from "html-react-parser";
-import { GlowOrb, Eyebrow, GradientText } from "@/components/ui";
+import { useRef, useEffect, useState } from 'react'
+import parse from 'html-react-parser'
+import { GlowOrb, Eyebrow, GradientText } from '@/components/ui'
 
 function decodeHtml(html: string): string {
-  return (html ?? "")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&amp;/gi, "&")
+  return (html ?? '')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
     .replace(/&#039;/g, "'")
-    .replace(/&#8217;/g, "'");
+    .replace(/&#8217;/g, "'")
 }
 
 interface TechImage {
-  url: string | null;
-  title: string | null;
+  url: string | null
+  title: string | null
 }
 
 interface TechStackSectionProps {
-  titleOne: string | null;
-  titleTwo: string | null;
-  text: string | null;
-  midTitle: string | null;
-  images: TechImage[];
-  accentColor: string;
+  titleOne: string | null
+  titleTwo: string | null
+  text: string | null
+  midTitle: string | null
+  images: TechImage[]
+  accentColor: string
 }
 
 function stripHtmlTags(html: string): string {
-  return (html ?? "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .trim();
+  return (html ?? '')
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
 }
 
-export function TechStackSection({
-  titleOne,
-  titleTwo,
-  text,
-  midTitle,
-  images,
-  accentColor,
-}: TechStackSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
+export function TechStackSection({ titleOne, titleTwo, text, midTitle, images, accentColor }: TechStackSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
+    const el = sectionRef.current
+    if (!el) return
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
+          setVisible(true)
+          obs.disconnect()
         }
       },
       { threshold: 0.08 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
-  const validImages = images.filter((img) => img.url);
-  const plainText = text ? stripHtmlTags(text) : null;
-  const cleanMidTitle = (midTitle ?? "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/&amp;/g, "&")
-    .trim();
+  const validImages = images.filter((img) => img.url)
+  const plainText = text ? stripHtmlTags(text) : null
+  const cleanMidTitle = (midTitle ?? '')
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/&amp;/g, '&')
+    .trim()
 
-  const count = validImages.length;
-  const countStr = String(count).padStart(2, "0");
+  const count = validImages.length
+  const countStr = String(count).padStart(2, '0')
 
   return (
     <>
-      <section
-        ref={sectionRef}
-        className="tss-root"
-        style={{ "--accent": accentColor } as React.CSSProperties}
-      >
+      <section ref={sectionRef} className="tss-root" style={{ '--accent': accentColor } as React.CSSProperties}>
         {/* Ambient layers */}
         {/* tss-orb--tr: circle, 620px, ${accentColor}14 = 7.8%, blur 110, pulse 12s */}
         <GlowOrb
@@ -118,19 +107,19 @@ export function TechStackSection({
 
         <div className="tss-inner">
           {/* ── Centered header ── */}
-          <div className={`tss-head ${visible ? "tss-head--on" : ""}`}>
+          <div className={`tss-head ${visible ? 'tss-head--on' : ''}`}>
             {cleanMidTitle && (
               <Eyebrow
                 ornament="mark"
                 align="center"
                 style={
                   {
-                    "--eb-gap": "16px",
-                    "--eb-line-w": "clamp(40px, 7vw, 72px)",
-                    "--eb-line-bg": "linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 67%, transparent))",
-                    "--eb-mb": "28px",
-                    "--eb-spacing": "0.36em",
-                    "--eb-weight": "800",
+                    '--eb-gap': '16px',
+                    '--eb-line-w': 'clamp(40px, 7vw, 72px)',
+                    '--eb-line-bg': 'linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 67%, transparent))',
+                    '--eb-mb': '28px',
+                    '--eb-spacing': '0.36em',
+                    '--eb-weight': '800',
                   } as React.CSSProperties
                 }
               >
@@ -140,9 +129,7 @@ export function TechStackSection({
 
             {(titleOne || titleTwo) && (
               <h2 className="tss-title">
-                {titleOne && (
-                  <span className="tss-title__line">{parse(decodeHtml(titleOne))}</span>
-                )}
+                {titleOne && <span className="tss-title__line">{parse(decodeHtml(titleOne))}</span>}
                 {titleTwo && (
                   <GradientText
                     as="span"
@@ -168,11 +155,11 @@ export function TechStackSection({
                 {validImages.map((img, i) => (
                   <div
                     key={i}
-                    className={`tss-card ${visible ? "tss-card--on" : ""}`}
+                    className={`tss-card ${visible ? 'tss-card--on' : ''}`}
                     style={
                       {
-                        "--ci": i,
-                        transitionDelay: visible ? `${0.15 + i * 0.07}s` : "0s",
+                        '--ci': i,
+                        transitionDelay: visible ? `${0.15 + i * 0.07}s` : '0s',
                       } as React.CSSProperties
                     }
                   >
@@ -180,26 +167,12 @@ export function TechStackSection({
                       <div className="tss-card__face-wrap">
                         <span className="tss-card__halo" aria-hidden="true" />
                         <div className="tss-card__face">
-                          <span
-                            className="tss-card__corner tss-card__corner--tl"
-                            aria-hidden="true"
-                          />
-                          <span
-                            className="tss-card__corner tss-card__corner--br"
-                            aria-hidden="true"
-                          />
-                          <img
-                            src={img.url!}
-                            alt={img.title ?? ""}
-                            className="tss-card__img"
-                          />
+                          <span className="tss-card__corner tss-card__corner--tl" aria-hidden="true" />
+                          <span className="tss-card__corner tss-card__corner--br" aria-hidden="true" />
+                          <img src={img.url!} alt={img.title ?? ''} className="tss-card__img" />
                         </div>
                       </div>
-                      {img.title && (
-                        <span className="tss-card__label">
-                          {stripHtmlTags(img.title)}
-                        </span>
-                      )}
+                      {img.title && <span className="tss-card__label">{stripHtmlTags(img.title)}</span>}
                     </div>
                   </div>
                 ))}
@@ -578,5 +551,5 @@ export function TechStackSection({
         }
       `}</style>
     </>
-  );
+  )
 }

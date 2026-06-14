@@ -1,62 +1,57 @@
-import { client } from "@/lib/apollo-client";
-import { GET_SERVICES_PAGE, GET_THEME_SETTINGS } from "@/lib/queries";
-import { enrichServiceDetails } from "@/lib/service-details";
-import { gql } from "@apollo/client";
-import type { TypedDocumentNode } from "@apollo/client";
-import { SectionReveal } from "@/components/SectionReveal";
-import { FadeIn } from "@/components/FadeIn";
-import { FAQSection } from "@/components/FAQSection";
-import { HeroHeadline } from "@/components/HeroHeadline";
-import { ClientsSection } from "@/components/ClientsSection";
-import { ServiceModalMenu } from "@/components/ServiceModalMenu";
-import { ServiceTechGroups, type TechGroup } from "@/components/ServiceTechGroups";
-import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from "@/components/ui";
-import parse from "html-react-parser";
-import type {
-  GetServicesPageData,
-  GetThemeSettingsData,
-  ServicesPageFields,
-  ThemeOptions,
-} from "@/lib/graphql-types";
+import { client } from '@/lib/apollo-client'
+import { GET_SERVICES_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
+import { enrichServiceDetails } from '@/lib/service-details'
+import { gql } from '@apollo/client'
+import type { TypedDocumentNode } from '@apollo/client'
+import { SectionReveal } from '@/components/SectionReveal'
+import { FadeIn } from '@/components/FadeIn'
+import { FAQSection } from '@/components/FAQSection'
+import { HeroHeadline } from '@/components/HeroHeadline'
+import { ClientsSection } from '@/components/ClientsSection'
+import { ServiceModalMenu } from '@/components/ServiceModalMenu'
+import { ServiceTechGroups, type TechGroup } from '@/components/ServiceTechGroups'
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
+import parse from 'html-react-parser'
+import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions } from '@/lib/graphql-types'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
-`;
+`
 
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
-`;
+`
 
 function stripHtml(html: string): string {
-  return (html ?? "")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&nbsp;/g, " ")
-    .trim();
+  return (html ?? '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
 }
 
 async function getServicesData(): Promise<ServicesPageFields> {
   try {
-    const { data } = await client.query({ query: SERVICES_PAGE_QUERY });
-    return data?.page?.template?.servicePage ?? ({} as ServicesPageFields);
+    const { data } = await client.query({ query: SERVICES_PAGE_QUERY })
+    return data?.page?.template?.servicePage ?? ({} as ServicesPageFields)
   } catch {
-    return {} as ServicesPageFields;
+    return {} as ServicesPageFields
   }
 }
 
 async function getThemeSettings(): Promise<ThemeOptions | null> {
   try {
-    const { data } = await client.query({ query: THEME_SETTINGS_QUERY });
-    return data?.themeSetting?.themeOptions ?? null;
+    const { data } = await client.query({ query: THEME_SETTINGS_QUERY })
+    return data?.themeSetting?.themeOptions ?? null
   } catch {
-    return null;
+    return null
   }
 }
 
 export default async function ServicesPage() {
-  const [sp, ts] = await Promise.all([getServicesData(), getThemeSettings()]);
+  const [sp, ts] = await Promise.all([getServicesData(), getThemeSettings()])
 
   // Each menu link is normalized to { label, link } and enriched from its WP
   // detail page in parallel. Anything that doesn't resolve degrades to a plain
@@ -66,20 +61,20 @@ export default async function ServicesPage() {
       (sp.prodrightMenu ?? []).map((i: any) => ({
         label: i?.prodmtitle ?? null,
         link: i?.prodmlink ?? null,
-      }))
+      })),
     ),
     enrichServiceDetails(
       (sp.brandrightMenu ?? []).map((i: any) => ({
         label: i?.rightmetitle ?? null,
         link: i?.rightmelink ?? null,
-      }))
+      })),
     ),
     enrichServiceDetails([
       { label: sp.devrightMenuToptitle ?? null, link: sp.devrightMenuToptitleLink ?? null },
       { label: sp.devrightMenuBottitle ?? null, link: sp.devrightMenuBottitleLink ?? null },
       { label: sp.rightMenuThreeTitle ?? null, link: sp.rightMenuThreeTitleLink ?? null },
     ]),
-  ]);
+  ])
 
   // Engineering groups, aligned by index with `engServices`. Empty groups
   // (no title) are dropped inside <ServiceTechGroups>.
@@ -87,25 +82,19 @@ export default async function ServicesPage() {
     {
       detail: engServices[0],
       copy: sp.devrightMenuToptitleCopy ?? null,
-      chips: (sp.rightMenuTopList ?? [])
-        .map((x: any) => x?.rightTopMenuItem)
-        .filter(Boolean),
+      chips: (sp.rightMenuTopList ?? []).map((x: any) => x?.rightTopMenuItem).filter(Boolean),
     },
     {
       detail: engServices[1],
       copy: null,
-      chips: (sp.rightMenuBotList ?? [])
-        .map((x: any) => x?.rightBottomMenuItem)
-        .filter(Boolean),
+      chips: (sp.rightMenuBotList ?? []).map((x: any) => x?.rightBottomMenuItem).filter(Boolean),
     },
     {
       detail: engServices[2],
       copy: null,
-      chips: (sp.rightMenuThreeList ?? [])
-        .map((x: any) => x?.rightThreeMenuItem)
-        .filter(Boolean),
+      chips: (sp.rightMenuThreeList ?? []).map((x: any) => x?.rightThreeMenuItem).filter(Boolean),
     },
-  ];
+  ]
 
   const prodImages = [
     sp.prodleftImageOne?.node?.sourceUrl,
@@ -117,7 +106,7 @@ export default async function ServicesPage() {
     sp.prodleftImageSeven?.node?.sourceUrl,
     sp.prodleftImageEight?.node?.sourceUrl,
     sp.prodleftImageNine?.node?.sourceUrl,
-  ].filter(Boolean) as string[];
+  ].filter(Boolean) as string[]
 
   const brandImages = [
     sp.brandimageOne?.node?.sourceUrl,
@@ -126,36 +115,30 @@ export default async function ServicesPage() {
     sp.brandimageFour?.node?.sourceUrl,
     sp.brandimageFive?.node?.sourceUrl,
     sp.brandimageSix?.node?.sourceUrl,
-  ].filter(Boolean) as string[];
+  ].filter(Boolean) as string[]
 
   const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
     .map((item: any) => ({
-      url: item.cLogo?.node?.sourceUrl ?? "",
-      alt: item.cLogo?.node?.altText ?? "",
+      url: item.cLogo?.node?.sourceUrl ?? '',
+      alt: item.cLogo?.node?.altText ?? '',
     }))
-    .filter((l: { url: string }) => l.url);
+    .filter((l: { url: string }) => l.url)
 
   const faqItems = (ts?.questionAnswerList ?? [])
     .filter((q: any) => q?.fQuestion)
     .map((q: any) => ({
       faqQuestion: q.fQuestion as string,
-      faqAnswer: (q.fAnswer ?? "") as string,
-    }));
+      faqAnswer: (q.fAnswer ?? '') as string,
+    }))
 
-  const heroTitle = stripHtml(sp.headerTitle ?? "");
+  const heroTitle = stripHtml(sp.headerTitle ?? '')
 
-  const svcCategories = [
-    sp.prodtitle,
-    sp.brandtitle,
-    sp.devtitle,
-    sp.prodtitle,
-    sp.brandtitle,
-    sp.devtitle,
-  ].filter((v): v is string => Boolean(v)).map(stripHtml);
+  const svcCategories = [sp.prodtitle, sp.brandtitle, sp.devtitle, sp.prodtitle, sp.brandtitle, sp.devtitle]
+    .filter((v): v is string => Boolean(v))
+    .map(stripHtml)
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
-
       {/* Grain overlay */}
       <GrainOverlay />
 
@@ -164,15 +147,15 @@ export default async function ServicesPage() {
         {/* animation="none" preserves base CSS transform (-translate-x-1/2) and matches
             frame-0 opacity of the original svcOrbGold (0.85) / svcOrbAmber (0.6) keyframes */}
         <GlowOrb
-          size={900} height={480} shape="ellipse" fade="70%" blur={80}
+          size={900}
+          height={480}
+          shape="ellipse"
+          fade="70%"
+          blur={80}
           color="rgba(250,204,21,0.13)"
           className="bottom-[-12%] left-1/2 -translate-x-1/2 z-0 opacity-85"
         />
-        <GlowOrb
-          size={640} fade="65%" blur={80}
-          color="rgba(251,146,60,0.055)"
-          className="top-[-8%] left-[-12%] z-0 opacity-60"
-        />
+        <GlowOrb size={640} fade="65%" blur={80} color="rgba(251,146,60,0.055)" className="top-[-8%] left-[-12%] z-0 opacity-60" />
         <div className="svc-hero__grid" aria-hidden="true" />
 
         {/* Corner frame brackets */}
@@ -182,10 +165,14 @@ export default async function ServicesPage() {
         <div className="svc-hero__corner svc-hero__corner--br" aria-hidden="true" />
 
         {/* Ghost number */}
-        <div className="svc-hero__ghost" aria-hidden="true">01</div>
+        <div className="svc-hero__ghost" aria-hidden="true">
+          01
+        </div>
 
         {/* Editorial index top-right */}
-        <div className="svc-hero__index" aria-hidden="true">— SERVICES —</div>
+        <div className="svc-hero__index" aria-hidden="true">
+          — SERVICES —
+        </div>
 
         {sp.headerBgOverlayLayer?.node?.sourceUrl && (
           <div className="svc-hero__layer" aria-hidden="true">
@@ -199,7 +186,7 @@ export default async function ServicesPage() {
               <Eyebrow
                 ornament="dot"
                 align="center"
-                style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em", "--eb-dot": "5px" } as React.CSSProperties}
+                style={{ '--eb-gap': '14px', '--eb-size': '10px', '--eb-spacing': '0.32em', '--eb-dot': '5px' } as React.CSSProperties}
               >
                 {sp.headerSubText}
               </Eyebrow>
@@ -209,7 +196,7 @@ export default async function ServicesPage() {
           <HeroHeadline
             headline={heroTitle}
             headlineClassName="gradient-text gradient-text--animate text-[clamp(3.6rem,11vw,128px)] font-black leading-[0.88] tracking-[-0.055em] mb-12 [word-break:break-word]"
-            headlineStyle={{ "--gt-gradient": "linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)" } as React.CSSProperties}
+            headlineStyle={{ '--gt-gradient': 'linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)' } as React.CSSProperties}
           />
 
           <FadeIn delay={0.22} duration={0.8}>
@@ -241,11 +228,23 @@ export default async function ServicesPage() {
                   <Button
                     href="/contact-us"
                     variant="primary"
-                    style={{ "--btn-pad": "16px 34px", "--btn-gap": "10px", boxShadow: "0 4px 28px rgba(250,204,21,0.24)" } as React.CSSProperties}
+                    style={
+                      {
+                        '--btn-pad': '16px 34px',
+                        '--btn-gap': '10px',
+                        boxShadow: '0 4px 28px rgba(250,204,21,0.24)',
+                      } as React.CSSProperties
+                    }
                   >
                     {sp.buttonText}
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                      <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </Button>
                 </FadeIn>
@@ -286,13 +285,11 @@ export default async function ServicesPage() {
               ornament="line"
               align="center"
               color="rgba(255,255,255,0.3)"
-              style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}
+              style={{ '--eb-gap': '14px', '--eb-size': '10px', '--eb-spacing': '0.32em' } as React.CSSProperties}
             >
               — 01 —
             </Eyebrow>
-            {sp.prodtitle && (
-              <h2 className="section-head__title">{stripHtml(sp.prodtitle)}</h2>
-            )}
+            {sp.prodtitle && <h2 className="section-head__title">{stripHtml(sp.prodtitle)}</h2>}
             {/* WP-sourced HTML — trusted backend only */}
             {sp.proddtxt && <div className="section-head__sub">{parse(sp.proddtxt)}</div>}
           </FadeIn>
@@ -310,13 +307,13 @@ export default async function ServicesPage() {
               {(prodImages[1] || prodImages[2]) && (
                 <div className="svc-prod__row">
                   {prodImages[1] && (
-                    <div className="svc-img-card" style={{ flex: "2" }}>
+                    <div className="svc-img-card" style={{ flex: '2' }}>
                       <img src={prodImages[1]} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
                   )}
                   {prodImages[2] && (
-                    <div className="svc-img-card svc-img-card--offset" style={{ flex: "3" }}>
+                    <div className="svc-img-card svc-img-card--offset" style={{ flex: '3' }}>
                       <img src={prodImages[2]} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
@@ -326,7 +323,7 @@ export default async function ServicesPage() {
               {(prodImages[3] || prodImages[4] || prodImages[5]) && (
                 <div className="svc-prod__row">
                   {[prodImages[3], prodImages[4], prodImages[5]].filter(Boolean).map((img, i) => (
-                    <div key={i} className={`svc-img-card${i === 1 ? " svc-img-card--up" : ""}`} style={{ flex: "1" }}>
+                    <div key={i} className={`svc-img-card${i === 1 ? ' svc-img-card--up' : ''}`} style={{ flex: '1' }}>
                       <img src={img} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
@@ -348,11 +345,7 @@ export default async function ServicesPage() {
                 service-detail modal (falls back to a plain link if its detail
                 page didn't resolve). */}
             <div className="svc-prod__menu">
-              <ServiceModalMenu
-                services={productServices}
-                ctaText={sp.buttonText ?? null}
-                ctaLink="/contact-us"
-              />
+              <ServiceModalMenu services={productServices} ctaText={sp.buttonText ?? null} ctaLink="/contact-us" />
             </div>
           </div>
         </div>
@@ -366,18 +359,24 @@ export default async function ServicesPage() {
         <div className="svc-brand__dots" aria-hidden="true" />
 
         <div className="svc-brand__inner">
-          <FadeIn className="section-head" style={{ "--sh-title-color": "#0a0a0a", "--sh-sub-color": "#4b5563" } as React.CSSProperties}>
+          <FadeIn className="section-head" style={{ '--sh-title-color': '#0a0a0a', '--sh-sub-color': '#4b5563' } as React.CSSProperties}>
             <Eyebrow
               ornament="line"
               align="center"
               color="rgba(0,0,0,0.45)"
-              style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em", "--eb-line-bg": "rgba(0,0,0,0.35)", "--eb-line-opacity": "1" } as React.CSSProperties}
+              style={
+                {
+                  '--eb-gap': '14px',
+                  '--eb-size': '10px',
+                  '--eb-spacing': '0.32em',
+                  '--eb-line-bg': 'rgba(0,0,0,0.35)',
+                  '--eb-line-opacity': '1',
+                } as React.CSSProperties
+              }
             >
               — 02 —
             </Eyebrow>
-            {sp.brandtitle && (
-              <h2 className="section-head__title">{stripHtml(sp.brandtitle)}</h2>
-            )}
+            {sp.brandtitle && <h2 className="section-head__title">{stripHtml(sp.brandtitle)}</h2>}
             {/* WP-sourced HTML — trusted backend only */}
             {sp.brandtext && <div className="section-head__sub">{parse(sp.brandtext)}</div>}
           </FadeIn>
@@ -386,7 +385,7 @@ export default async function ServicesPage() {
             {/* Left: polaroid gallery */}
             <SectionReveal className="svc-polaroid-grid">
               {brandImages.map((img, i) => (
-                <div key={i} className="svc-polaroid" style={{ "--pi": i } as React.CSSProperties}>
+                <div key={i} className="svc-polaroid" style={{ '--pi': i } as React.CSSProperties}>
                   <div className="svc-polaroid__frame">
                     <img src={img} alt="" className="svc-polaroid__img" />
                   </div>
@@ -398,12 +397,7 @@ export default async function ServicesPage() {
                 service-detail modal (light variant); falls back to a plain link
                 if its detail page didn't resolve. */}
             <div className="svc-brand__menu">
-              <ServiceModalMenu
-                services={brandServices}
-                ctaText={sp.buttonText ?? null}
-                ctaLink="/contact-us"
-                variant="light"
-              />
+              <ServiceModalMenu services={brandServices} ctaText={sp.buttonText ?? null} ctaLink="/contact-us" variant="light" />
             </div>
           </div>
         </div>
@@ -421,23 +415,17 @@ export default async function ServicesPage() {
               ornament="line"
               align="center"
               color="rgba(255,255,255,0.3)"
-              style={{ "--eb-gap": "14px", "--eb-size": "10px", "--eb-spacing": "0.32em" } as React.CSSProperties}
+              style={{ '--eb-gap': '14px', '--eb-size': '10px', '--eb-spacing': '0.32em' } as React.CSSProperties}
             >
               — 03 —
             </Eyebrow>
-            {sp.devtitle && (
-              <h2 className="section-head__title">{stripHtml(sp.devtitle)}</h2>
-            )}
+            {sp.devtitle && <h2 className="section-head__title">{stripHtml(sp.devtitle)}</h2>}
             {/* WP-sourced HTML — trusted backend only */}
             {sp.devtext && <div className="section-head__sub">{parse(sp.devtext)}</div>}
           </FadeIn>
 
           <div className="svc-dev__body">
-            <ServiceTechGroups
-              groups={techGroups}
-              ctaText={sp.buttonText ?? null}
-              ctaLink="/contact-us"
-            />
+            <ServiceTechGroups groups={techGroups} ctaText={sp.buttonText ?? null} ctaLink="/contact-us" />
 
             {sp.devleftimage?.node?.sourceUrl && (
               <FadeIn delay={0.18} yOffset={32} className="svc-dev__img-wrap">
@@ -460,13 +448,7 @@ export default async function ServicesPage() {
       />
 
       {/* ══ FAQ ══ */}
-      {faqItems.length > 0 && (
-        <FAQSection
-          heading={ts?.faqHeading ?? null}
-          subtext={ts?.faqShortText ?? null}
-          items={faqItems}
-        />
-      )}
+      {faqItems.length > 0 && <FAQSection heading={ts?.faqHeading ?? null} subtext={ts?.faqShortText ?? null} items={faqItems} />}
 
       <style>{`
 
@@ -725,5 +707,5 @@ export default async function ServicesPage() {
         }
       `}</style>
     </main>
-  );
+  )
 }

@@ -1,63 +1,83 @@
-"use client";
+'use client'
 
-import { useRef, useEffect } from "react";
-import { motion } from "motion/react";
-import { GlowOrb } from "@/components/ui";
+import { useRef, useEffect } from 'react'
+import { motion } from 'motion/react'
+import { GlowOrb } from '@/components/ui'
 
 interface GridImageSectionProps {
-  imageUrl?: string | null;
-  imageMobileUrl?: string | null;
+  imageUrl?: string | null
+  imageMobileUrl?: string | null
 }
 
 export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionProps) {
-  const sectionRef  = useRef<HTMLDivElement>(null);
-  const imgInnerRef = useRef<HTMLDivElement>(null);
-  const frameRef    = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const imgInnerRef = useRef<HTMLDivElement>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
 
   /* Scroll-driven parallax ─────────────────────────── */
   useEffect(() => {
     const tick = () => {
-      if (!sectionRef.current || !imgInnerRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const vh   = window.innerHeight;
-      if (rect.bottom < -200 || rect.top > vh + 200) return;
-      const progress  = (vh - rect.top) / (vh + rect.height);
-      const intensity = window.innerWidth < 768 ? -55 : -130;
-      const translate = (progress - 0.5) * intensity;
-      imgInnerRef.current.style.transform = `translateY(${translate}px)`;
-    };
-    window.addEventListener("scroll", tick, { passive: true });
-    tick();
-    return () => window.removeEventListener("scroll", tick);
-  }, []);
+      if (!sectionRef.current || !imgInnerRef.current) return
+      const rect = sectionRef.current.getBoundingClientRect()
+      const vh = window.innerHeight
+      if (rect.bottom < -200 || rect.top > vh + 200) return
+      const progress = (vh - rect.top) / (vh + rect.height)
+      const intensity = window.innerWidth < 768 ? -55 : -130
+      const translate = (progress - 0.5) * intensity
+      imgInnerRef.current.style.transform = `translateY(${translate}px)`
+    }
+    window.addEventListener('scroll', tick, { passive: true })
+    tick()
+    return () => window.removeEventListener('scroll', tick)
+  }, [])
 
   /* 3-D tilt on hover ──────────────────────────────── */
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = frameRef.current;
-    if (!el) return;
-    el.style.transition = "none";
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width  - 0.5;
-    const y = (e.clientY - r.top)  / r.height - 0.5;
-    el.style.transform = `perspective(1400px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg) translateZ(8px)`;
-  };
+    const el = frameRef.current
+    if (!el) return
+    el.style.transition = 'none'
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width - 0.5
+    const y = (e.clientY - r.top) / r.height - 0.5
+    el.style.transform = `perspective(1400px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg) translateZ(8px)`
+  }
   const onLeave = () => {
-    const el = frameRef.current;
-    if (!el) return;
-    el.style.transition = "transform 0.9s cubic-bezier(.23,1,.32,1)";
-    el.style.transform  = "perspective(1400px) rotateY(0deg) rotateX(0deg) translateZ(0)";
-  };
+    const el = frameRef.current
+    if (!el) return
+    el.style.transition = 'transform 0.9s cubic-bezier(.23,1,.32,1)'
+    el.style.transform = 'perspective(1400px) rotateY(0deg) rotateX(0deg) translateZ(0)'
+  }
 
-  if (!imageUrl) return null;
+  if (!imageUrl) return null
 
   return (
     <>
       <div className="gi-section" ref={sectionRef}>
-
         {/* ── ambient glow orbs ── */}
-        <GlowOrb animation="none" size={680} fade="62%" blur={110} color="rgba(250,204,21,0.10)" className="top-[-35%] left-[-8%] opacity-[0.85]" />
-        <GlowOrb animation="none" size={560} fade="62%" blur={110} color="rgba(251,146,60,0.07)" className="bottom-[-35%] right-[-6%] opacity-[0.85]" />
-        <GlowOrb animation="none" size={420} fade="62%" blur={110} color="rgba(250,204,21,0.04)" className="top-[20%] left-[38%] opacity-[0.85]" />
+        <GlowOrb
+          animation="none"
+          size={680}
+          fade="62%"
+          blur={110}
+          color="rgba(250,204,21,0.10)"
+          className="top-[-35%] left-[-8%] opacity-[0.85]"
+        />
+        <GlowOrb
+          animation="none"
+          size={560}
+          fade="62%"
+          blur={110}
+          color="rgba(251,146,60,0.07)"
+          className="bottom-[-35%] right-[-6%] opacity-[0.85]"
+        />
+        <GlowOrb
+          animation="none"
+          size={420}
+          fade="62%"
+          blur={110}
+          color="rgba(250,204,21,0.04)"
+          className="top-[20%] left-[38%] opacity-[0.85]"
+        />
 
         {/* ── entrance animation ── */}
         <motion.div
@@ -67,12 +87,7 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
           viewport={{ once: true, amount: 0.1 }}
         >
           {/* ── 3-D tilt frame ── */}
-          <div
-            ref={frameRef}
-            className="gi-frame"
-            onMouseMove={onMove}
-            onMouseLeave={onLeave}
-          >
+          <div ref={frameRef} className="gi-frame" onMouseMove={onMove} onMouseLeave={onLeave}>
             {/* pulsing border overlay */}
             <div className="gi-pulse" aria-hidden="true" />
 
@@ -95,24 +110,17 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
             <div className="gi-viewport">
               <div className="gi-img-inner" ref={imgInnerRef}>
                 <picture>
-                  {imageMobileUrl && (
-                    <source media="(max-width: 640px)" srcSet={imageMobileUrl} />
-                  )}
-                  <img
-                    src={imageUrl}
-                    alt="Selected work — Triolla design portfolio"
-                    className="gi-img"
-                    loading="lazy"
-                  />
+                  {imageMobileUrl && <source media="(max-width: 640px)" srcSet={imageMobileUrl} />}
+                  <img src={imageUrl} alt="Selected work — Triolla design portfolio" className="gi-img" loading="lazy" />
                 </picture>
               </div>
 
               {/* vignette + edge fades */}
-              <div className="gi-vignette"     aria-hidden="true" />
-              <div className="gi-fade gi-fade--top"    aria-hidden="true" />
+              <div className="gi-vignette" aria-hidden="true" />
+              <div className="gi-fade gi-fade--top" aria-hidden="true" />
               <div className="gi-fade gi-fade--bottom" aria-hidden="true" />
-              <div className="gi-fade gi-fade--left"   aria-hidden="true" />
-              <div className="gi-fade gi-fade--right"  aria-hidden="true" />
+              <div className="gi-fade gi-fade--left" aria-hidden="true" />
+              <div className="gi-fade gi-fade--right" aria-hidden="true" />
 
               {/* one-time shimmer sweep on entrance */}
               <div className="gi-shimmer" aria-hidden="true" />
@@ -389,5 +397,5 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
         }
       `}</style>
     </>
-  );
+  )
 }

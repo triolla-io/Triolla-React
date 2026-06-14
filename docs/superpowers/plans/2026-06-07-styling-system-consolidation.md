@@ -16,7 +16,7 @@
 
 2. **Screenshots freeze animations at frame 0.** The harness uses Playwright's `animations: 'disabled'`, which pauses every CSS animation/transition at its first frame. Therefore:
    - The **static frame-0 appearance** (position, size, color, blur, gradient stops, radius, shadow) MUST match exactly.
-   - **Animation *timing* differences are invisible to the gate.** Deduping ~30 near-identical keyframes (`svcShimmer`/`aboutShimmer`/`techShimmer` → one `textShimmer`; `svcGrain`/`aboutGrain`/`techGrain` → one `grain`) is an explicit spec goal and is safe — the frozen frame is identical.
+   - **Animation _timing_ differences are invisible to the gate.** Deduping ~30 near-identical keyframes (`svcShimmer`/`aboutShimmer`/`techShimmer` → one `textShimmer`; `svcGrain`/`aboutGrain`/`techGrain` → one `grain`) is an explicit spec goal and is safe — the frozen frame is identical.
 
 3. **All content comes from WordPress.** This refactor touches only styling/markup structure. Never change data fetching, copy, `stripHtml`/`parse` usage, Apollo queries, or conditional-render logic (`data ? … : null`). If a field is absent the section still hides — preserve every existing guard.
 
@@ -29,6 +29,7 @@
 ## File Structure
 
 **Created:**
+
 - `lib/motion.ts` — named easing curves (`EASE.smooth`, `EASE.bounce`, …) shared by `motion` components.
 - `components/ui/GlowOrb.tsx` — radial-gradient blur orb.
 - `components/ui/Eyebrow.tsx` — gold/accent uppercase label (dot / line / mark / pill variants).
@@ -44,6 +45,7 @@
 - `tests/visual/routes.spec.ts` — full-page screenshots per route × 2 viewports.
 
 **Modified:**
+
 - `app/globals.css` — add `@theme` tokens, canonical `@keyframes`, shared component classes.
 - `package.json` — add Playwright dev dep + `test:visual` script.
 - `app/page.tsx` (Phase 1) then every file in the Phase 2 list.
@@ -57,6 +59,7 @@
 ### Task 0.1: Stand up the Playwright visual-regression harness
 
 **Files:**
+
 - Modify: `package.json`
 - Create: `playwright.config.ts`
 - Create: `tests/visual/routes.spec.ts`
@@ -65,14 +68,17 @@
 - [ ] **Step 1: Install Playwright as a dev dependency**
 
 Run:
+
 ```bash
 npm install -D @playwright/test && npx playwright install chromium
 ```
+
 Expected: `@playwright/test` appears under `devDependencies`; Chromium downloads.
 
 - [ ] **Step 2: Add the `test:visual` scripts to `package.json`**
 
 In the `"scripts"` block add:
+
 ```json
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots"
@@ -81,40 +87,40 @@ In the `"scripts"` block add:
 - [ ] **Step 3: Create `playwright.config.ts`**
 
 ```ts
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
-  testDir: "./tests/visual",
+  testDir: './tests/visual',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: [["html", { open: "never" }]],
+  reporter: [['html', { open: 'never' }]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: 'http://localhost:3000',
     // Freeze animations at frame 0 so live timing differences never flake the diff.
     // The static rendered frame is what we gate on.
   },
   expect: {
     // Allow sub-pixel AA noise but catch real layout/color shifts.
     toHaveScreenshot: {
-      animations: "disabled",
-      caret: "hide",
+      animations: 'disabled',
+      caret: 'hide',
       maxDiffPixelRatio: 0.01,
-      scale: "css",
+      scale: 'css',
     },
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
-    { name: "mobile", use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 } } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
+    { name: 'mobile', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } } },
   ],
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
-});
+})
 ```
 
 - [ ] **Step 4: Create `tests/visual/routes.spec.ts`**
@@ -122,60 +128,57 @@ export default defineConfig({
 > NOTE: the dynamic `[slug]` portfolio route needs one real published slug. Replace `PORTFOLIO_SLUG` with a real slug from WP (find one: `curl -s https://triolla.io/graphql -H 'content-type: application/json' -d '{"query":"{portfolios(first:1){nodes{slug}}}"}'` — adjust the query to the actual post type if it differs). If no slug is available, leave it out of `ROUTES` and document the gap.
 
 ```ts
-import { test, expect } from "@playwright/test";
+import { test, expect } from '@playwright/test'
 
-const PORTFOLIO_SLUG = "REPLACE_WITH_REAL_SLUG";
+const PORTFOLIO_SLUG = 'REPLACE_WITH_REAL_SLUG'
 
-const ROUTES = [
-  "/",
-  "/services",
-  "/about-us",
-  "/technology",
-  "/contact-us",
-  "/privacy-policy",
-  "/terms-of-use",
-  `/${PORTFOLIO_SLUG}`,
-];
+const ROUTES = ['/', '/services', '/about-us', '/technology', '/contact-us', '/privacy-policy', '/terms-of-use', `/${PORTFOLIO_SLUG}`]
 
 for (const route of ROUTES) {
   test(`full-page screenshot ${route}`, async ({ page }) => {
-    await page.goto(route, { waitUntil: "networkidle" });
+    await page.goto(route, { waitUntil: 'networkidle' })
     // Settle lazy/in-view content and webfont swap before snapshotting.
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(800);
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(400);
-    const name = route === "/" ? "home" : route.replace(/\//g, "_").replace(/^_/, "");
-    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true });
-  });
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+    await page.waitForTimeout(800)
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.waitForTimeout(400)
+    const name = route === '/' ? 'home' : route.replace(/\//g, '_').replace(/^_/, '')
+    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true })
+  })
 }
 ```
 
 - [ ] **Step 5: Ignore Playwright artifacts (but commit baselines)**
 
 Append to `.gitignore`:
+
 ```
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 ```
+
 Do NOT ignore `tests/visual/**/*-snapshots/` — baselines are committed and are the source of truth.
 
 - [ ] **Step 6: Capture baselines against the CURRENT (unconverted) code**
 
 Run:
+
 ```bash
 npm run test:visual:update
 ```
+
 Expected: baseline PNGs written under `tests/visual/routes.spec.ts-snapshots/` for every route × 2 projects. Confirm the directory is populated.
 
 - [ ] **Step 7: Verify the gate is green against unchanged code**
 
 Run:
+
 ```bash
 npm run test:visual
 ```
+
 Expected: all tests PASS (zero diff — we are comparing current code to baselines just captured). If any test flakes, increase the settle `waitForTimeout` or add the offending dynamic element to a mask; do not loosen `maxDiffPixelRatio` beyond 0.01.
 
 - [ ] **Step 8: Commit**
@@ -190,31 +193,35 @@ git commit -m "test: add Playwright visual-regression harness with route baselin
 ### Task 0.2: Create `lib/motion.ts` shared easing curves
 
 **Files:**
+
 - Create: `lib/motion.ts`
 
 - [ ] **Step 1: Write `lib/motion.ts`**
 
 Curves extracted from existing usage (occurrence counts in comments).
+
 ```ts
 // Shared easing curves, deduped from per-component cubic-bezier literals.
 // Use with `motion` transitions: transition={{ ease: EASE.smooth }}.
 // CSS equivalents live in app/globals.css as --ease-* @theme tokens.
 export const EASE = {
-  smooth: [0.23, 1, 0.32, 1] as const,    // ~42 uses — default transform/scale/lift
-  bounce: [0.16, 1, 0.3, 1] as const,     // ~11 uses — modal/header reveals
-  standard: [0.4, 0, 0.2, 1] as const,    // ~10 uses — geometric/rotation
-  symmetric: [0.2, 1, 0.3, 1] as const,   // ~4 uses  — tech stack reveals
-} as const;
+  smooth: [0.23, 1, 0.32, 1] as const, // ~42 uses — default transform/scale/lift
+  bounce: [0.16, 1, 0.3, 1] as const, // ~11 uses — modal/header reveals
+  standard: [0.4, 0, 0.2, 1] as const, // ~10 uses — geometric/rotation
+  symmetric: [0.2, 1, 0.3, 1] as const, // ~4 uses  — tech stack reveals
+} as const
 
-export type EaseName = keyof typeof EASE;
+export type EaseName = keyof typeof EASE
 ```
 
 - [ ] **Step 2: Typecheck**
 
 Run:
+
 ```bash
 npx tsc --noEmit
 ```
+
 Expected: no new errors.
 
 - [ ] **Step 3: Commit**
@@ -231,95 +238,164 @@ git commit -m "feat(ui): add shared EASE curves in lib/motion.ts"
 This is additive only. No existing rule changes; nothing yet consumes these. The screenshot gate must stay green (no selector here matches existing markup).
 
 **Files:**
+
 - Modify: `app/globals.css`
 
 - [ ] **Step 1: Add `@theme` tokens and a default `--accent`**
 
 After the existing `@theme { … }` block's closing brace is fine, but keep it in one `@theme`. Replace the current `@theme` block with:
+
 ```css
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: #facc15;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-bounce: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-symmetric: cubic-bezier(0.2, 1, 0.3, 1);
 }
 ```
+
 And add a default accent on `:root` (so accent-agnostic primitives work everywhere without an explicit override). In the existing `:root { … }` block add the line:
+
 ```css
-  --accent: #facc15;
+--accent: #facc15;
 ```
 
 - [ ] **Step 2: Append the canonical keyframes block at the end of the file**
 
 These are the deduped union of the ~30 per-file keyframes. Bodies are taken verbatim from the most representative current usage; frozen frame 0 matches every page.
+
 ```css
 /* ───────────────────────── Canonical keyframes ───────────────────────── */
 
 @keyframes grain {
-  0%   { transform: translate(0,0); }
-  10%  { transform: translate(-5%,-10%); }
-  20%  { transform: translate(-15%, 5%); }
-  30%  { transform: translate( 7%,-25%); }
-  40%  { transform: translate(-5%, 25%); }
-  50%  { transform: translate(-15%, 10%); }
-  60%  { transform: translate(15%, 0%); }
-  70%  { transform: translate( 0%, 15%); }
-  80%  { transform: translate( 3%,  35%); }
-  90%  { transform: translate(-10%, 10%); }
-  100% { transform: translate(0, 0); }
+  0% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-5%, -10%);
+  }
+  20% {
+    transform: translate(-15%, 5%);
+  }
+  30% {
+    transform: translate(7%, -25%);
+  }
+  40% {
+    transform: translate(-5%, 25%);
+  }
+  50% {
+    transform: translate(-15%, 10%);
+  }
+  60% {
+    transform: translate(15%, 0%);
+  }
+  70% {
+    transform: translate(0%, 15%);
+  }
+  80% {
+    transform: translate(3%, 35%);
+  }
+  90% {
+    transform: translate(-10%, 10%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }
 
 @keyframes orbPulse {
-  0%,100% { opacity: 1;   transform: scale(1); }
-  50%     { opacity: 0.7; transform: scale(1.08); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.08);
+  }
 }
 
 @keyframes orbDrift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(40px, 30px) scale(1.08); }
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(40px, 30px) scale(1.08);
+  }
 }
 
 @keyframes textShimmer {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
 }
 
 @keyframes dotBlink {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 @keyframes marquee {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes marqueeRev {
-  0%   { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 @keyframes scrollPulse {
-  0%,100% { opacity: 0.4; transform: scaleY(1); }
-  50%     { opacity: 1;   transform: scaleY(1.1); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.1);
+  }
 }
 
 @keyframes shineSweep {
-  from { background-position: 200% 0; }
-  to   { background-position: -200% 0; }
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
 }
 ```
 
 - [ ] **Step 3: Verify the gate is still green (additive change)**
 
 Run:
+
 ```bash
 npm run test:visual
 ```
+
 Expected: PASS on all routes (no markup consumes the new tokens/keyframes yet).
 
 - [ ] **Step 4: Commit**
@@ -336,6 +412,7 @@ git commit -m "feat(ui): add design tokens and canonical keyframes to globals.cs
 Extracted from the identical `.grain-overlay` / `.svc-grain` / `.about-grain` / `.tech-grain` (all byte-identical except keyframe name).
 
 **Files:**
+
 - Create: `components/ui/GrainOverlay.tsx`
 - Modify: `app/globals.css` (add `.grain` class)
 - Create: `components/ui/index.ts`
@@ -364,7 +441,7 @@ Extracted from the identical `.grain-overlay` / `.svc-grain` / `.about-grain` / 
 ```tsx
 interface GrainOverlayProps {
   /** Overlay opacity. Defaults to the canonical 0.04. */
-  opacity?: number;
+  opacity?: number
 }
 
 export function GrainOverlay({ opacity }: GrainOverlayProps) {
@@ -372,16 +449,16 @@ export function GrainOverlay({ opacity }: GrainOverlayProps) {
     <div
       aria-hidden="true"
       className="grain"
-      style={opacity !== undefined ? ({ "--grain-opacity": String(opacity) } as React.CSSProperties) : undefined}
+      style={opacity !== undefined ? ({ '--grain-opacity': String(opacity) } as React.CSSProperties) : undefined}
     />
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Create the barrel `components/ui/index.ts`**
 
 ```ts
-export { GrainOverlay } from "./GrainOverlay";
+export { GrainOverlay } from './GrainOverlay'
 ```
 
 - [ ] **Step 4: Typecheck**
@@ -403,6 +480,7 @@ git commit -m "feat(ui): add GrainOverlay primitive and .grain class"
 Replaces every radial-gradient blur orb (`hero-orb*`, `winners-orb*`, `svc-hero__orb*`, `about-*__orb*`, `tech-hero-orb*`, `tss-orb*`, `tsf-cream-orb`, `wc-orb*`, `fq-orb*`, `why-section__orb`, `cs-clients__orb*`, `tech-steps__orb*`). All differ only in static visual + position + animation timing — all of which the props below express.
 
 **Files:**
+
 - Create: `components/ui/GlowOrb.tsx`
 - Modify: `app/globals.css` (add `.glow-orb` classes)
 - Modify: `components/ui/index.ts`
@@ -419,57 +497,65 @@ Replaces every radial-gradient blur orb (`hero-orb*`, `winners-orb*`, `svc-hero_
   background: radial-gradient(var(--orb-shape, circle) at center, var(--orb-color) 0%, transparent var(--orb-fade, 65%));
   filter: blur(var(--orb-blur, 0px));
 }
-.glow-orb--pulse      { animation: orbPulse var(--orb-dur, 9s) ease-in-out infinite; }
-.glow-orb--pulse-rev  { animation: orbPulse var(--orb-dur, 9s) ease-in-out infinite reverse; }
-.glow-orb--drift      { animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate; }
-.glow-orb--drift-rev  { animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate-reverse; }
+.glow-orb--pulse {
+  animation: orbPulse var(--orb-dur, 9s) ease-in-out infinite;
+}
+.glow-orb--pulse-rev {
+  animation: orbPulse var(--orb-dur, 9s) ease-in-out infinite reverse;
+}
+.glow-orb--drift {
+  animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate;
+}
+.glow-orb--drift-rev {
+  animation: orbDrift var(--orb-dur, 14s) ease-in-out infinite alternate-reverse;
+}
 ```
 
 - [ ] **Step 2: Write `components/ui/GlowOrb.tsx`**
 
 ```tsx
-type OrbAnimation = "none" | "pulse" | "pulse-rev" | "drift" | "drift-rev";
+type OrbAnimation = 'none' | 'pulse' | 'pulse-rev' | 'drift' | 'drift-rev'
 
 interface GlowOrbProps {
   /** CSS width, e.g. 900 (px) or "60vw". */
-  size: number | string;
+  size: number | string
   /** CSS height; defaults to `size` (circle). Pass a different value for an ellipse. */
-  height?: number | string;
+  height?: number | string
   /** Full gradient inner color incl. alpha, e.g. "rgba(250,204,21,0.14)"
    *  or accent-driven "color-mix(in srgb, var(--accent) 14%, transparent)". */
-  color: string;
-  shape?: "circle" | "ellipse";
+  color: string
+  shape?: 'circle' | 'ellipse'
   /** Transparent stop, e.g. "65%" or "70%". */
-  fade?: string;
+  fade?: string
   /** blur() radius in px. Many orbs use 0; some use 60–110. */
-  blur?: number;
-  animation?: OrbAnimation;
+  blur?: number
+  animation?: OrbAnimation
   /** Animation duration in seconds. */
-  duration?: number;
+  duration?: number
   /** Tailwind positioning utilities, e.g. "bottom-[-10%] left-1/2 -translate-x-1/2". */
-  className?: string;
+  className?: string
 }
 
 const ANIM_CLASS: Record<OrbAnimation, string> = {
-  none: "",
-  pulse: "glow-orb--pulse",
-  "pulse-rev": "glow-orb--pulse-rev",
-  drift: "glow-orb--drift",
-  "drift-rev": "glow-orb--drift-rev",
-};
+  none: '',
+  pulse: 'glow-orb--pulse',
+  'pulse-rev': 'glow-orb--pulse-rev',
+  drift: 'glow-orb--drift',
+  'drift-rev': 'glow-orb--drift-rev',
+}
 
-const px = (v: number | string) => (typeof v === "number" ? `${v}px` : v);
+const px = (v: number | string) => (typeof v === 'number' ? `${v}px` : v)
 
 export function GlowOrb({
   size,
   height,
   color,
-  shape = "circle",
-  fade = "65%",
+  shape = 'circle',
+  fade = '65%',
   blur = 0,
-  animation = "none",
+  animation = 'none',
   duration,
-  className = "",
+  className = '',
 }: GlowOrbProps) {
   return (
     <div
@@ -477,25 +563,26 @@ export function GlowOrb({
       className={`glow-orb ${ANIM_CLASS[animation]} ${className}`}
       style={
         {
-          "--orb-w": px(size),
-          "--orb-h": px(height ?? size),
-          "--orb-color": color,
-          "--orb-shape": shape,
-          "--orb-fade": fade,
-          "--orb-blur": `${blur}px`,
-          ...(duration !== undefined ? { "--orb-dur": `${duration}s` } : {}),
+          '--orb-w': px(size),
+          '--orb-h': px(height ?? size),
+          '--orb-color': color,
+          '--orb-shape': shape,
+          '--orb-fade': fade,
+          '--orb-blur': `${blur}px`,
+          ...(duration !== undefined ? { '--orb-dur': `${duration}s` } : {}),
         } as React.CSSProperties
       }
     />
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 In `components/ui/index.ts` add:
+
 ```ts
-export { GlowOrb } from "./GlowOrb";
+export { GlowOrb } from './GlowOrb'
 ```
 
 - [ ] **Step 4: Typecheck**
@@ -517,6 +604,7 @@ git commit -m "feat(ui): add GlowOrb primitive and .glow-orb classes"
 Covers all eyebrow variants: dots (home/svc/about), lines+text (svc/about/cs), lines+mark ✦ (tss/tech-steps), pill (tech hero). Variant axes from extraction: ornament (dot|line|mark|none), alignment, color (gold/accent/dark/muted), pill wrapper.
 
 **Files:**
+
 - Create: `components/ui/Eyebrow.tsx`
 - Modify: `app/globals.css` (add `.eyebrow*` classes)
 - Modify: `components/ui/index.ts`
@@ -535,14 +623,19 @@ Covers all eyebrow variants: dots (home/svc/about), lines+text (svc/about/cs), l
   color: var(--eb-color, var(--accent));
   margin-bottom: var(--eb-mb, 24px);
 }
-.eyebrow--center { display: flex; justify-content: center; }
+.eyebrow--center {
+  display: flex;
+  justify-content: center;
+}
 .eyebrow--pill {
   padding: 8px 16px;
   border-radius: 999px;
   background: var(--eb-pill-bg, color-mix(in srgb, var(--accent) 9%, transparent));
 }
 .eyebrow__dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   background: currentColor;
   animation: dotBlink 2.2s ease-in-out infinite;
   flex-shrink: 0;
@@ -554,70 +647,61 @@ Covers all eyebrow variants: dots (home/svc/about), lines+text (svc/about/cs), l
   background: var(--eb-line-bg, currentColor);
   opacity: var(--eb-line-opacity, 0.55);
 }
-.eyebrow__mark { color: currentColor; font-size: 13px; line-height: 1; }
+.eyebrow__mark {
+  color: currentColor;
+  font-size: 13px;
+  line-height: 1;
+}
 ```
 
 - [ ] **Step 2: Write `components/ui/Eyebrow.tsx`**
 
 ```tsx
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
-type Ornament = "none" | "dot" | "line" | "mark";
+type Ornament = 'none' | 'dot' | 'line' | 'mark'
 
 interface EyebrowProps {
-  children: ReactNode;
+  children: ReactNode
   /** Symmetric ornaments on both sides of the label. */
-  ornament?: Ornament;
-  align?: "start" | "center";
-  pill?: boolean;
+  ornament?: Ornament
+  align?: 'start' | 'center'
+  pill?: boolean
   /** Override label color (defaults to var(--accent)). e.g. "rgba(0,0,0,0.45)". */
-  color?: string;
+  color?: string
   /** Per-instance CSS-var overrides (size, spacing, gap, line width, etc.). */
-  style?: React.CSSProperties;
-  className?: string;
+  style?: React.CSSProperties
+  className?: string
 }
 
 function Ornaments({ kind }: { kind: Ornament }) {
-  if (kind === "dot") return <span className="eyebrow__dot" aria-hidden="true" />;
-  if (kind === "line") return <span className="eyebrow__line" aria-hidden="true" />;
-  if (kind === "mark") return <span className="eyebrow__mark" aria-hidden="true">✦</span>;
-  return null;
+  if (kind === 'dot') return <span className="eyebrow__dot" aria-hidden="true" />
+  if (kind === 'line') return <span className="eyebrow__line" aria-hidden="true" />
+  if (kind === 'mark')
+    return (
+      <span className="eyebrow__mark" aria-hidden="true">
+        ✦
+      </span>
+    )
+  return null
 }
 
-export function Eyebrow({
-  children,
-  ornament = "none",
-  align = "start",
-  pill = false,
-  color,
-  style,
-  className = "",
-}: EyebrowProps) {
-  const cls = [
-    "eyebrow",
-    align === "center" ? "eyebrow--center" : "",
-    pill ? "eyebrow--pill" : "",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+export function Eyebrow({ children, ornament = 'none', align = 'start', pill = false, color, style, className = '' }: EyebrowProps) {
+  const cls = ['eyebrow', align === 'center' ? 'eyebrow--center' : '', pill ? 'eyebrow--pill' : '', className].filter(Boolean).join(' ')
   return (
-    <div
-      className={cls}
-      style={{ ...(color ? ({ "--eb-color": color } as React.CSSProperties) : {}), ...style }}
-    >
+    <div className={cls} style={{ ...(color ? ({ '--eb-color': color } as React.CSSProperties) : {}), ...style }}>
       <Ornaments kind={ornament} />
       {children}
       <Ornaments kind={ornament} />
     </div>
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 ```ts
-export { Eyebrow } from "./Eyebrow";
+export { Eyebrow } from './Eyebrow'
 ```
 
 - [ ] **Step 4: Typecheck** — Run: `npx tsc --noEmit` — Expected: no new errors.
@@ -636,6 +720,7 @@ git commit -m "feat(ui): add Eyebrow primitive and .eyebrow classes"
 Replaces the gradient-clip headings (`hero-headline`, `svc-hero__title`, `about-hero__title`, `tech-shimmer-heading`, `tss-title__line--accent`, `wc-heading__gold`, static `fq-count`).
 
 **Files:**
+
 - Create: `components/ui/GradientText.tsx`
 - Modify: `app/globals.css` (add `.gradient-text` class)
 - Modify: `components/ui/index.ts`
@@ -659,55 +744,55 @@ Replaces the gradient-clip headings (`hero-headline`, `svc-hero__title`, `about-
 - [ ] **Step 2: Write `components/ui/GradientText.tsx`**
 
 ```tsx
-import { ElementType, ReactNode } from "react";
+import { ElementType, ReactNode } from 'react'
 
 interface GradientTextProps {
-  children: ReactNode;
+  children: ReactNode
   /** Tag to render. Default span. */
-  as?: ElementType;
-  animate?: boolean;
+  as?: ElementType
+  animate?: boolean
   /** Full CSS gradient. Defaults to the white→accent→white diagonal. */
-  gradient?: string;
+  gradient?: string
   /** background-size, e.g. "200% auto" or "220% auto". */
-  backgroundSize?: string;
+  backgroundSize?: string
   /** Shimmer duration in seconds. */
-  duration?: number;
-  className?: string;
-  style?: React.CSSProperties;
+  duration?: number
+  className?: string
+  style?: React.CSSProperties
 }
 
 export function GradientText({
   children,
-  as: Tag = "span",
+  as: Tag = 'span',
   animate = false,
   gradient,
   backgroundSize,
   duration,
-  className = "",
+  className = '',
   style,
 }: GradientTextProps) {
   return (
     <Tag
-      className={`gradient-text ${animate ? "gradient-text--animate" : ""} ${className}`.trim()}
+      className={`gradient-text ${animate ? 'gradient-text--animate' : ''} ${className}`.trim()}
       style={
         {
-          ...(gradient ? { "--gt-gradient": gradient } : {}),
-          ...(backgroundSize ? { "--gt-size": backgroundSize } : {}),
-          ...(duration !== undefined ? { "--gt-dur": `${duration}s` } : {}),
+          ...(gradient ? { '--gt-gradient': gradient } : {}),
+          ...(backgroundSize ? { '--gt-size': backgroundSize } : {}),
+          ...(duration !== undefined ? { '--gt-dur': `${duration}s` } : {}),
           ...style,
         } as React.CSSProperties
       }
     >
       {children}
     </Tag>
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 ```ts
-export { GradientText } from "./GradientText";
+export { GradientText } from './GradientText'
 ```
 
 - [ ] **Step 4: Typecheck** — Run: `npx tsc --noEmit` — Expected: no new errors.
@@ -726,6 +811,7 @@ git commit -m "feat(ui): add GradientText primitive and .gradient-text class"
 Replaces `btn-primary`, `btn-ghost`, `svc-hero__cta`, `about-hero__cta`, `cs-clients__cta`, `btn-outline-gold`, and the simple pill CTAs. (The form-submit `wc-btn` with its shine sweep + done/busy states is page-unique and stays in `WannaChatSection` — documented leftover.)
 
 **Files:**
+
 - Create: `components/ui/Button.tsx`
 - Modify: `app/globals.css` (add `.btn*` classes)
 - Modify: `components/ui/index.ts`
@@ -740,7 +826,12 @@ Replaces `btn-primary`, `btn-ghost`, `svc-hero__cta`, `about-hero__cta`, `cs-cli
   border-radius: 999px;
   font-size: var(--btn-size, 15px);
   padding: var(--btn-pad, 14px 28px);
-  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 .btn--primary {
   background: var(--accent);
@@ -779,52 +870,52 @@ Replaces `btn-primary`, `btn-ghost`, `svc-hero__cta`, `about-hero__cta`, `cs-cli
 - [ ] **Step 2: Write `components/ui/Button.tsx`**
 
 ```tsx
-import Link from "next/link";
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import Link from 'next/link'
+import { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type Variant = "primary" | "ghost" | "outline";
+type Variant = 'primary' | 'ghost' | 'outline'
 
 interface CommonProps {
-  children: ReactNode;
-  variant?: Variant;
-  className?: string;
-  style?: React.CSSProperties;
+  children: ReactNode
+  variant?: Variant
+  className?: string
+  style?: React.CSSProperties
 }
 
-type ButtonAsLink = CommonProps & { href: string };
-type ButtonAsButton = CommonProps & { href?: undefined } & ButtonHTMLAttributes<HTMLButtonElement>;
-type ButtonProps = ButtonAsLink | ButtonAsButton;
+type ButtonAsLink = CommonProps & { href: string }
+type ButtonAsButton = CommonProps & { href?: undefined } & ButtonHTMLAttributes<HTMLButtonElement>
+type ButtonProps = ButtonAsLink | ButtonAsButton
 
 const VARIANT_CLASS: Record<Variant, string> = {
-  primary: "btn--primary",
-  ghost: "btn--ghost",
-  outline: "btn--outline",
-};
+  primary: 'btn--primary',
+  ghost: 'btn--ghost',
+  outline: 'btn--outline',
+}
 
 export function Button(props: ButtonProps) {
-  const { children, variant = "primary", className = "", style } = props;
-  const cls = `btn ${VARIANT_CLASS[variant]} ${className}`.trim();
+  const { children, variant = 'primary', className = '', style } = props
+  const cls = `btn ${VARIANT_CLASS[variant]} ${className}`.trim()
 
   if (props.href !== undefined) {
     return (
       <Link href={props.href} className={cls} style={style}>
         {children}
       </Link>
-    );
+    )
   }
-  const { children: _c, variant: _v, className: _cn, style: _s, href: _h, ...rest } = props;
+  const { children: _c, variant: _v, className: _cn, style: _s, href: _h, ...rest } = props
   return (
     <button className={cls} style={style} {...rest}>
       {children}
     </button>
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 ```ts
-export { Button } from "./Button";
+export { Button } from './Button'
 ```
 
 - [ ] **Step 4: Typecheck** — Run: `npx tsc --noEmit` — Expected: no new errors.
@@ -843,6 +934,7 @@ git commit -m "feat(ui): add Button primitive and .btn classes"
 Composes `Eyebrow` + title (`GradientText` or plain) + subtitle. Replaces `svc-section-head`, `about-section-head`, `tss-head`, `cs-clients__head`, `tech-steps__head`.
 
 **Files:**
+
 - Create: `components/ui/SectionHeading.tsx`
 - Modify: `app/globals.css` (add `.section-head*` classes)
 - Modify: `components/ui/index.ts`
@@ -850,7 +942,13 @@ Composes `Eyebrow` + title (`GradientText` or plain) + subtitle. Replaces `svc-s
 - [ ] **Step 1: Add `.section-head` classes to `app/globals.css`** (values from `svc-section-*`)
 
 ```css
-.section-head { text-align: center; margin-bottom: var(--sh-mb, 72px); max-width: var(--sh-max, none); margin-left: auto; margin-right: auto; }
+.section-head {
+  text-align: center;
+  margin-bottom: var(--sh-mb, 72px);
+  max-width: var(--sh-max, none);
+  margin-left: auto;
+  margin-right: auto;
+}
 .section-head__title {
   font-size: var(--sh-title-size, clamp(2.2rem, 5.5vw, 4.8rem));
   font-weight: 900;
@@ -871,59 +969,53 @@ Composes `Eyebrow` + title (`GradientText` or plain) + subtitle. Replaces `svc-s
 - [ ] **Step 2: Write `components/ui/SectionHeading.tsx`**
 
 ```tsx
-import { ReactNode } from "react";
-import { Eyebrow } from "./Eyebrow";
+import { ReactNode } from 'react'
+import { Eyebrow } from './Eyebrow'
 
 interface SectionHeadingProps {
   /** Eyebrow label content (string or nodes). Omit to skip the eyebrow. */
-  eyebrow?: ReactNode;
-  eyebrowOrnament?: "none" | "dot" | "line" | "mark";
-  eyebrowColor?: string;
+  eyebrow?: ReactNode
+  eyebrowOrnament?: 'none' | 'dot' | 'line' | 'mark'
+  eyebrowColor?: string
   /** Title — accepts already-parsed nodes (e.g. parse(decodeHtml(...))). */
-  title?: ReactNode;
+  title?: ReactNode
   /** Subtitle/lead — accepts parsed nodes. */
-  subtitle?: ReactNode;
+  subtitle?: ReactNode
   /** Dark text variant for light/cream backgrounds. */
-  dark?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
+  dark?: boolean
+  className?: string
+  style?: React.CSSProperties
 }
 
 export function SectionHeading({
   eyebrow,
-  eyebrowOrnament = "line",
+  eyebrowOrnament = 'line',
   eyebrowColor,
   title,
   subtitle,
   dark = false,
-  className = "",
+  className = '',
   style,
 }: SectionHeadingProps) {
-  const darkVars = dark
-    ? ({ "--sh-title-color": "#0a0a0a", "--sh-sub-color": "#4b5563" } as React.CSSProperties)
-    : {};
+  const darkVars = dark ? ({ '--sh-title-color': '#0a0a0a', '--sh-sub-color': '#4b5563' } as React.CSSProperties) : {}
   return (
     <div className={`section-head ${className}`.trim()} style={{ ...darkVars, ...style }}>
       {eyebrow != null && (
-        <Eyebrow
-          ornament={eyebrowOrnament}
-          align="center"
-          color={eyebrowColor ?? (dark ? "rgba(0,0,0,0.45)" : undefined)}
-        >
+        <Eyebrow ornament={eyebrowOrnament} align="center" color={eyebrowColor ?? (dark ? 'rgba(0,0,0,0.45)' : undefined)}>
           {eyebrow}
         </Eyebrow>
       )}
       {title != null && <h2 className="section-head__title">{title}</h2>}
       {subtitle != null && <div className="section-head__sub">{subtitle}</div>}
     </div>
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 ```ts
-export { SectionHeading } from "./SectionHeading";
+export { SectionHeading } from './SectionHeading'
 ```
 
 - [ ] **Step 4: Typecheck** — Run: `npx tsc --noEmit` — Expected: no new errors.
@@ -942,6 +1034,7 @@ git commit -m "feat(ui): add SectionHeading primitive and .section-head classes"
 Replaces `cs-mq*`, `cs-marquee-track`, `tech-marquee-track`, `svc-hero__strip-track`, `about-hero__strip-track`, `about-showcase__ticker-track`. Variant axes: speed, direction, pause-on-hover, fade masks, item duplication.
 
 **Files:**
+
 - Create: `components/ui/Marquee.tsx`
 - Modify: `app/globals.css` (add `.marquee*` classes)
 - Modify: `components/ui/index.ts`
@@ -949,7 +1042,10 @@ Replaces `cs-mq*`, `cs-marquee-track`, `tech-marquee-track`, `svc-hero__strip-tr
 - [ ] **Step 1: Add `.marquee` classes to `app/globals.css`**
 
 ```css
-.marquee { position: relative; overflow: hidden; }
+.marquee {
+  position: relative;
+  overflow: hidden;
+}
 .marquee__track {
   display: flex;
   width: max-content;
@@ -957,8 +1053,12 @@ Replaces `cs-mq*`, `cs-marquee-track`, `tech-marquee-track`, `svc-hero__strip-tr
   animation: marquee var(--mq-dur, 40s) linear infinite;
   will-change: transform;
 }
-.marquee__track--rev { animation-name: marqueeRev; }
-.marquee--pause:hover .marquee__track { animation-play-state: paused; }
+.marquee__track--rev {
+  animation-name: marqueeRev;
+}
+.marquee--pause:hover .marquee__track {
+  animation-play-state: paused;
+}
 .marquee__fade {
   position: absolute;
   top: 0;
@@ -967,69 +1067,75 @@ Replaces `cs-mq*`, `cs-marquee-track`, `tech-marquee-track`, `svc-hero__strip-tr
   z-index: 2;
   pointer-events: none;
 }
-.marquee__fade--l { left: 0;  background: linear-gradient(to right, var(--mq-fade-color, #080808) 0%, transparent 100%); }
-.marquee__fade--r { right: 0; background: linear-gradient(to left,  var(--mq-fade-color, #080808) 0%, transparent 100%); }
+.marquee__fade--l {
+  left: 0;
+  background: linear-gradient(to right, var(--mq-fade-color, #080808) 0%, transparent 100%);
+}
+.marquee__fade--r {
+  right: 0;
+  background: linear-gradient(to left, var(--mq-fade-color, #080808) 0%, transparent 100%);
+}
 ```
 
 - [ ] **Step 2: Write `components/ui/Marquee.tsx`**
 
 ```tsx
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
 interface MarqueeProps<T> {
-  items: T[];
+  items: T[]
   /** How many times to repeat `items` for a seamless loop (2 minimum). */
-  repeat?: number;
+  repeat?: number
   /** Animation duration in seconds. */
-  speed?: number;
-  direction?: "left" | "right";
-  pauseOnHover?: boolean;
+  speed?: number
+  direction?: 'left' | 'right'
+  pauseOnHover?: boolean
   /** Edge fade masks (gradient to a solid bg color). */
-  fade?: boolean;
+  fade?: boolean
   /** Solid color the fade masks blend to. Default "#080808". */
-  fadeColor?: string;
-  renderItem: (item: T, index: number) => ReactNode;
-  className?: string;
+  fadeColor?: string
+  renderItem: (item: T, index: number) => ReactNode
+  className?: string
 }
 
 export function Marquee<T>({
   items,
   repeat = 2,
   speed = 40,
-  direction = "left",
+  direction = 'left',
   pauseOnHover = false,
   fade = false,
   fadeColor,
   renderItem,
-  className = "",
+  className = '',
 }: MarqueeProps<T>) {
-  const duped = Array.from({ length: repeat }).flatMap(() => items);
+  const duped = Array.from({ length: repeat }).flatMap(() => items)
   return (
     <div
-      className={`marquee ${pauseOnHover ? "marquee--pause" : ""} ${className}`.trim()}
+      className={`marquee ${pauseOnHover ? 'marquee--pause' : ''} ${className}`.trim()}
       style={
         {
-          ...(fadeColor ? { "--mq-fade-color": fadeColor } : {}),
+          ...(fadeColor ? { '--mq-fade-color': fadeColor } : {}),
         } as React.CSSProperties
       }
     >
       {fade && <div className="marquee__fade marquee__fade--l" aria-hidden="true" />}
       {fade && <div className="marquee__fade marquee__fade--r" aria-hidden="true" />}
       <div
-        className={`marquee__track ${direction === "right" ? "marquee__track--rev" : ""}`.trim()}
-        style={{ "--mq-dur": `${speed}s` } as React.CSSProperties}
+        className={`marquee__track ${direction === 'right' ? 'marquee__track--rev' : ''}`.trim()}
+        style={{ '--mq-dur': `${speed}s` } as React.CSSProperties}
       >
         {duped.map((item, i) => renderItem(item, i))}
       </div>
     </div>
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 ```ts
-export { Marquee } from "./Marquee";
+export { Marquee } from './Marquee'
 ```
 
 - [ ] **Step 4: Typecheck** — Run: `npx tsc --noEmit` — Expected: no new errors.
@@ -1048,6 +1154,7 @@ git commit -m "feat(ui): add Marquee primitive and .marquee classes"
 Replaces `portfolio-card*`, `svc-img-card*`, `about-showcase__card*`, `aic-slide*`. Variant axes: radius, shine angle, hover-zoom scale, hover-lift, optional tag/badge/overlay.
 
 **Files:**
+
 - Create: `components/ui/ShineImageCard.tsx`
 - Modify: `app/globals.css` (add `.shine-card*` classes)
 - Modify: `components/ui/index.ts`
@@ -1062,11 +1169,15 @@ Replaces `portfolio-card*`, `svc-img-card*`, `about-showcase__card*`, `aic-slide
   border-radius: var(--sc-radius, 20px);
   background: var(--sc-bg, #0f0f0f);
   box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
-  transition: transform 0.5s var(--ease-smooth), box-shadow 0.5s;
+  transition:
+    transform 0.5s var(--ease-smooth),
+    box-shadow 0.5s;
 }
 .shine-card:hover {
   transform: translateY(var(--sc-lift, -5px)) scale(var(--sc-scale, 1.01));
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(250, 204, 21, 0.18);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(250, 204, 21, 0.18);
 }
 .shine-card__img {
   display: block;
@@ -1075,7 +1186,9 @@ Replaces `portfolio-card*`, `svc-img-card*`, `about-showcase__card*`, `aic-slide
   object-fit: cover;
   transition: transform 0.7s var(--ease-smooth);
 }
-.shine-card:hover .shine-card__img { transform: scale(var(--sc-img-scale, 1.07)); }
+.shine-card:hover .shine-card__img {
+  transform: scale(var(--sc-img-scale, 1.07));
+}
 .shine-card__shine {
   position: absolute;
   inset: 0;
@@ -1085,7 +1198,9 @@ Replaces `portfolio-card*`, `svc-img-card*`, `about-showcase__card*`, `aic-slide
   background-position: 200% 0;
   transition: background-position 0.55s;
 }
-.shine-card:hover .shine-card__shine { background-position: -200% 0; }
+.shine-card:hover .shine-card__shine {
+  background-position: -200% 0;
+}
 .shine-card__tag {
   background: var(--accent);
   color: #000;
@@ -1105,50 +1220,42 @@ Replaces `portfolio-card*`, `svc-img-card*`, `about-showcase__card*`, `aic-slide
   opacity: 0;
   transition: opacity 0.35s;
 }
-.shine-card:hover .shine-card__overlay { opacity: 1; }
+.shine-card:hover .shine-card__overlay {
+  opacity: 1;
+}
 ```
 
 - [ ] **Step 2: Write `components/ui/ShineImageCard.tsx`**
 
 ```tsx
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
 interface ShineImageCardProps {
-  src: string;
-  alt: string;
+  src: string
+  alt: string
   /** Border radius in px. Default 20. */
-  radius?: number;
+  radius?: number
   /** Diagonal shine angle, e.g. "105deg" | "128deg" | "135deg". */
-  shineAngle?: string;
+  shineAngle?: string
   /** Image zoom scale on hover. Default 1.07. */
-  imgScale?: number;
+  imgScale?: number
   /** Content shown in the bottom gradient overlay (revealed on hover). */
-  overlay?: ReactNode;
+  overlay?: ReactNode
   /** Static tag/badge content (always visible). */
-  badge?: ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
+  badge?: ReactNode
+  className?: string
+  style?: React.CSSProperties
 }
 
-export function ShineImageCard({
-  src,
-  alt,
-  radius,
-  shineAngle,
-  imgScale,
-  overlay,
-  badge,
-  className = "",
-  style,
-}: ShineImageCardProps) {
+export function ShineImageCard({ src, alt, radius, shineAngle, imgScale, overlay, badge, className = '', style }: ShineImageCardProps) {
   return (
     <div
       className={`shine-card ${className}`.trim()}
       style={
         {
-          ...(radius !== undefined ? { "--sc-radius": `${radius}px` } : {}),
-          ...(shineAngle ? { "--sc-shine-angle": shineAngle } : {}),
-          ...(imgScale !== undefined ? { "--sc-img-scale": String(imgScale) } : {}),
+          ...(radius !== undefined ? { '--sc-radius': `${radius}px` } : {}),
+          ...(shineAngle ? { '--sc-shine-angle': shineAngle } : {}),
+          ...(imgScale !== undefined ? { '--sc-img-scale': String(imgScale) } : {}),
           ...style,
         } as React.CSSProperties
       }
@@ -1158,14 +1265,14 @@ export function ShineImageCard({
       {overlay != null && <div className="shine-card__overlay">{overlay}</div>}
       {badge != null && badge}
     </div>
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 ```ts
-export { ShineImageCard } from "./ShineImageCard";
+export { ShineImageCard } from './ShineImageCard'
 ```
 
 - [ ] **Step 4: Typecheck** — Run: `npx tsc --noEmit` — Expected: no new errors.
@@ -1184,6 +1291,7 @@ git commit -m "feat(ui): add ShineImageCard primitive and .shine-card classes"
 Replaces `svc-wave-down` / `about-wave-down` (identical path; only `fill` changes to bridge section bg colors).
 
 **Files:**
+
 - Create: `components/ui/WaveDivider.tsx`
 - Modify: `app/globals.css` (add `.wave-divider` class)
 - Modify: `components/ui/index.ts`
@@ -1191,8 +1299,16 @@ Replaces `svc-wave-down` / `about-wave-down` (identical path; only `fill` change
 - [ ] **Step 1: Add `.wave-divider` class to `app/globals.css`**
 
 ```css
-.wave-divider { position: relative; line-height: 0; z-index: 2; margin-top: var(--wave-mt, 64px); }
-.wave-divider svg { width: 100%; display: block; }
+.wave-divider {
+  position: relative;
+  line-height: 0;
+  z-index: 2;
+  margin-top: var(--wave-mt, 64px);
+}
+.wave-divider svg {
+  width: 100%;
+  display: block;
+}
 ```
 
 - [ ] **Step 2: Write `components/ui/WaveDivider.tsx`** (path verbatim from extraction)
@@ -1200,34 +1316,33 @@ Replaces `svc-wave-down` / `about-wave-down` (identical path; only `fill` change
 ```tsx
 interface WaveDividerProps {
   /** Fill color = the background color of the section BELOW the wave. */
-  to: string;
+  to: string
   /** Top margin in px. Default 64. */
-  marginTop?: number;
-  className?: string;
+  marginTop?: number
+  className?: string
 }
 
-const WAVE_PATH =
-  "M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z";
+const WAVE_PATH = 'M0 55 L180 22 L360 68 L540 18 L720 60 L900 20 L1080 58 L1260 24 L1440 52 L1440 90 L0 90 Z'
 
-export function WaveDivider({ to, marginTop, className = "" }: WaveDividerProps) {
+export function WaveDivider({ to, marginTop, className = '' }: WaveDividerProps) {
   return (
     <div
       aria-hidden="true"
       className={`wave-divider ${className}`.trim()}
-      style={marginTop !== undefined ? ({ "--wave-mt": `${marginTop}px` } as React.CSSProperties) : undefined}
+      style={marginTop !== undefined ? ({ '--wave-mt': `${marginTop}px` } as React.CSSProperties) : undefined}
     >
       <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <path d={WAVE_PATH} fill={to} />
       </svg>
     </div>
-  );
+  )
 }
 ```
 
 - [ ] **Step 3: Add to barrel**
 
 ```ts
-export { WaveDivider } from "./WaveDivider";
+export { WaveDivider } from './WaveDivider'
 ```
 
 - [ ] **Step 4: Typecheck** — Run: `npx tsc --noEmit` — Expected: no new errors.
@@ -1248,28 +1363,34 @@ Convert the home page end-to-end. This battle-tests every primitive and finalize
 The Home page contains: `grain-overlay`, hero orbs (`hero-orb--gold/amber/dim`), `hero-grid` (mask — page-unique leftover), `hero-headline` (gradient text), `eyebrow` (dots), `scroll-cue` (page-unique leftover), portfolio cards (via `PortfolioGrid` — defer to Phase 2.5), `winners-*` section (orbs + sparkles + award cards — largely page-unique), `btn-primary`/`btn-ghost` (none rendered directly on this page — they belong to child components).
 
 **Files:**
+
 - Modify: `app/page.tsx`
 
 - [ ] **Step 1: Baseline check (must be green before editing)**
 
 Run:
+
 ```bash
 npm run test:visual -- -g "home"
 ```
+
 Expected: PASS (home desktop + mobile match committed baselines).
 
 - [ ] **Step 2: Replace the grain overlay**
 
 Add import: `import { GrainOverlay, GlowOrb, Eyebrow, GradientText } from "@/components/ui";`
 Replace line 133 `<div aria-hidden="true" className="grain-overlay" />` with:
+
 ```tsx
 <GrainOverlay />
 ```
+
 Delete the `.grain-overlay` rule and its `@keyframes grain` from the `<style>` block (now provided by `.grain` + canonical `grain` keyframe).
 
 - [ ] **Step 3: Replace the hero orbs**
 
 Replace lines 141-143 (`hero-orb--gold/amber/dim`) with the GlowOrb equivalents (exact static values from the extracted CSS):
+
 ```tsx
 <GlowOrb
   size={900} height={500} shape="ellipse" fade="70%" blur={80}
@@ -1287,29 +1408,36 @@ Replace lines 141-143 (`hero-orb--gold/amber/dim`) with the GlowOrb equivalents 
   className="top-[10%] right-[-8%] max-md:w-[320px] max-md:h-[320px]"
 />
 ```
+
 > The mobile size overrides (lines 715-725 of the old `<style>`) move into the `max-md:` arbitrary utilities above. Delete `.hero-orb`, `.hero-orb--gold/amber/dim`, `@keyframes orbPulse`, and the mobile `@media` orb block from the `<style>`.
-Keep `.hero-grid` in the `<style>` (mask-image — legitimate Layer-1-or-leftover; leave as a scoped leftover for now).
+> Keep `.hero-grid` in the `<style>` (mask-image — legitimate Layer-1-or-leftover; leave as a scoped leftover for now).
 
 - [ ] **Step 4: Replace the hero eyebrow**
 
 Replace lines 149-153 with:
+
 ```tsx
-<Eyebrow ornament="dot" align="center" style={{ "--eb-spacing": "0.25em", "--eb-mb": "28px" } as React.CSSProperties}>
+<Eyebrow ornament="dot" align="center" style={{ '--eb-spacing': '0.25em', '--eb-mb': '28px' } as React.CSSProperties}>
   Product UX/UI design for
 </Eyebrow>
 ```
+
 Delete `.eyebrow`, `.eyebrow__dot`, `@keyframes dotBlink`, and the unused `.section-eyebrow` rule from the `<style>`. (The old dot used `2s` blink and `gap:12px`; canonical uses `2.2s` + `gap:12px` default — frozen frame identical, gap identical.)
 
 - [ ] **Step 5: Replace the hero headline gradient**
 
 The `HeroHeadline` component receives `headlineClassName`. Today it includes `hero-headline`. Swap that class for the canonical `gradient-text gradient-text--animate` and remove the `hero-headline` rule + `@keyframes textShimmer` from `<style>`. Change the `headlineClassName` (line 158) from:
+
 ```
 "text-[clamp(2.2rem,10vw,110px)] leading-[0.9] font-bold tracking-tighter mb-6 md:mb-8 max-w-[1200px] hero-headline"
 ```
+
 to:
+
 ```
 "text-[clamp(2.2rem,10vw,110px)] leading-[0.9] font-bold tracking-tighter mb-6 md:mb-8 max-w-[1200px] gradient-text gradient-text--animate"
 ```
+
 > The default `--gt-gradient` is `linear-gradient(135deg, #fff 40%, var(--accent) 55%, #fff 70%)` = the exact home gradient (accent is #facc15). `--gt-dur` defaults to 6s = exact. No inline override needed.
 
 - [ ] **Step 6: Leave page-unique blocks as scoped leftovers**
@@ -1319,17 +1447,21 @@ Keep in the `<style>`: `.hero-grid`, `.scroll-cue*` + `@keyframes scrollPulse` (
 - [ ] **Step 7: Run the screenshot gate**
 
 Run:
+
 ```bash
 npm run test:visual -- -g "home"
 ```
+
 Expected: PASS with zero meaningful diff. If a diff appears, open `playwright-report/` and reconcile (most likely cause: a CSS-var default differs from the original literal — fix the primitive call, not the baseline).
 
 - [ ] **Step 8: Lint + typecheck**
 
 Run:
+
 ```bash
 npm run lint && npx tsc --noEmit
 ```
+
 Expected: no new errors.
 
 - [ ] **Step 9: Commit**
@@ -1366,6 +1498,7 @@ If Steps 2-7 required any primitive prop additions, note them. The primitive API
 **Files:** Modify `app/services/page.tsx`. Route: `/services`.
 
 **Pattern inventory → primitive:**
+
 - `.svc-grain` + `@keyframes svcGrain` → `<GrainOverlay />`.
 - `.svc-hero__orb--gold` (900×480, `rgba(250,204,21,0.13)`, ellipse, fade 70%) and `.svc-hero__orb--amber` (640, `rgba(251,146,60,0.055)`, fade 65%, alternate) + their keyframes → two `<GlowOrb>` (use `animation="drift"`/`"pulse"` matching original; static values exact).
 - `.svc-eyebrow*` (dot/line/center/gold/dark variants) → `<Eyebrow ornament="dot|line" align="center" color={…}>`. Map `--dark-text` → `color="rgba(0,0,0,0.45)"`; `--gold` → default; line width is 32px = default.
@@ -1391,6 +1524,7 @@ If Steps 2-7 required any primitive prop additions, note them. The primitive API
 **Files:** Modify `app/about-us/page.tsx`. Route: `/about-us`. (Largest file — 1015 lines.)
 
 **Pattern inventory → primitive:**
+
 - `.about-grain` + keyframes → `<GrainOverlay />`.
 - `.about-hero__orb--gold` (900×480, `rgba(250,204,21,0.14)`), `.about-hero__orb--amber` (640, `rgba(251,146,60,0.06)`), `.about-showcase__orb` (1100×600, `rgba(250,204,21,0.05)`, blur 100, ellipse, no anim), `.about-learn__orb` (600, `rgba(250,204,21,0.04)`, blur 90) → `<GlowOrb>` each (exact static values; `animation="none"` for the showcase/learn orbs).
 - `.about-eyebrow*` (identical to svc variants) → `<Eyebrow>` (dot/line, center, color).
@@ -1417,6 +1551,7 @@ If Steps 2-7 required any primitive prop additions, note them. The primitive API
 **Files:** Modify `app/technology/page.tsx`, `components/TechStackSection.tsx`, `components/TechStickyFeature.tsx`. Route: `/technology`. **This task migrates dynamic accent to `--accent`.**
 
 **`app/technology/page.tsx`:**
+
 - Set `--accent` once: on the page's outermost element add `style={{ "--accent": accentColor } as React.CSSProperties}` (accentColor stays `"#facc15"` at line 66). All descendant primitives/classes inherit it.
 - `.tech-grain` + keyframes → `<GrainOverlay />`.
 - `.tech-hero-orb--gold` (`${accentColor}22`→`color-mix(in srgb, var(--accent) 13.3%, transparent)`, 900×500, ellipse, fade 70%) and `.tech-hero-orb--amber` (`${accentColor}0d`→4.7%, 500, fade 65%, reverse) → `<GlowOrb color="color-mix(...)" …>`.
@@ -1461,6 +1596,7 @@ If Steps 2-7 required any primitive prop additions, note them. The primitive API
 **Files:** Modify `components/AnimatedSteps.tsx`, `components/GridImageSection.tsx`, `components/FAQSection.tsx`, `components/PortfolioTemplate.tsx`, `components/PortfolioGrid.tsx`. Routes: `/`, `/<portfolio-slug>`. Gate against `home` and the portfolio route.
 
 **Pattern inventory → primitive:**
+
 - `AnimatedSteps` (prop `accentColor`): set `--accent` root; `.tech-steps__orb--l/r` → `<GlowOrb>` (`${ac}10`→6.25%, `${ac}0a`→3.9%); `.tech-steps__eyebrow*` → `<Eyebrow ornament="line"/"mark">`; `.tech-steps__head/title/sub` → `<SectionHeading>`. The step dots/connector/scan-beam/shimmer rules are bespoke step-timeline cascade → convert `${ac}` → `var(--accent)`/`color-mix`, keep rules as leftover.
 - `GridImageSection`: `.gi-shimmer` one-time entry shimmer (108deg, `giShimmer` keyframe) is parallax/entrance-specific → keep as leftover; convert any plain orb/badge to primitives. The frame radius (52px) and parallax are JS/scroll-driven → leftover.
 - `FAQSection`: `.fq-orb--a/b/c` (`rgba(250,204,21,0.09)`/`rgba(251,146,60,0.06)`/`rgba(250,204,21,0.03)`, `fqFloat`) → `<GlowOrb animation="drift">`; `.fq-count` (static gradient 128deg #facc15→#f59e0b) → `<GradientText gradient="linear-gradient(128deg,#facc15,#f59e0b)">` (no `animate`). The accordion (`FAQAccordion`) behavior + `.fq-item__btn` stay.
@@ -1480,6 +1616,7 @@ If Steps 2-7 required any primitive prop additions, note them. The primitive API
 **Files:** Modify `components/ClientsSection.tsx`, `components/WhyUsSection.tsx`, `components/AboutImageCarousel.tsx`, `components/LegalArticle.tsx`, `app/contact-us/page.tsx`, `components/ServiceModalMenu.tsx`, `components/ServiceTechGroups.tsx`. (Legal pages `app/privacy-policy`, `app/terms-of-use` are 36 lines each and render `LegalArticle` — converting `LegalArticle` covers them.) Routes: `/`, `/about-us`, `/contact-us`, `/privacy-policy`, `/terms-of-use`. Gate against each.
 
 **Pattern inventory → primitive:**
+
 - `ClientsSection` (prop `accentColor`): set `--accent` root; `.cs-clients__orb--l/r` → `<GlowOrb>`; `.cs-clients__eyebrow*` (lines, accent) → `<Eyebrow ornament="line">`; `.cs-clients__head/title` → `<SectionHeading>` (no subtitle); `.cs-mq*` two-row (32s fwd / 26s rev, 220px fade) → two `<Marquee speed={32}/{26} direction="left"/"right" fade pauseOnHover>` (logo cards passed via `renderItem`); `.cs-clients__cta` → `<Button variant="primary" href="/contact-us" style={{ background:"var(--accent)", "--btn-pad":"14px 32px" }}>`. Convert `${ac}` → `var(--accent)`/`color-mix`.
 - `WhyUsSection`: `.why-section__orb` (`rgba(250,204,21,0.05)`, blur 60) → `<GlowOrb blur={60}>`; `.btn-outline-gold` → `<Button variant="outline" href={…} style={{ "--btn-pad":"14px 32px","--btn-size":"16px" }}>`. Card layout rules stay (page-unique).
 - `AboutImageCarousel` (client, drag/scroll): `.aic-slide*` (radius 20, shine 135deg, scale-only 1.04, fixed 340×400) → `<ShineImageCard radius={20} shineAngle="135deg" imgScale={1.04} style={{ "--sc-lift":"0px","--sc-scale":"1" }} className="w-[340px] h-[400px] shrink-0" />` (no lift). Drag/scroll behavior stays.
@@ -1502,10 +1639,13 @@ If Steps 2-7 required any primitive prop additions, note them. The primitive API
 - [ ] **Step 1: Confirm `<style>` reduction**
 
 Run:
+
 ```bash
 grep -rl "<style" app components | sort
 ```
+
 Expected: only files with documented page-unique leftovers remain (e.g. home `winners`/`scroll-cue`, services strip chrome, sticky/3D/parallax in tech & grid). Every remaining `<style>` should be justified by a leftover noted in this plan. Run a line-count delta to confirm the ~3,200 → ~30% target:
+
 ```bash
 git diff --stat <phase0-start-commit> HEAD -- app components | tail -1
 ```
@@ -1513,33 +1653,41 @@ git diff --stat <phase0-start-commit> HEAD -- app components | tail -1
 - [ ] **Step 2: Confirm no JS-template-string CSS accent remains**
 
 Run:
+
 ```bash
 grep -rnE '\$\{(accentColor|ac)\}' app components
 ```
+
 Expected: zero matches (all migrated to `var(--accent)` / `color-mix`).
 
 - [ ] **Step 3: Confirm primitive adoption (no per-file re-implementation)**
 
 Run:
+
 ```bash
 grep -rnE '\.(svc|about|tss|wc|fq|cs|tech)-[a-z-]*(orb|eyebrow|grain|wave|marquee|shimmer)' app components | grep -v "components/ui/"
 ```
+
 Expected: only documented leftovers.
 
 - [ ] **Step 4: Full visual-regression run, all routes, both viewports**
 
 Run:
+
 ```bash
 npm run test:visual
 ```
+
 Expected: ALL PASS, zero meaningful diff on every route.
 
 - [ ] **Step 5: Lint + typecheck + production build**
 
 Run:
+
 ```bash
 npm run lint && npx tsc --noEmit && npm run build
 ```
+
 Expected: all succeed.
 
 - [ ] **Step 6: Commit any touch-ups**
