@@ -29,6 +29,14 @@ const MENU_COLUMNS = [
 
 const COL_HEADING_FIELDS = ['footmenuTitleOne', 'footmenuTitleTwo', 'footmenuTitleThree', 'footmenuTitleFour', 'footmenuTitleFive'] as const
 
+/** Turn a WP legal-page link (e.g. "https://triolla.io/privacy-policy/") into a
+ *  local route so it resolves to the new-site page instead of the old WP one.
+ *  Genuinely external hosts are returned untouched. */
+function localizeHref(url: string): string {
+  if (url.startsWith('http') && !url.includes('triolla.io')) return url
+  return url.replace(/^https?:\/\/(www\.)?triolla\.io/i, '').replace(/\/+$/, '') || '/'
+}
+
 /* ── Data fetching ──────────────────────────────────────── */
 
 const FOOTER_QUERY: TypedDocumentNode<GetFooterData> = gql`
@@ -295,17 +303,17 @@ export default async function Footer() {
               {privacyText && privacyLink && (
                 <>
                   {' | '}
-                  <a href={privacyLink} className="footer-bottom-link">
+                  <Link href={localizeHref(privacyLink)} className="footer-bottom-link">
                     {privacyText}
-                  </a>
+                  </Link>
                 </>
               )}
               {termText && termLink && (
                 <>
                   {' | '}
-                  <a href={termLink} className="footer-bottom-link">
+                  <Link href={localizeHref(termLink)} className="footer-bottom-link">
                     {termText}
-                  </a>
+                  </Link>
                 </>
               )}
             </p>

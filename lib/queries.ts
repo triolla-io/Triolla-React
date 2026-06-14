@@ -159,6 +159,60 @@ export const GET_CONTENT_PAGE = `
   }
 `
 
+// Careers page — Template_CareerPage ACF. Hero (headerTitle/boldText/…), a job
+// list (jobsList repeater) and two image galleries (topImages, gImageList).
+export const GET_CAREERS_PAGE = `
+  query GetCareersPage {
+    page(id: "careers", idType: URI) {
+      template {
+        ... on Template_CareerPage {
+          careerFields {
+            headerTitle
+            boldText
+            shortText
+            moreText
+            buttonText
+            headerBgColor
+            jHeading
+            jShortText
+            topImages { tImage { node { sourceUrl } } }
+            gImageList { gImage { node { sourceUrl } } }
+            jobsList {
+              jobName
+              noOfPositions
+              aboutLabel
+              aboutDescription
+              jobDescriptionLabel
+              jobDescription
+              requirementsLabel
+              requirements { jText }
+              applyEmail
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+// Branding & Studio — a single service-detail page (Template_ServiceDetailPage)
+// promoted to its own standalone route. Pulls the title, hero image, the bold
+// lead (ACF topBoldText) and the body content HTML re-typeset on the page.
+export const GET_BRANDING_STUDIO = `
+  query GetBrandingStudio {
+    page(id: "branding-studio", idType: URI) {
+      title
+      featuredImage { node { sourceUrl altText } }
+      content
+      template {
+        ... on Template_ServiceDetailPage {
+          postFields { topBoldText }
+        }
+      }
+    }
+  }
+`
+
 export const GET_FOOTER_DATA = `
   query GetFooterData {
     menus {

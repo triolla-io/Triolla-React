@@ -236,6 +236,48 @@ export interface ServiceDetailPage {
 /** The response from `buildServiceDetailsQuery` uses aliases s0, s1, … */
 export type GetServiceDetailsData = Record<string, ServiceDetailPage | null>
 
+/* ── GET_BRANDING_STUDIO ────────────────────────────────── */
+
+export interface GetBrandingStudioData {
+  page: ServiceDetailPage | null
+}
+
+/* ── GET_CAREERS_PAGE ───────────────────────────────────── */
+
+export interface CareerJob {
+  jobName: string | null
+  noOfPositions: string | null
+  aboutLabel: string | null
+  aboutDescription: string | null
+  jobDescriptionLabel: string | null
+  jobDescription: string | null
+  requirementsLabel: string | null
+  requirements: { jText: string | null }[] | null
+  applyEmail: string | null
+}
+
+export interface CareerFields {
+  headerTitle: string | null
+  boldText: string | null
+  shortText: string | null
+  moreText: string | null
+  buttonText: string | null
+  headerBgColor: string | null
+  jHeading: string | null
+  jShortText: string | null
+  topImages: { tImage: WPImage | null }[] | null
+  gImageList: { gImage: WPImage | null }[] | null
+  jobsList: CareerJob[] | null
+}
+
+export interface GetCareersPageData {
+  page: {
+    template: {
+      careerFields: CareerFields | null
+    } | null
+  } | null
+}
+
 /* ── GET_PORTFOLIO_SLUGS ────────────────────────────────── */
 
 export interface GetPortfolioSlugsData {
