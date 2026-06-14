@@ -27,8 +27,6 @@ interface AnimatedStepsProps {
 export default function AnimatedSteps({ steps, title, subtext, accentColor = '#facc15' }: AnimatedStepsProps) {
   if (steps.length === 0) return null
 
-  const ac = accentColor
-
   return (
     <section className="tech-steps" style={{ '--accent': accentColor } as React.CSSProperties}>
       <style>{`

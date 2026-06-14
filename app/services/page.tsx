@@ -12,7 +12,7 @@ import { ServiceModalMenu } from '@/components/ServiceModalMenu'
 import { ServiceTechGroups, type TechGroup } from '@/components/ServiceTechGroups'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
 import parse from 'html-react-parser'
-import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions } from '@/lib/graphql-types'
+import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
@@ -58,13 +58,13 @@ export default async function ServicesPage() {
   // link (or plain text) rather than a fabricated modal.
   const [productServices, brandServices, engServices] = await Promise.all([
     enrichServiceDetails(
-      (sp.prodrightMenu ?? []).map((i: any) => ({
+      (sp.prodrightMenu ?? []).map((i: { prodmtitle: string | null; prodmlink: string | null }) => ({
         label: i?.prodmtitle ?? null,
         link: i?.prodmlink ?? null,
       })),
     ),
     enrichServiceDetails(
-      (sp.brandrightMenu ?? []).map((i: any) => ({
+      (sp.brandrightMenu ?? []).map((i: { rightmetitle: string | null; rightmelink: string | null }) => ({
         label: i?.rightmetitle ?? null,
         link: i?.rightmelink ?? null,
       })),
@@ -82,17 +82,17 @@ export default async function ServicesPage() {
     {
       detail: engServices[0],
       copy: sp.devrightMenuToptitleCopy ?? null,
-      chips: (sp.rightMenuTopList ?? []).map((x: any) => x?.rightTopMenuItem).filter(Boolean),
+      chips: (sp.rightMenuTopList ?? []).map((x: { rightTopMenuItem: string }) => x?.rightTopMenuItem).filter(Boolean),
     },
     {
       detail: engServices[1],
       copy: null,
-      chips: (sp.rightMenuBotList ?? []).map((x: any) => x?.rightBottomMenuItem).filter(Boolean),
+      chips: (sp.rightMenuBotList ?? []).map((x: { rightBottomMenuItem: string }) => x?.rightBottomMenuItem).filter(Boolean),
     },
     {
       detail: engServices[2],
       copy: null,
-      chips: (sp.rightMenuThreeList ?? []).map((x: any) => x?.rightThreeMenuItem).filter(Boolean),
+      chips: (sp.rightMenuThreeList ?? []).map((x: { rightThreeMenuItem: string }) => x?.rightThreeMenuItem).filter(Boolean),
     },
   ]
 
@@ -118,15 +118,15 @@ export default async function ServicesPage() {
   ].filter(Boolean) as string[]
 
   const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
-    .map((item: any) => ({
+    .map((item: { cLogo: WPImage | null }) => ({
       url: item.cLogo?.node?.sourceUrl ?? '',
       alt: item.cLogo?.node?.altText ?? '',
     }))
     .filter((l: { url: string }) => l.url)
 
   const faqItems = (ts?.questionAnswerList ?? [])
-    .filter((q: any) => q?.fQuestion)
-    .map((q: any) => ({
+    .filter((q: { fQuestion: string | null; fAnswer: string | null }) => q?.fQuestion)
+    .map((q: { fQuestion: string | null; fAnswer: string | null }) => ({
       faqQuestion: q.fQuestion as string,
       faqAnswer: (q.fAnswer ?? '') as string,
     }))

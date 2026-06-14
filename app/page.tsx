@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { HeroHeadline } from '@/components/HeroHeadline'
 import { SectionReveal } from '@/components/SectionReveal'
 import { FadeIn } from '@/components/FadeIn'
@@ -15,7 +14,7 @@ import { client } from '@/lib/apollo-client'
 import { GET_HOME_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
-import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOptions } from '@/lib/graphql-types'
+import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 
 const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
   ${GET_HOME_PAGE}
@@ -80,17 +79,17 @@ export default async function Home() {
   const winTitle = hp.winTitle ?? ''
   const winSubtext = hp.winSubtitle ?? ''
 
-  const awards = (hp.wboxes ?? []).map((b: any) => ({
+  const awards = (hp.wboxes ?? []).map((b: { wboxTitle: string; winImg: WPImage | null }) => ({
     ...parseAward(b.wboxTitle ?? ''),
     imgUrl: b.winImg?.node?.sourceUrl ?? null,
   }))
 
   const whyTitle = stripHtml(hp.abthretitle ?? '')
   const whyText = stripHtml(hp.abtthretext ?? '')
-  const serviceCards: any[] = hp.abthrelist ?? []
+  const serviceCards = hp.abthrelist ?? []
 
   const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
-    .map((item: any) => ({
+    .map((item: { cLogo: WPImage | null }) => ({
       url: item.cLogo?.node?.sourceUrl ?? '',
       alt: item.cLogo?.node?.altText ?? '',
     }))
@@ -122,8 +121,8 @@ export default async function Home() {
   ].filter((x): x is NonNullable<typeof x> => x !== null)
 
   const faqItems = (ts?.questionAnswerList ?? [])
-    .filter((q: any) => q?.fQuestion)
-    .map((q: any) => ({
+    .filter((q: { fQuestion: string | null; fAnswer: string | null }) => q?.fQuestion)
+    .map((q: { fQuestion: string | null; fAnswer: string | null }) => ({
       faqQuestion: q.fQuestion as string,
       faqAnswer: (q.fAnswer ?? '') as string,
     }))
@@ -265,7 +264,7 @@ export default async function Home() {
           DESIGN PROCESS TIMELINE
       ══════════════════════════════════════════════ */}
       <AnimatedSteps
-        steps={(hp.designType ?? []).map((item: any, i: number) => ({
+        steps={(hp.designType ?? []).map((item: { dName: string }, i: number) => ({
           number: String(i + 1),
           numtitle: item.dName ?? '',
         }))}

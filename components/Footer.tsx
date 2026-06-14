@@ -9,18 +9,6 @@ import { FooterNavLink } from '@/components/FooterNavLink'
 import { getAllServices, deriveUri } from '@/lib/service-details'
 import type { GetFooterData, GetThemeSettingsData, FooterMenu, ThemeOptions } from '@/lib/graphql-types'
 
-/* ── Types ──────────────────────────────────────────────── */
-
-interface MenuItem {
-  label: string
-  url: string
-}
-interface WPMenu {
-  name: string
-  slug: string
-  menuItems: { nodes: MenuItem[] }
-}
-
 interface MentionLogo {
   mentionLogo?: { node?: { sourceUrl?: string } } | null
   mentionLogoLink?: string | null

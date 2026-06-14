@@ -11,7 +11,7 @@ import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
 import parse from 'html-react-parser'
-import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOptions } from '@/lib/graphql-types'
+import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 
 const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
   ${GET_ABOUT_PAGE}
@@ -54,7 +54,7 @@ export default async function AboutUsPage() {
 
   const faqItems: { faqQuestion: string; faqAnswer: string }[] = ap.faqItems ?? []
   const clientLogos: { url: string; alt: string }[] = (ap.clientLogos ?? [])
-    .map((l: any) => ({
+    .map((l: { logoImage: WPImage | null; logoName: string | null }) => ({
       url: l.logoImage?.node?.sourceUrl ?? '',
       alt: l.logoName ?? '',
     }))
@@ -71,7 +71,7 @@ export default async function AboutUsPage() {
 
   // Category strip at bottom of hero — derived from why-us card titles
   const heroStripWords = (ap.abthrelist ?? [])
-    .map((c: any) => stripHtml(c.abteintitle ?? ''))
+    .map((c: { abteintitle: string | null; abthreintext: string | null; abthreimage: WPImage | null }) => stripHtml(c.abteintitle ?? ''))
     .filter(Boolean)
     .slice(0, 6)
 
@@ -308,22 +308,24 @@ export default async function AboutUsPage() {
 
           {(ap.imagesSection ?? []).length > 0 && (
             <div className="about-partners">
-              {(ap.imagesSection ?? []).map((item: any, idx: number) => (
-                <FadeIn key={idx} delay={idx * 0.12} yOffset={20}>
-                  <div className="about-partner">
-                    <div className="about-partner__head">
-                      {item.imageText && <span className="about-partner__label">{item.imageText}</span>}
-                      {item.topimages?.node?.sourceUrl && (
-                        <img src={item.topimages.node.sourceUrl} alt="" className="about-partner__logo" />
+              {(ap.imagesSection ?? []).map(
+                (item: { imageText: string | null; topabtext: string | null; topimages: WPImage | null }, idx: number) => (
+                  <FadeIn key={idx} delay={idx * 0.12} yOffset={20}>
+                    <div className="about-partner">
+                      <div className="about-partner__head">
+                        {item.imageText && <span className="about-partner__label">{item.imageText}</span>}
+                        {item.topimages?.node?.sourceUrl && (
+                          <img src={item.topimages.node.sourceUrl} alt="" className="about-partner__logo" />
+                        )}
+                      </div>
+                      {item.topabtext && (
+                        /* WP-sourced HTML — trusted backend only */
+                        <div className="about-partner__body">{parse(item.topabtext)}</div>
                       )}
                     </div>
-                    {item.topabtext && (
-                      /* WP-sourced HTML — trusted backend only */
-                      <div className="about-partner__body">{parse(item.topabtext)}</div>
-                    )}
-                  </div>
-                </FadeIn>
-              ))}
+                  </FadeIn>
+                ),
+              )}
             </div>
           )}
         </div>
@@ -367,33 +369,43 @@ export default async function AboutUsPage() {
           </FadeIn>
 
           <div className="about-svc__rows">
-            {(ap.servlist ?? []).map((serv: any, i: number) => (
-              <FadeIn key={i} delay={i * 0.08} yOffset={20}>
-                <div className="about-srow">
-                  <div className="about-srow__left">
-                    <div className="about-srow__num">{(i + 1).toString().padStart(2, '0')}</div>
-                    <h3 className="about-srow__cat">{serv.servlleftText}</h3>
-                  </div>
-                  <div className="about-srow__right">
-                    <p className="about-srow__items">
-                      {(serv.servrightList ?? []).map((item: any, j: number) => (
-                        <span key={j}>
-                          <Link href={item.itemLink || '#'} target={item.linkTarget || '_self'} className="about-sitem">
-                            {item.listItem}
-                          </Link>
-                          {j < (serv.servrightList?.length ?? 0) - 1 && (
-                            <span className="about-sitem__sep" aria-hidden="true">
-                              {' '}
-                              |{' '}
+            {(ap.servlist ?? []).map(
+              (
+                serv: {
+                  servlleftText: string | null
+                  servrightList: { listItem: string; itemLink: string | null; linkTarget: string | null }[] | null
+                },
+                i: number,
+              ) => (
+                <FadeIn key={i} delay={i * 0.08} yOffset={20}>
+                  <div className="about-srow">
+                    <div className="about-srow__left">
+                      <div className="about-srow__num">{(i + 1).toString().padStart(2, '0')}</div>
+                      <h3 className="about-srow__cat">{serv.servlleftText}</h3>
+                    </div>
+                    <div className="about-srow__right">
+                      <p className="about-srow__items">
+                        {(serv.servrightList ?? []).map(
+                          (item: { listItem: string; itemLink: string | null; linkTarget: string | null }, j: number) => (
+                            <span key={j}>
+                              <Link href={item.itemLink || '#'} target={item.linkTarget || '_self'} className="about-sitem">
+                                {item.listItem}
+                              </Link>
+                              {j < (serv.servrightList?.length ?? 0) - 1 && (
+                                <span className="about-sitem__sep" aria-hidden="true">
+                                  {' '}
+                                  |{' '}
+                                </span>
+                              )}
                             </span>
-                          )}
-                        </span>
-                      ))}
-                    </p>
+                          ),
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </FadeIn>
-            ))}
+                </FadeIn>
+              ),
+            )}
           </div>
         </div>
 
@@ -412,7 +424,7 @@ export default async function AboutUsPage() {
 
       {/* ══ DESIGN PROCESS ══ */}
       <AnimatedSteps
-        steps={(ap.designType ?? []).map((item: any) => ({
+        steps={(ap.designType ?? []).map((item: { dName: string }) => ({
           numtitle: item.dName ?? '',
         }))}
         title={ap.uDesignHeading ?? null}
@@ -450,7 +462,9 @@ export default async function AboutUsPage() {
                 </div>
               )}
             </FadeIn>
-            <AboutImageCarousel images={(ap.learnslider ?? []).map((s: any) => s.learnimage?.node?.sourceUrl ?? null)} />
+            <AboutImageCarousel
+              images={(ap.learnslider ?? []).map((s: { learnimage: WPImage | null }) => s.learnimage?.node?.sourceUrl ?? null)}
+            />
           </div>
         </section>
       )}

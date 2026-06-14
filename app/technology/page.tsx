@@ -10,7 +10,7 @@ import { TechStackSection } from '@/components/TechStackSection'
 import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from '@/components/ui'
-import type { GetTechnologyPageData, GetThemeSettingsData, TechnologyPageFields, ThemeOptions } from '@/lib/graphql-types'
+import type { GetTechnologyPageData, GetThemeSettingsData, TechnologyPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 
 const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
   ${GET_TECHNOLOGY_PAGE}
@@ -29,16 +29,6 @@ function stripHtml(html: string): string {
     .replace(/&nbsp;/g, ' ')
     .replace(/&#8217;/g, "'")
     .trim()
-}
-
-function decodeHtml(html: string): string {
-  return (html ?? '')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&amp;/gi, '&')
-    .replace(/&quot;/gi, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/&#8217;/g, "'")
 }
 
 async function getTechData(): Promise<TechnologyPageFields> {
@@ -66,7 +56,7 @@ export default async function TechnologyPage() {
      (eyebrow lines, hover labels, CTA pill) invisible. Hardcode brand color. */
   const accentColor: string = '#facc15'
 
-  const companies: any[] = tp.companyList ?? []
+  const companies: { companyName: string }[] = tp.companyList ?? []
 
   const gridImages = [
     {
@@ -99,7 +89,7 @@ export default async function TechnologyPage() {
     },
   ].filter((item) => item.url)
 
-  const steps: any[] = tp.numberList ?? []
+  const steps: { number: string; numtitle: string }[] = tp.numberList ?? []
 
   /* ── All 8 Tech Stack Images ── */
   const allStackImages = [{ url: tp.midImageOne?.node?.sourceUrl ?? null, title: null }, ...gridImages]
@@ -108,14 +98,14 @@ export default async function TechnologyPage() {
   const bottomGridImage: string | null = ts?.commonGridOneImage?.node?.sourceUrl ?? null
 
   const faqItems = (tp.qaList ?? [])
-    .filter((q: any) => q?.question)
-    .map((q: any) => ({
+    .filter((q: { question: string; answer: string }) => q?.question)
+    .map((q: { question: string; answer: string }) => ({
       faqQuestion: q.question as string,
       faqAnswer: q.answer ?? '',
     }))
 
   const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
-    .map((item: any) => ({
+    .map((item: { cLogo: WPImage | null }) => ({
       url: item.cLogo?.node?.sourceUrl ?? '',
       alt: item.cLogo?.node?.altText ?? '',
     }))
@@ -427,7 +417,7 @@ export default async function TechnologyPage() {
             pauseOnHover
             fade
             fadeColor="#080808"
-            renderItem={(c: any, i: number) => (
+            renderItem={(c: { companyName: string }, i: number) => (
               <span key={i} className="tech-marquee-item">
                 <span className="tech-marquee-name">{c.companyName}</span>
                 <span className="tech-marquee-sep" style={{ color: 'var(--accent)' }} aria-hidden="true">

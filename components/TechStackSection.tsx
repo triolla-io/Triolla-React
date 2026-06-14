@@ -66,9 +66,6 @@ export function TechStackSection({ titleOne, titleTwo, text, midTitle, images, a
     .replace(/&amp;/g, '&')
     .trim()
 
-  const count = validImages.length
-  const countStr = String(count).padStart(2, '0')
-
   return (
     <>
       <section ref={sectionRef} className="tss-root" style={{ '--accent': accentColor } as React.CSSProperties}>
