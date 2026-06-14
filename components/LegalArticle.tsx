@@ -1,19 +1,5 @@
-import parse, { type HTMLReactParserOptions, Element as ParserElement } from 'html-react-parser'
 import { GlowOrb } from '@/components/ui'
-
-/** Strip interactive/script chrome from WP content — only the readable article
- *  (headings, paragraphs, lists, links) survives. Same allowlist approach the
- *  service-detail modal uses, kept consistent across the site. */
-const DROP_TAGS = new Set(['script', 'style', 'form', 'input', 'button', 'textarea', 'select', 'iframe', 'noscript'])
-
-const parseOptions: HTMLReactParserOptions = {
-  replace: (node) => {
-    if (node instanceof ParserElement && DROP_TAGS.has(node.name)) {
-      return <></>
-    }
-    return undefined
-  },
-}
+import { WpContent } from '@/lib/wp-content'
 
 interface LegalArticleProps {
   title: string | null
@@ -51,8 +37,10 @@ export function LegalArticle({ title, content, eyebrow }: LegalArticleProps) {
         </header>
 
         {content && (
-          /* WP-sourced HTML — trusted backend, sanitized via DROP_TAGS */
-          <div className="legal-prose">{parse(content, parseOptions)}</div>
+          /* WP-sourced HTML — trusted backend, sanitized inside <WpContent> */
+          <div className="legal-prose">
+            <WpContent html={content} />
+          </div>
         )}
       </article>
 

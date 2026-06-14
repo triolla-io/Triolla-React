@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:visual": "playwright test",
-    "test:visual:update": "playwright test --update-snapshots"
+    "test:visual:update": "playwright test --update-snapshots",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@apollo/client": "^4.1.9",

@@ -459,3 +459,69 @@ export const GET_TECHNOLOGY_PAGE = `
     }
   }
 `
+
+/** Number of cards fetched per "Load More" click. Lives here (a plain module)
+ *  rather than in the `'use server'` actions file — a `'use server'` module may
+ *  only export async functions, so a constant export there is a build error. */
+export const BLOG_PAGE_SIZE = 9
+
+export const GET_BLOG_PAGE = `
+  query GetBlogPage {
+    page(id: "/blog/", idType: URI) {
+      template {
+        ... on Template_BlogPage {
+          blogPageFields {
+            headerTitle
+            shortText
+            boldText
+            buttonText
+            moreText
+            headerBgColor
+            headerBgOverlayLayer { node { sourceUrl altText } }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_BLOG_POSTS = `
+  query GetBlogPosts($first: Int!, $after: String) {
+    posts(first: $first, after: $after, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        id
+        title
+        uri
+        date
+        featuredImage { node { sourceUrl altText } }
+      }
+    }
+  }
+`
+
+export const GET_POST_SLUGS = `
+  query GetPostSlugs {
+    posts(first: 200, where: { status: PUBLISH }) {
+      nodes {
+        uri
+      }
+    }
+  }
+`
+
+export const GET_POST_BY_URI = `
+  query GetPostByUri($uri: ID!) {
+    post(id: $uri, idType: URI) {
+      title
+      content
+      date
+      uri
+      featuredImage { node { sourceUrl altText } }
+      postFields { topBoldText }
+    }
+  }
+`

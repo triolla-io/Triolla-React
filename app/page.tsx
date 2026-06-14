@@ -5,7 +5,7 @@ import { CountUpNumber } from '@/components/CountUpNumber'
 import { PortfolioGrid } from '@/components/PortfolioGrid'
 import { FAQSection } from '@/components/FAQSection'
 import { GridImageSection } from '@/components/GridImageSection'
-import { WannaChatSection } from '@/components/WannaChatSection'
+import { ContactCTA } from '@/components/ContactCTA'
 import { WhyUsSection } from '@/components/WhyUsSection'
 import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
@@ -15,6 +15,7 @@ import { GET_HOME_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
+import { stripHtml } from '@/lib/text'
 
 const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
   ${GET_HOME_PAGE}
@@ -25,16 +26,6 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
 `
 
 /* ── WP content helpers ──────────────────────────── */
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
-}
 
 function parseAward(wboxTitle: string): { rank: number; label: string } {
   const rankMatch = wboxTitle.match(/#(\d+)/)
@@ -88,45 +79,14 @@ export default async function Home() {
   const whyText = stripHtml(hp.abtthretext ?? '')
   const serviceCards = hp.abthrelist ?? []
 
-  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap(
-    (item: { cLogo: WPImage | null }) => {
-      const url = item.cLogo?.node?.sourceUrl
-      return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
-    }
-  )
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap((item: { cLogo: WPImage | null }) => {
+    const url = item.cLogo?.node?.sourceUrl
+    return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
+  })
 
-  const contactItems = [
-    ts?.cEmailLabel && ts?.cEmailAddress
-      ? {
-          label: ts.cEmailLabel,
-          value: ts.cEmailAddress,
-          href: `mailto:${ts.cEmailAddress}`,
-        }
-      : null,
-    ts?.cTlvLabel && ts?.cTlvNumber
-      ? {
-          label: ts.cTlvLabel,
-          value: ts.cTlvNumber,
-          href: `tel:${ts.cTlvNumber.replace(/[^+\d]/g, '')}`,
-        }
-      : null,
-    ts?.cNyLabel && ts?.cNyNumber
-      ? {
-          label: ts.cNyLabel,
-          value: ts.cNyNumber,
-          href: `tel:${ts.cNyNumber.replace(/[^+\d]/g, '')}`,
-        }
-      : null,
-    ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
-  ].filter((x): x is NonNullable<typeof x> => x !== null)
-
-  const faqItems = (ts?.questionAnswerList ?? []).flatMap(
-    (q: { fQuestion: string | null; fAnswer: string | null }) => {
-      return q?.fQuestion
-        ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }]
-        : []
-    }
-  )
+  const faqItems = (ts?.questionAnswerList ?? []).flatMap((q: { fQuestion: string | null; fAnswer: string | null }) => {
+    return q?.fQuestion ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }] : []
+  })
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
@@ -289,21 +249,7 @@ export default async function Home() {
       {/* ══════════════════════════════════════════════
           CONTACT SECTION
       ══════════════════════════════════════════════ */}
-      <WannaChatSection
-        contactItems={contactItems}
-        leftHeading={
-          ts?.cLeftHeading
-            ? ts.cLeftHeading
-                .replace(/<br\s*\/?>/gi, '\n')
-                .replace(/<[^>]+>/g, '')
-                .trim()
-            : null
-        }
-        formHeading={ts?.cContactFormHeading ? stripHtml(ts.cContactFormHeading) : null}
-        submitLabel={ts?.cButton ?? null}
-        callUsLabel={ts?.cCallUsLabel ?? null}
-        fallbackEmail={ts?.cEmailAddress ?? null}
-      />
+      <ContactCTA ts={ts} />
 
       {/* ══════════════════════════════════════════════
           GLOBAL STYLES
