@@ -53,12 +53,12 @@ export default async function AboutUsPage() {
   const [ap, ts] = await Promise.all([getAboutData(), getThemeSettings()])
 
   const faqItems: { faqQuestion: string; faqAnswer: string }[] = ap.faqItems ?? []
-  const clientLogos: { url: string; alt: string }[] = (ap.clientLogos ?? [])
-    .map((l: { logoImage: WPImage | null; logoName: string | null }) => ({
-      url: l.logoImage?.node?.sourceUrl ?? '',
-      alt: l.logoName ?? '',
-    }))
-    .filter((l: { url: string }) => l.url)
+  const clientLogos: { url: string; alt: string }[] = (ap.clientLogos ?? []).flatMap(
+    (l: { logoImage: WPImage | null; logoName: string | null }) => {
+      const url = l.logoImage?.node?.sourceUrl
+      return url ? [{ url, alt: l.logoName ?? '' }] : []
+    }
+  )
 
   const heroTitle = stripHtml(ap.headerTitle ?? '')
 
@@ -71,8 +71,10 @@ export default async function AboutUsPage() {
 
   // Category strip at bottom of hero — derived from why-us card titles
   const heroStripWords = (ap.abthrelist ?? [])
-    .map((c: { abteintitle: string | null; abthreintext: string | null; abthreimage: WPImage | null }) => stripHtml(c.abteintitle ?? ''))
-    .filter(Boolean)
+    .flatMap((c: { abteintitle: string | null; abthreintext: string | null; abthreimage: WPImage | null }) => {
+      const text = stripHtml(c.abteintitle ?? '')
+      return text ? [text] : []
+    })
     .slice(0, 6)
 
   return (

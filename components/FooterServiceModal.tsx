@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, use, useMemo, type ReactNode } from 'react'
 import { useServiceModal, type ServiceDetail } from '@/components/ServiceDetailModal'
 
 /**
@@ -37,8 +37,10 @@ export function FooterModalProvider({
     ctaLink,
   })
 
+  const contextValue = useMemo(() => ({ open, setTriggerRef }), [open, setTriggerRef])
+
   return (
-    <FooterModalContext.Provider value={{ open, setTriggerRef }}>
+    <FooterModalContext.Provider value={contextValue}>
       {children}
       {modal}
     </FooterModalContext.Provider>
@@ -46,5 +48,5 @@ export function FooterModalProvider({
 }
 
 export function useFooterModal() {
-  return useContext(FooterModalContext)
+  return use(FooterModalContext)
 }

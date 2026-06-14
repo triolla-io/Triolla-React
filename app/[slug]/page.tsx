@@ -28,10 +28,15 @@ export async function generateStaticParams() {
     const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
 
     const nodes = data?.pages?.nodes ?? []
-    return nodes
-      .filter((n) => n?.template?.__typename === 'Template_PortfolioPage')
-      .map((n) => ({ slug: (n.uri ?? '').replace(/^\/+|\/+$/g, '') }))
-      .filter((p) => p.slug.length > 0)
+    return nodes.flatMap((n) => {
+      if (n?.template?.__typename === 'Template_PortfolioPage') {
+        const slug = (n.uri ?? '').replace(/^\/+|\/+$/g, '')
+        if (slug.length > 0) {
+          return [{ slug }]
+        }
+      }
+      return []
+    })
   } catch {
     // Build emits no portfolio routes rather than crashing.
     return []

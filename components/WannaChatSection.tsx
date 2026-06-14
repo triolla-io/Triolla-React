@@ -181,6 +181,7 @@ export function WannaChatSection({
                           <input
                             id={`wc-${f.key}`}
                             name={f.key}
+                            aria-label={f.label || undefined}
                             type={f.type}
                             className="wc-field__inp"
                             value={val}
@@ -206,6 +207,7 @@ export function WannaChatSection({
                     type="submit"
                     className={`wc-btn${pending ? ' wc-btn--busy' : ''}${state.status === 'sent' ? ' wc-btn--done' : ''}`}
                     disabled={pending || state.status === 'sent'}
+                    aria-label={submitLabel || 'Submit contact form'}
                   >
                     <span className="wc-btn__sweep" />
                     <span className="wc-btn__txt">{state.status === 'sent' ? '✓' : pending ? '…' : (submitLabel ?? '')}</span>
@@ -235,7 +237,7 @@ export function WannaChatSection({
                   </button>
 
                   {/* Status / fallback region */}
-                  <div className="wc-status" role="status" aria-live="polite">
+                  <output className="wc-status" aria-live="polite">
                     {state.status === 'sent' && <p className="wc-status__ok">Thanks — we’ll be in touch shortly.</p>}
                     {state.status === 'error' && state.message && <p className="wc-status__err">{state.message}</p>}
                     {state.status === 'unconfigured' && (
@@ -253,7 +255,7 @@ export function WannaChatSection({
                         )}
                       </p>
                     )}
-                  </div>
+                  </output>
                 </form>
               </div>
             </div>

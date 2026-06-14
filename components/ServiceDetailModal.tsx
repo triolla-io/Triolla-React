@@ -4,6 +4,43 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import parse, { type HTMLReactParserOptions, Element as ParserElement } from 'html-react-parser'
 
+interface ModalPortalProps {
+  children: React.ReactNode
+  onCancel: () => void
+  active: ServiceDetail
+  closing: boolean
+  reduceMotion: boolean
+}
+
+function ModalPortal({ children, onCancel, active, closing, reduceMotion }: ModalPortalProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (dialog) {
+      dialog.showModal()
+      const handleCancel = (e: Event) => {
+        e.preventDefault()
+        onCancel()
+      }
+      dialog.addEventListener('cancel', handleCancel)
+      return () => {
+        dialog.removeEventListener('cancel', handleCancel)
+      }
+    }
+  }, [onCancel])
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className={`svcm-overlay${closing ? ' svcm-overlay--closing' : ''}${reduceMotion ? ' svcm-overlay--reduced' : ''}`}
+      aria-label={active.title ?? active.label ?? 'Service details'}
+    >
+      {children}
+    </dialog>
+  )
+}
+
 /** One service, enriched server-side from its WP detail page.
  *  `hasDetail` is false when the page failed to resolve — such items render as
  *  a plain link instead of a modal trigger (never fabricated content). */
@@ -68,7 +105,7 @@ export function useServiceModal(services: ServiceDetail[], { ctaText, ctaLink }:
 
   // Indices of services that actually have a detail modal, in display order —
   // prev/next cycles only through these (plain links are skipped).
-  const detailIndices = services.map((s, i) => (s.hasDetail ? i : -1)).filter((i) => i >= 0)
+  const detailIndices = services.flatMap((s, i) => (s.hasDetail ? [i] : []))
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -160,11 +197,11 @@ export function useServiceModal(services: ServiceDetail[], { ctaText, ctaLink }:
   const modal =
     isOpen && active && typeof document !== 'undefined'
       ? createPortal(
-          <div
-            className={`svcm-overlay${closing ? ' svcm-overlay--closing' : ''}${reduceMotion ? ' svcm-overlay--reduced' : ''}`}
-            role="dialog"
-            aria-modal="true"
-            aria-label={active.title ?? active.label ?? 'Service details'}
+          <ModalPortal
+            active={active}
+            closing={closing}
+            reduceMotion={reduceMotion}
+            onCancel={close}
           >
             {/* Backdrop — click to close */}
             <div className="svcm-backdrop" aria-hidden="true" onClick={close} />
@@ -257,6 +294,12 @@ export function useServiceModal(services: ServiceDetail[], { ctaText, ctaLink }:
               .svcm-overlay {
                 position: fixed; inset: 0; z-index: 10000;
                 display: flex; align-items: stretch; justify-content: center;
+                background: transparent; border: none; padding: 0; margin: 0;
+                width: 100%; height: 100%; max-width: none; max-height: none;
+                color: inherit; overflow: visible;
+              }
+              .svcm-overlay::backdrop {
+                background: transparent;
               }
               .svcm-backdrop {
                 position: absolute; inset: 0;
@@ -511,7 +554,7 @@ export function useServiceModal(services: ServiceDetail[], { ctaText, ctaLink }:
                 .svcm-cta { justify-content: center; }
               }
             `}</style>
-          </div>,
+          </ModalPortal>,
           document.body,
         )
       : null

@@ -97,19 +97,20 @@ export default async function TechnologyPage() {
   /* ── Bottom portfolio grid image ── */
   const bottomGridImage: string | null = ts?.commonGridOneImage?.node?.sourceUrl ?? null
 
-  const faqItems = (tp.qaList ?? [])
-    .filter((q: { question: string; answer: string }) => q?.question)
-    .map((q: { question: string; answer: string }) => ({
-      faqQuestion: q.question as string,
-      faqAnswer: q.answer ?? '',
-    }))
+  const faqItems = (tp.qaList ?? []).flatMap(
+    (q: { question: string; answer: string }) => {
+      return q?.question
+        ? [{ faqQuestion: q.question, faqAnswer: q.answer ?? '' }]
+        : []
+    }
+  )
 
-  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
-    .map((item: { cLogo: WPImage | null }) => ({
-      url: item.cLogo?.node?.sourceUrl ?? '',
-      alt: item.cLogo?.node?.altText ?? '',
-    }))
-    .filter((l: { url: string }) => l.url)
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap(
+    (item: { cLogo: WPImage | null }) => {
+      const url = item.cLogo?.node?.sourceUrl
+      return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
+    }
+  )
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress

@@ -25,7 +25,7 @@ Read `schema.graphql` before writing any query — never guess field names. Rege
 
 ### `use client` vs Server Components
 
-Pages (`app/**/page.tsx`) are Server Components. Client components: `HeaderClient`, `HeroHeadline`, `SectionReveal`, `FadeIn`, `CountUpNumber`, `CookieBanner`, `FAQAccordion`, `LearnCarousel`, `PortfolioGrid`, `ClientLogoStrip`. `Header`/`Footer` are Server Components.
+Pages (`app/**/page.tsx`) are Server Components. Client components: `HeaderClient`, `HeroHeadline`, `SectionReveal`, `FadeIn`, `CountUpNumber`, `CookieBanner`, `FAQAccordion`, `PortfolioGrid`. `Header`/`Footer` are Server Components.
 
 ### Adding a New Page
 

@@ -153,6 +153,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
               {items.map((_, i) => (
                 <button
                   key={i}
+                  type="button"
                   aria-label={`Case study ${i + 1}`}
                   onClick={() =>
                     panelRefs.current[i]?.scrollIntoView({

@@ -240,6 +240,7 @@ export function TechStickyFeature({
                 {panels.map((_, i) => (
                   <button
                     key={i}
+                    type="button"
                     aria-label={`Panel ${i + 1}`}
                     onClick={() =>
                       panelRefs.current[i]?.scrollIntoView({
@@ -428,7 +429,7 @@ export function TechStickyFeature({
                         background: 'linear-gradient(to right, transparent, var(--accent))',
                       }}
                     />
-                    <span className="font-bold tracking-[0.4em] uppercase" style={{ fontSize: '11px', color: 'var(--accent)' }}>
+                    <span className="font-bold tracking-[0.4em] uppercase" style={{ fontSize: '12px', color: 'var(--accent)' }}>
                       Our Promise
                     </span>
                     <div

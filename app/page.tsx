@@ -88,12 +88,12 @@ export default async function Home() {
   const whyText = stripHtml(hp.abtthretext ?? '')
   const serviceCards = hp.abthrelist ?? []
 
-  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
-    .map((item: { cLogo: WPImage | null }) => ({
-      url: item.cLogo?.node?.sourceUrl ?? '',
-      alt: item.cLogo?.node?.altText ?? '',
-    }))
-    .filter((l: { url: string }) => l.url)
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap(
+    (item: { cLogo: WPImage | null }) => {
+      const url = item.cLogo?.node?.sourceUrl
+      return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
+    }
+  )
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
@@ -120,12 +120,13 @@ export default async function Home() {
     ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
   ].filter((x): x is NonNullable<typeof x> => x !== null)
 
-  const faqItems = (ts?.questionAnswerList ?? [])
-    .filter((q: { fQuestion: string | null; fAnswer: string | null }) => q?.fQuestion)
-    .map((q: { fQuestion: string | null; fAnswer: string | null }) => ({
-      faqQuestion: q.fQuestion as string,
-      faqAnswer: (q.fAnswer ?? '') as string,
-    }))
+  const faqItems = (ts?.questionAnswerList ?? []).flatMap(
+    (q: { fQuestion: string | null; fAnswer: string | null }) => {
+      return q?.fQuestion
+        ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }]
+        : []
+    }
+  )
 
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { GlowOrb } from '@/components/ui'
 
 interface GridImageSectionProps {
@@ -80,7 +80,7 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
         />
 
         {/* ── entrance animation ── */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.92, y: 72 }}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 1.05, ease: [0.23, 1, 0.32, 1] }}
@@ -129,7 +129,7 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
               <div className="gi-scanlines" aria-hidden="true" />
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
       <style>{`

@@ -82,17 +82,17 @@ export default async function ServicesPage() {
     {
       detail: engServices[0],
       copy: sp.devrightMenuToptitleCopy ?? null,
-      chips: (sp.rightMenuTopList ?? []).map((x: { rightTopMenuItem: string }) => x?.rightTopMenuItem).filter(Boolean),
+      chips: (sp.rightMenuTopList ?? []).flatMap((x: { rightTopMenuItem: string }) => x?.rightTopMenuItem ? [x.rightTopMenuItem] : []),
     },
     {
       detail: engServices[1],
       copy: null,
-      chips: (sp.rightMenuBotList ?? []).map((x: { rightBottomMenuItem: string }) => x?.rightBottomMenuItem).filter(Boolean),
+      chips: (sp.rightMenuBotList ?? []).flatMap((x: { rightBottomMenuItem: string }) => x?.rightBottomMenuItem ? [x.rightBottomMenuItem] : []),
     },
     {
       detail: engServices[2],
       copy: null,
-      chips: (sp.rightMenuThreeList ?? []).map((x: { rightThreeMenuItem: string }) => x?.rightThreeMenuItem).filter(Boolean),
+      chips: (sp.rightMenuThreeList ?? []).flatMap((x: { rightThreeMenuItem: string }) => x?.rightThreeMenuItem ? [x.rightThreeMenuItem] : []),
     },
   ]
 
@@ -117,19 +117,20 @@ export default async function ServicesPage() {
     sp.brandimageSix?.node?.sourceUrl,
   ].filter(Boolean) as string[]
 
-  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? [])
-    .map((item: { cLogo: WPImage | null }) => ({
-      url: item.cLogo?.node?.sourceUrl ?? '',
-      alt: item.cLogo?.node?.altText ?? '',
-    }))
-    .filter((l: { url: string }) => l.url)
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap(
+    (item: { cLogo: WPImage | null }) => {
+      const url = item.cLogo?.node?.sourceUrl
+      return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
+    }
+  )
 
-  const faqItems = (ts?.questionAnswerList ?? [])
-    .filter((q: { fQuestion: string | null; fAnswer: string | null }) => q?.fQuestion)
-    .map((q: { fQuestion: string | null; fAnswer: string | null }) => ({
-      faqQuestion: q.fQuestion as string,
-      faqAnswer: (q.fAnswer ?? '') as string,
-    }))
+  const faqItems = (ts?.questionAnswerList ?? []).flatMap(
+    (q: { fQuestion: string | null; fAnswer: string | null }) => {
+      return q?.fQuestion
+        ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }]
+        : []
+    }
+  )
 
   const heroTitle = stripHtml(sp.headerTitle ?? '')
 

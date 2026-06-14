@@ -73,7 +73,12 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
                 const isOpen = open === i
                 return (
                   <div key={i} className={`fq-item${isOpen ? ' fq-item--open' : ''}`}>
-                    <button className="fq-item__btn" onClick={() => setOpen(isOpen ? null : i)} aria-expanded={isOpen}>
+                    <button
+                      type="button"
+                      className="fq-item__btn"
+                      onClick={() => setOpen(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                    >
                       <span className="fq-item__num">{String(i + 1).padStart(2, '0')}</span>
                       <span className="fq-item__q">{item.faqQuestion}</span>
                       <span className="fq-item__icon" aria-hidden="true">

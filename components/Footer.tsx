@@ -177,6 +177,8 @@ export default async function Footer() {
                 {mentions.map((m, i) => {
                   const src = m.mentionLogo?.node?.sourceUrl
                   if (!src) return null
+                  const linkHostname = m.mentionLogoLink ? m.mentionLogoLink.replace(/^https?:\/\/(www\.)?/, '').split('/')[0] : ''
+                  const label = linkHostname ? `Visit ${linkHostname}` : 'View mention'
                   return (
                     <a
                       key={i}
@@ -185,6 +187,7 @@ export default async function Footer() {
                       rel="noopener noreferrer"
                       className="footer-mention"
                       style={{ '--mi': i } as React.CSSProperties}
+                      aria-label={label}
                     >
                       <img src={src} alt="" className="footer-mention__img" width={100} height={36} />
                     </a>
@@ -206,20 +209,23 @@ export default async function Footer() {
         <div className="w-[90%] mx-auto py-10 md:py-16">
           <SectionReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-5 md:gap-x-8 gap-y-10 md:gap-y-12">
             {[
-              ...columns
-                .filter((col) => col.heading || col.items.length > 0)
-                .map((col, i) => (
-                  <div key={i}>
-                    {col.heading && <h3 className="footer-col-heading">{col.heading}</h3>}
-                    <ul className="space-y-3">
-                      {col.items.map((item) => (
-                        <li key={item.label}>
-                          <FooterNavLink label={item.label} url={item.url} serviceIndex={item.serviceIndex} />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )),
+              ...columns.flatMap((col, i) => {
+                if (col.heading || col.items.length > 0) {
+                  return [
+                    <div key={i}>
+                      {col.heading && <h3 className="footer-col-heading">{col.heading}</h3>}
+                      <ul className="space-y-3">
+                        {col.items.map((item) => (
+                          <li key={item.label}>
+                            <FooterNavLink label={item.label} url={item.url} serviceIndex={item.serviceIndex} />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>,
+                  ]
+                }
+                return []
+              }),
               ...(socials.length > 0
                 ? [
                     <div key="social">

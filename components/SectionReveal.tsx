@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useInView } from 'motion/react'
+import { m, useInView } from 'motion/react'
 import { useRef, ReactNode } from 'react'
 
 interface SectionRevealProps {
@@ -29,12 +29,12 @@ export function SectionReveal({ children, className = '' }: SectionRevealProps) 
   const isInView = useInView(ref, { once: true, amount: 0 })
 
   return (
-    <motion.div ref={ref} className={className} variants={container} initial="hidden" animate={isInView ? 'show' : 'hidden'}>
+    <m.div ref={ref} className={className} variants={container} initial="hidden" animate={isInView ? 'show' : 'hidden'}>
       {(Array.isArray(children) ? children : [children]).map((child, i) => (
-        <motion.div key={i} variants={item}>
+        <m.div key={i} variants={item}>
           {child}
-        </motion.div>
+        </m.div>
       ))}
-    </motion.div>
+    </m.div>
   )
 }

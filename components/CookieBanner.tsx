@@ -45,18 +45,23 @@ export default function CookieBanner() {
 
         <div className="flex flex-wrap gap-3 shrink-0">
           <button
+            type="button"
             onClick={handleAccept}
             className="px-6 py-2 bg-yellow-400 text-black font-medium rounded hover:bg-yellow-500 transition-colors"
           >
             Accept
           </button>
           <button
+            type="button"
             onClick={handleReject}
             className="px-6 py-2 bg-transparent border border-white/20 text-white font-medium rounded hover:bg-white/10 transition-colors"
           >
             Reject
           </button>
-          <button className="px-6 py-2 bg-transparent border border-white/20 text-white font-medium rounded hover:bg-white/10 transition-colors">
+          <button
+            type="button"
+            className="px-6 py-2 bg-transparent border border-white/20 text-white font-medium rounded hover:bg-white/10 transition-colors"
+          >
             Settings
           </button>
         </div>

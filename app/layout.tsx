@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CookieBanner from '@/components/CookieBanner'
 import { BfcacheReloader } from '@/components/BfcacheReloader'
+import { MotionProvider } from '@/components/MotionProvider'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -31,7 +32,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
         <Header />
-        <main className="grow">{children}</main>
+        <main className="grow">
+          <MotionProvider>{children}</MotionProvider>
+        </main>
         <Footer />
         <CookieBanner />
         <BfcacheReloader />

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRef } from 'react'
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { ShineImageCard } from '@/components/ui'
 
 interface AboutImageCarouselProps {
@@ -16,7 +16,7 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
 
   return (
     <div className="aic-root" ref={constraintsRef}>
-      <motion.div drag="x" dragConstraints={constraintsRef} dragElastic={0.08} className="aic-track">
+      <m.div drag="x" dragConstraints={constraintsRef} dragElastic={0.08} className="aic-track">
         {validImages.map((src, i) => (
           <ShineImageCard
             key={i}
@@ -35,7 +35,7 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
             className="w-[340px] h-[400px] shrink-0 max-md:w-[260px] max-md:h-[320px]"
           />
         ))}
-      </motion.div>
+      </m.div>
 
       {/* drag hint */}
       <div className="aic-hint" aria-hidden="true">

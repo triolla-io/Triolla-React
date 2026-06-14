@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 
 interface HeroHeadlineProps {
   headline: string
@@ -17,7 +17,7 @@ export function HeroHeadline({ headline, subtext, headlineClassName = '', headli
     <>
       <h1 className={headlineClassName} style={headlineStyle}>
         {words.map((word, i) => (
-          <motion.span
+          <m.span
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -25,18 +25,18 @@ export function HeroHeadline({ headline, subtext, headlineClassName = '', headli
             className="inline-block mr-[0.25em]"
           >
             {word}
-          </motion.span>
+          </m.span>
         ))}
       </h1>
       {subtext && (
-        <motion.p
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: words.length * 0.08 + 0.4 }}
           className={subtextClassName}
         >
           {subtext}
-        </motion.p>
+        </m.p>
       )}
     </>
   )

@@ -63,6 +63,7 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
   return (
     <div ref={buttonRef} className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <button
+        type="button"
         className={`flex items-center gap-1 text-[14px] font-medium transition-colors hover:text-yellow-400 ${
           isActive ? 'text-yellow-400' : 'text-white'
         }`}
@@ -326,6 +327,7 @@ export function HeaderClient({
         <div className="pointer-events-auto bg-yellow-400 text-black py-1.5 md:py-2 px-10 text-center text-[11px] md:text-[13px] font-medium relative flex items-center justify-center">
           <span>{ticker}</span>
           <button
+            type="button"
             className="absolute right-4 text-black hover:opacity-60 transition-opacity"
             aria-label="Close"
             onClick={() => setIsTickerDismissed(true)}
@@ -446,6 +448,7 @@ export function HeaderClient({
               </a>
             )}
             <button
+              type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white hover:text-yellow-400 p-2 transition-colors"
               aria-label="Toggle menu"
