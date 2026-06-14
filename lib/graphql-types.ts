@@ -440,3 +440,64 @@ export interface GetAboutPageData {
     } | null
   } | null
 }
+
+/* ── Blog ───────────────────────────────────────────────── */
+
+export interface BlogPageFields {
+  headerTitle?: string | null
+  shortText?: string | null
+  boldText?: string | null
+  buttonText?: string | null
+  moreText?: string | null
+  headerBgColor?: string | null
+  headerBgOverlayLayer?: WPImage | null
+}
+
+export interface GetBlogPageData {
+  page: {
+    template: {
+      blogPageFields: BlogPageFields | null
+    } | null
+  } | null
+}
+
+export interface BlogPostNode {
+  id: string
+  title: string | null
+  uri: string | null
+  date: string | null
+  featuredImage?: WPImage | null
+}
+
+export interface BlogPostsPageInfo {
+  hasNextPage: boolean
+  endCursor: string | null
+}
+
+export interface BlogPostsConnection {
+  pageInfo: BlogPostsPageInfo
+  nodes: BlogPostNode[]
+}
+
+export interface GetBlogPostsData {
+  posts: BlogPostsConnection | null
+}
+
+export interface GetPostSlugsData {
+  posts: {
+    nodes: { uri: string | null }[]
+  } | null
+}
+
+export interface SinglePost {
+  title: string | null
+  content: string | null
+  date: string | null
+  uri: string | null
+  featuredImage?: WPImage | null
+  postFields?: { topBoldText: string | null } | null
+}
+
+export interface GetPostByUriData {
+  post: SinglePost | null
+}
