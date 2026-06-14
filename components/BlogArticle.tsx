@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { GlowOrb } from '@/components/ui'
 import { ReadingProgress } from '@/components/ReadingProgress'
-import { renderWpContent } from '@/lib/wp-content'
+import { WpContent } from '@/lib/wp-content'
 import { stripHtml, formatPostDate } from '@/lib/text'
 import type { SinglePost } from '@/lib/graphql-types'
 
@@ -58,7 +58,11 @@ export function BlogArticle({ post }: { post: SinglePost }) {
 
         {intro && <p className="article-intro">{intro}</p>}
 
-        {content && <div className="article-prose">{renderWpContent(content)}</div>}
+        {content && (
+          <div className="article-prose">
+            <WpContent html={content} />
+          </div>
+        )}
       </article>
 
       <style>{`

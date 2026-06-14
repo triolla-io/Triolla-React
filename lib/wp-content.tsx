@@ -1,11 +1,11 @@
 import parse, { type HTMLReactParserOptions, Element as ParserElement } from 'html-react-parser'
 
 /** Strip interactive/script chrome from WP content — only the readable article
- *  (headings, paragraphs, lists, links, images, tables) survives. Shared by the
- *  legal pages and the blog article body. */
-export const DROP_TAGS = new Set(['script', 'style', 'form', 'input', 'button', 'textarea', 'select', 'iframe', 'noscript'])
+ *  (headings, paragraphs, lists, links, images, tables) survives. Internal to
+ *  this module; consumers use the <WpContent> component below. */
+const DROP_TAGS = new Set(['script', 'style', 'form', 'input', 'button', 'textarea', 'select', 'iframe', 'noscript'])
 
-export const wpParseOptions: HTMLReactParserOptions = {
+const wpParseOptions: HTMLReactParserOptions = {
   replace: (node) => {
     if (node instanceof ParserElement && DROP_TAGS.has(node.name)) {
       return <></>
@@ -14,7 +14,9 @@ export const wpParseOptions: HTMLReactParserOptions = {
   },
 }
 
-/** Parse trusted, sanitized WP HTML into React nodes. */
-export function renderWpContent(html: string) {
-  return parse(html, wpParseOptions)
+/** Renders trusted, sanitized WP HTML as React nodes. A named component (rather
+ *  than an inline `parse()` call in the parent's JSX) so React reconciles it by
+ *  component identity and preserves any child state across re-renders. */
+export function WpContent({ html }: { html: string }) {
+  return <>{parse(html, wpParseOptions)}</>
 }

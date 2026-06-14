@@ -1,5 +1,5 @@
 import { GlowOrb } from '@/components/ui'
-import { renderWpContent } from '@/lib/wp-content'
+import { WpContent } from '@/lib/wp-content'
 
 interface LegalArticleProps {
   title: string | null
@@ -37,8 +37,10 @@ export function LegalArticle({ title, content, eyebrow }: LegalArticleProps) {
         </header>
 
         {content && (
-          /* WP-sourced HTML — trusted backend, sanitized via DROP_TAGS */
-          <div className="legal-prose">{renderWpContent(content)}</div>
+          /* WP-sourced HTML — trusted backend, sanitized inside <WpContent> */
+          <div className="legal-prose">
+            <WpContent html={content} />
+          </div>
         )}
       </article>
 
