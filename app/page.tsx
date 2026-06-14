@@ -15,6 +15,7 @@ import { GET_HOME_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
+import { stripHtml } from '@/lib/text'
 
 const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
   ${GET_HOME_PAGE}
@@ -25,16 +26,6 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
 `
 
 /* ── WP content helpers ──────────────────────────── */
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
-}
 
 function parseAward(wboxTitle: string): { rank: number; label: string } {
   const rankMatch = wboxTitle.match(/#(\d+)/)
