@@ -115,7 +115,7 @@ export default async function BlogPage() {
   const heroBold = bp?.boldText ?? null
 
   return (
-    <main className="blog-root bg-[#080808] text-white overflow-x-clip relative pb-24 md:pb-32">
+    <main className="blog-root bg-[#080808] text-white overflow-x-clip relative pb-16 md:pb-32">
       <GrainOverlay />
 
       {/* ── HERO ── */}
@@ -157,7 +157,7 @@ export default async function BlogPage() {
 
       <div className="blog-body max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {featured && <FeaturedPost post={featured} />}
-        <section className="blog-grid-section py-16 md:py-24">
+        <section className="blog-grid-section py-8 md:py-24">
           <BlogPostGrid initialPosts={gridPosts} initialPageInfo={gridPageInfo} loadMoreLabel={loadMoreLabel} />
         </section>
       </div>
@@ -220,6 +220,11 @@ export default async function BlogPage() {
         }
         .blog-featured__link:hover .blog-featured__title { color: #facc15; }
         .blog-featured__link:hover .blog-featured__cue { transform: translateX(10px); }
+
+        @media (max-width: 768px) {
+          .blog-hero { padding: 72px 20px 36px; }
+          .blog-featured { padding-top: 32px; }
+        }
       `}</style>
     </main>
   )

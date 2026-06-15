@@ -188,8 +188,8 @@ export default async function CareersPage() {
         .careers-hero__inner .btn { margin-top: 36px; }
 
         @media (max-width: 768px) {
-          .careers-hero { padding: 116px 20px 88px; min-height: auto; }
-          .careers-hero__index { right: 20px; top: 30px; }
+          .careers-hero { padding: 64px 20px 52px; min-height: auto; }
+          .careers-hero__index { right: 20px; top: 20px; }
           .careers-hero__ghost { font-size: clamp(140px, 40vw, 220px); }
         }
       `}</style>
