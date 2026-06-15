@@ -1,3 +1,7 @@
+'use client'
+
+import { useRef, useState, useEffect } from 'react'
+import { m } from 'motion/react'
 import parse from 'html-react-parser'
 import { FadeIn } from './FadeIn'
 import { GlowOrb, Eyebrow } from '@/components/ui'
@@ -25,6 +29,21 @@ interface AnimatedStepsProps {
 }
 
 export default function AnimatedSteps({ steps, title, subtext, accentColor = '#facc15' }: AnimatedStepsProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [activeStep, setActiveStep] = useState(0)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const handleScroll = () => {
+      const cardWidth = el.scrollWidth / steps.length
+      const idx = Math.round(el.scrollLeft / cardWidth)
+      setActiveStep(Math.min(idx, steps.length - 1))
+    }
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [steps.length])
+
   if (steps.length === 0) return null
 
   return (
@@ -348,7 +367,7 @@ export default function AnimatedSteps({ steps, title, subtext, accentColor = '#f
         </svg>
       </div>
 
-      <div className="tech-steps__scroll-wrap">
+      <div className="tech-steps__scroll-wrap" ref={scrollRef}>
         {steps.map((step, i) => (
           <div key={i} className="tech-step" style={{ '--si': i } as React.CSSProperties}>
             <div className="tech-step__bg-num" aria-hidden="true">
@@ -370,6 +389,21 @@ export default function AnimatedSteps({ steps, title, subtext, accentColor = '#f
           </div>
         ))}
       </div>
+      {steps.length > 1 && (
+        <div className="flex justify-center gap-2 mt-4 md:hidden" aria-hidden="true">
+          {steps.map((_, i) => (
+            <m.span
+              key={i}
+              animate={{
+                width: i === activeStep ? 16 : 6,
+                backgroundColor: i === activeStep ? '#facc15' : 'rgba(255,255,255,0.25)',
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              style={{ height: 6, borderRadius: 999, display: 'block' }}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
