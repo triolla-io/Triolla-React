@@ -297,8 +297,29 @@ export default async function ServicesPage() {
           </FadeIn>
 
           <div className="svc-prod__body">
-            {/* Left: image collage */}
-            <div className="svc-prod__gallery">
+            {/* Mobile-only: 3-card floating collage */}
+            {(prodImages[0] || prodImages[1] || prodImages[2]) && (
+              <div className="svc-mobile-collage md:hidden" aria-hidden="true">
+                {prodImages[0] && (
+                  <div className="svc-mc-card svc-mc-card--a">
+                    <img src={wpImg(prodImages[0]) ?? ''} alt="" />
+                  </div>
+                )}
+                {prodImages[1] && (
+                  <div className="svc-mc-card svc-mc-card--b">
+                    <img src={wpImg(prodImages[1]) ?? ''} alt="" />
+                  </div>
+                )}
+                {prodImages[2] && (
+                  <div className="svc-mc-card svc-mc-card--c">
+                    <img src={wpImg(prodImages[2]) ?? ''} alt="" />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Left: image collage (desktop only) */}
+            <div className="svc-prod__gallery max-md:hidden">
               {prodImages[0] && (
                 <div className="svc-img-card svc-img-card--featured">
                   <img src={wpImg(prodImages[0]) ?? ''} alt="" className="svc-img-card__img" />
@@ -714,18 +735,75 @@ export default async function ServicesPage() {
           .section-head { margin-bottom: 24px; }
           .section-head__title { font-size: clamp(1.8rem, 7vw, 3.2rem) !important; line-height: 1.08 !important; }
 
-          /* ── Product gallery — mobile: 1 hero image only ── */
-          /* Complex 9-image collage stays desktop only.
-             Mobile shows one full-width hero shot + the service list. */
-          .svc-img-card--featured {
-            width: 100%;
-            aspect-ratio: 16/10;
-            border-radius: 16px;
+          /* ── Mobile collage ── */
+          .svc-mobile-collage {
+            position: relative;
+            height: 280px;
+            margin: 28px 0 32px;
           }
-          .svc-img-card--featured .svc-img-card__img {
-            width: 100%; height: 100%; object-fit: cover;
+
+          /* Card A — large, center-left, back */
+          .svc-mc-card--a {
+            position: absolute;
+            width: 63%;
+            top: 0; left: 6%;
+            aspect-ratio: 4/3;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 20px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+            z-index: 2;
+            transform: rotate(-2.4deg);
+            animation: svcMcA 7s ease-in-out infinite, svcMcIn 0.65s cubic-bezier(0.23,1,0.32,1) both;
+            animation-delay: 0s, 0.05s;
           }
-          /* Hide secondary images and icons on mobile */
+          /* Card B — medium, upper-right, mid */
+          .svc-mc-card--b {
+            position: absolute;
+            width: 52%;
+            top: 16px; right: 2%;
+            aspect-ratio: 4/3;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 14px 44px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+            z-index: 3;
+            transform: rotate(2.6deg);
+            animation: svcMcB 9s ease-in-out 1.1s infinite, svcMcIn 0.65s cubic-bezier(0.23,1,0.32,1) 0.12s both;
+          }
+          /* Card C — small, front-center-bottom */
+          .svc-mc-card--c {
+            position: absolute;
+            width: 40%;
+            bottom: 0; left: 32%;
+            aspect-ratio: 1/1;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(250,204,21,0.1);
+            z-index: 4;
+            transform: rotate(-1deg);
+            animation: svcMcC 11s ease-in-out 0.6s infinite, svcMcIn 0.65s cubic-bezier(0.23,1,0.32,1) 0.22s both;
+          }
+          .svc-mc-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+          /* Float keyframes — each card has different phase + amplitude */
+          @keyframes svcMcA {
+            0%,100% { transform: rotate(-2.4deg) translateY(0); }
+            50%      { transform: rotate(-1.7deg) translateY(-9px); }
+          }
+          @keyframes svcMcB {
+            0%,100% { transform: rotate(2.6deg) translateY(0); }
+            50%      { transform: rotate(1.9deg) translateY(-7px); }
+          }
+          @keyframes svcMcC {
+            0%,100% { transform: rotate(-1deg) translateY(0); }
+            50%      { transform: rotate(-0.4deg) translateY(-5px); }
+          }
+          /* Entrance: anti-gravity slide up */
+          @keyframes svcMcIn {
+            from { opacity: 0; transform: translateY(28px) rotate(var(--r, 0deg)); }
+            to   { opacity: 1; transform: translateY(0) rotate(var(--r, 0deg)); }
+          }
+
+          /* Hide desktop gallery rows on mobile */
           .svc-prod__row,
           .svc-prod__icons { display: none; }
           .svc-img-card:hover { transform: none; }
