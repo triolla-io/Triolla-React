@@ -301,7 +301,7 @@ export default async function ServicesPage() {
             <div className="svc-prod__gallery">
               {prodImages[0] && (
                 <div className="svc-img-card svc-img-card--featured">
-                  <img src={prodImages[0]} alt="" className="svc-img-card__img" />
+                  <img src={wpImg(prodImages[0]) ?? ''} alt="" className="svc-img-card__img" />
                   <div className="svc-img-card__shine" aria-hidden="true" />
                   <span className="svc-img-card__badge">UI Design</span>
                 </div>
@@ -310,13 +310,13 @@ export default async function ServicesPage() {
                 <div className="svc-prod__row">
                   {prodImages[1] && (
                     <div className="svc-img-card" style={{ flex: '2' }}>
-                      <img src={prodImages[1]} alt="" className="svc-img-card__img" />
+                      <img src={wpImg(prodImages[1]) ?? ''} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
                   )}
                   {prodImages[2] && (
                     <div className="svc-img-card svc-img-card--offset" style={{ flex: '3' }}>
-                      <img src={prodImages[2]} alt="" className="svc-img-card__img" />
+                      <img src={wpImg(prodImages[2]) ?? ''} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
                   )}
@@ -720,11 +720,22 @@ export default async function ServicesPage() {
             grid-template-columns: 1fr 1fr;
             gap: 8px;
           }
-          /* Featured card spans both columns */
+          /* Featured card spans both columns, wide aspect */
           .svc-img-card--featured {
             grid-column: 1 / -1;
             width: 100%;
             margin-bottom: 0;
+            aspect-ratio: 16/9;
+          }
+          /* Uniform 4/3 on all non-featured cards */
+          .svc-prod__gallery .svc-img-card:not(.svc-img-card--featured) {
+            aspect-ratio: 4/3;
+          }
+          /* Make images fill their aspect-ratio containers */
+          .svc-prod__gallery .svc-img-card__img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
           }
           /* Collapse flex rows into grid children */
           .svc-prod__row {
