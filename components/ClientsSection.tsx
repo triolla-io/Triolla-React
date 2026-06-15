@@ -48,12 +48,13 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         }
         .cs-logo-card {
           flex-shrink: 0;
-          width: 176px; height: 112px;
-          border-radius: 24px;
+          width: clamp(120px, 18vw, 176px);
+          height: clamp(76px, 11.5vw, 112px);
+          border-radius: clamp(16px, 3vw, 24px);
           border: 1px solid rgba(255,255,255,0.07);
           background: rgba(255,255,255,0.025);
           display: flex; align-items: center; justify-content: center;
-          padding: 14px;
+          padding: clamp(10px, 1.5vw, 14px);
           position: relative;
           transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
           overflow: hidden;
@@ -85,7 +86,6 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         .cs-logo-card:hover .cs-logo-img { opacity: 0.9; }
         @media (max-width: 768px) {
           .cs-clients { padding: 52px 0 64px; }
-          .cs-logo-card { width: 136px; height: 88px; border-radius: 18px; }
         }
       `}</style>
 
