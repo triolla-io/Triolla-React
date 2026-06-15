@@ -18,6 +18,7 @@ import { FadeIn } from '@/components/FadeIn'
 import { BlogPostGrid } from '@/components/BlogPostGrid'
 import { ContactCTA } from '@/components/ContactCTA'
 import { stripHtml, formatPostDate } from '@/lib/text'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 
 const BLOG_PAGE_QUERY: TypedDocumentNode<GetBlogPageData> = gql`
   ${GET_BLOG_PAGE}
@@ -31,9 +32,9 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
 
 export const metadata: Metadata = { title: 'Blog | Triolla' }
 
-async function getBlogPage(): Promise<BlogPageFields | null> {
+async function getBlogPage(uri: string): Promise<BlogPageFields | null> {
   try {
-    const { data } = await client.query({ query: BLOG_PAGE_QUERY })
+    const { data } = await client.query({ query: BLOG_PAGE_QUERY, variables: { uri } })
     return data?.page?.template?.blogPageFields ?? null
   } catch {
     return null
@@ -100,8 +101,10 @@ function FeaturedPost({ post }: { post: BlogPostNode }) {
   )
 }
 
-export default async function BlogPage() {
-  const [bp, postsConn, ts] = await Promise.all([getBlogPage(), getInitialPosts(), getThemeSettings()])
+export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const [bp, postsConn, ts] = await Promise.all([getBlogPage(PAGE_URI.blog[loc]), getInitialPosts(), getThemeSettings()])
 
   const allPosts = postsConn?.nodes ?? []
   const featured = allPosts[0] ?? null
