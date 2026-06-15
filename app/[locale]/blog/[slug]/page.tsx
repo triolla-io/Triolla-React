@@ -124,11 +124,45 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
+async function findAlternateBlogPath(locale: string, slug: string): Promise<{ en: string; he: string }> {
+  const target = decodeSlug(slug)
+  try {
+    const { data } = await client.query({ query: POST_SLUGS_QUERY })
+    const nodes = data?.posts?.nodes ?? []
+    const node = nodes.find((n) => {
+      const route = derivePostRoute(n?.uri ?? null)
+      return route?.locale === locale && decodeSlug(route.slug) === target
+    })
+    if (!node) return { en: `/blog/${slug}`, he: `/he/blog/${slug}` }
+
+    const trans = node.translations ?? []
+    const enTrans = trans.find((t) => t.locale === 'en_US' || t.locale === 'en')
+    const heTrans = trans.find((t) => t.locale === 'he_IL' || t.locale === 'he')
+
+    const enPath = enTrans?.href
+      ? enTrans.href.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '')
+      : locale === 'en' ? `/blog/${slug}` : null
+    const hePath = heTrans?.href
+      ? heTrans.href.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '')
+      : locale === 'he' ? `/he/blog/${slug}` : null
+
+    return {
+      en: enPath ?? `/blog/${slug}`,
+      he: hePath ?? `/he/blog/${slug}`,
+    }
+  } catch {
+    return { en: `/blog/${slug}`, he: `/he/blog/${slug}` }
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
   const loc = isLocale(locale) ? locale : defaultLocale
-  const post = await getPost(loc, slug)
-  return { title: post?.title ? `${stripHtml(post.title)} | Triolla` : 'Blog | Triolla' }
+  const [post, altPaths] = await Promise.all([getPost(loc, slug), findAlternateBlogPath(loc, slug)])
+  return {
+    title: post?.title ? `${stripHtml(post.title)} | Triolla` : 'Blog | Triolla',
+    alternates: { languages: { en: altPaths.en, he: altPaths.he } },
+  }
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {

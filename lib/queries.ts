@@ -332,6 +332,10 @@ export const GET_PORTFOLIO_SLUGS = `
         template {
           __typename
         }
+        translations {
+          href
+          locale
+        }
       }
     }
   }
@@ -569,6 +573,10 @@ export const GET_POST_SLUGS = `
       nodes {
         uri
         databaseId
+        translations {
+          href
+          locale
+        }
       }
     }
   }

@@ -288,6 +288,7 @@ export interface GetPortfolioSlugsData {
       uri: string | null
       databaseId: number | null
       template: { __typename: string } | null
+      translations: { href: string | null; locale: string | null }[] | null
     }[]
   } | null
 }
@@ -530,7 +531,11 @@ export interface GetBlogPostsData {
 
 export interface GetPostSlugsData {
   posts: {
-    nodes: { uri: string | null; databaseId: number | null }[]
+    nodes: {
+      uri: string | null
+      databaseId: number | null
+      translations: { href: string | null; locale: string | null }[] | null
+    }[]
   } | null
 }
 

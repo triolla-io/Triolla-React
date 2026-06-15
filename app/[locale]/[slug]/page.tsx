@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { client } from '@/lib/apollo-client'
 import { GET_PORTFOLIO_PAGE, GET_PORTFOLIO_SLUGS, GET_THEME_SETTINGS } from '@/lib/queries'
 import { defaultLocale } from '@/lib/i18n'
@@ -62,6 +63,53 @@ export async function generateStaticParams() {
   } catch {
     // Build emits no portfolio routes rather than crashing.
     return []
+  }
+}
+
+/**
+ * Given the current (locale, slug), return the alternate-locale path using
+ * the WPML `translations[].href` field on the same node.
+ */
+async function findAlternatePortfolioPath(locale: string, slug: string): Promise<{ en: string; he: string }> {
+  const target = decodeSlug(slug)
+  try {
+    const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
+    const nodes = data?.pages?.nodes ?? []
+    const node = nodes.find((n) => {
+      if (n?.template?.__typename !== 'Template_PortfolioPage') return false
+      const route = deriveRoute(n.uri)
+      return route?.locale === locale && decodeSlug(route.slug) === target
+    })
+    if (!node) return { en: `/${slug}`, he: `/he/${slug}` }
+
+    const trans = node.translations ?? []
+    const enTrans = trans.find((t) => t.locale === 'en_US' || t.locale === 'en')
+    const heTrans = trans.find((t) => t.locale === 'he_IL' || t.locale === 'he')
+
+    // Derive path from translation href (strip domain) or current node uri
+    const enPath = enTrans?.href
+      ? enTrans.href.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '')
+      : locale === 'en' ? `/${slug}` : null
+    const hePath = heTrans?.href
+      ? heTrans.href.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '')
+      : locale === 'he' ? `/he/${slug}` : null
+
+    return {
+      en: enPath ?? `/${slug}`,
+      he: hePath ?? `/he/${slug}`,
+    }
+  } catch {
+    return { en: `/${slug}`, he: `/he/${slug}` }
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
+  const { locale, slug } = await params
+  const paths = await findAlternatePortfolioPath(locale, slug)
+  return {
+    alternates: {
+      languages: { en: paths.en, he: paths.he },
+    },
   }
 }
 
