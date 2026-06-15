@@ -160,6 +160,10 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
           cursor: crosshair;
         }
 
+        @media (hover: none) {
+          .gi-frame { cursor: default; }
+        }
+
         /* pulsing glow on border */
         .gi-pulse {
           position: absolute;
