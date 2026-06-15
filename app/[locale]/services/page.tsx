@@ -140,7 +140,7 @@ export default async function ServicesPage() {
     .map(stripHtml)
 
   return (
-    <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
+    <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
       {/* Grain overlay */}
       <GrainOverlay />
 
@@ -693,13 +693,15 @@ export default async function ServicesPage() {
           .svc-prod__menu, .svc-brand__menu { position: static; margin-top: 40px; }
         }
         @media (max-width: 768px) {
-          .svc-hero { padding: 96px 20px 148px; }
+          .svc-hero { padding: 56px 20px 56px; min-height: auto; }
+          .svc-scroll-cue { display: none; }
           .svc-hero__corner { display: none; }
           .svc-hero__ghost { font-size: clamp(110px, 38vw, 180px); }
           .svc-hero__index { right: 20px; top: 30px; }
           .svc-prod__inner, .svc-brand__inner, .svc-dev__inner { padding: 0 20px; }
-          .svc-prod { padding-top: 72px; }
-          .svc-dev { padding: 72px 0 96px; }
+          .svc-prod { padding-top: 40px; }
+          .svc-dev { padding: 40px 0 48px; }
+          .svc-brand__inner { padding: 40px 20px; }
           .svc-polaroid-grid { grid-template-columns: 1fr 1fr; }
           .svc-prod__row { flex-direction: column; }
           .svc-prod__row > * { flex: 1 1 auto !important; }
