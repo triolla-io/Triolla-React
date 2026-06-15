@@ -812,6 +812,8 @@ export default async function ServicesPage() {
           .svc-prod__row,
           .svc-prod__icons { display: none; }
           .svc-img-card:hover { transform: none; }
+          /* Remove the 40px gap the 1100px rule adds between gallery and menu */
+          .svc-prod__menu { margin-top: 12px; }
 
           /* ── Polaroids → 2-col, no rotation (rotations distort on mobile) ── */
           .svc-polaroid-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
