@@ -321,9 +321,9 @@ export default function AnimatedSteps({ steps, title, subtext, accentColor = '#f
         }
 
         @media (max-width: 768px) {
-          .tech-steps { padding: 72px 0 64px; }
-          .tech-steps__scroll-wrap { padding: 20px 20px 44px; gap: 24px; scroll-padding-left: 20px; }
-          .tech-step { min-width: 240px; }
+          .tech-steps { padding: 36px 0 32px; }
+          .tech-steps__scroll-wrap { padding: 16px 16px 36px; gap: 16px; scroll-padding-left: 16px; }
+          .tech-step { min-width: min(240px, 72vw); }
         }
       `}</style>
 

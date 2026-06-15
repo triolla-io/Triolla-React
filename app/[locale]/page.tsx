@@ -96,14 +96,14 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   })
 
   return (
-    <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
+    <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
       {/* ── Grain noise overlay ── */}
       <GrainOverlay />
 
       {/* ══════════════════════════════════════════════
           HERO
       ══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex flex-col items-center pt-24 md:pt-32 pb-14 md:pb-20 px-4 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center pt-16 md:pt-32 pb-8 md:pb-20 px-4 overflow-hidden">
         {/* Ambient orb cluster */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <GlowOrb
@@ -168,7 +168,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* ══════════════════════════════════════════════
           PORTFOLIO GRID
       ══════════════════════════════════════════════ */}
-      <section className="relative z-20 max-w-[1600px] mx-auto px-4 -mt-10 mb-16 md:mb-32">
+      <section className="relative z-20 max-w-[1600px] mx-auto px-4 -mt-10 mb-6 md:mb-32">
         <PortfolioGrid />
       </section>
 
@@ -180,7 +180,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* ══════════════════════════════════════════════
           AWARDS SECTION
       ══════════════════════════════════════════════ */}
-      <section id="winners-section" className="winners-section mb-16 md:mb-32 relative overflow-hidden">
+      <section id="winners-section" className="winners-section mb-6 md:mb-32 relative overflow-hidden">
         {/* Ambient light orbs */}
         <div className="winners-orb winners-orb--tl" aria-hidden="true" />
         <div className="winners-orb winners-orb--br" aria-hidden="true" />
@@ -192,12 +192,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         ))}
 
         <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <FadeIn className="text-center mb-20">
+          <FadeIn className="text-center mb-8 md:mb-20">
             <h3 className="winners-title">{winTitle}</h3>
             <p className="winners-subtitle">{winSubtext}</p>
           </FadeIn>
 
-          <SectionReveal className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <SectionReveal className="grid grid-cols-3 md:grid-cols-3 gap-4 md:gap-12">
             {awards.map((award: { rank: number; label: string; imgUrl: string | null }, i: number) => (
               <div key={i} className="award-card group" style={{ '--ai': i } as React.CSSProperties}>
                 <div className="award-medal-wrap">
@@ -446,25 +446,30 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         /* ─── Winners section ──────────────────── */
         @media (max-width: 768px) {
           .winners-section {
-            padding: 72px 0 80px;
+            padding: 40px 0 44px;
           }
           .winners-title {
-            font-size: clamp(1.8rem, 8vw, 2.6rem);
+            font-size: clamp(1.5rem, 7vw, 2.2rem);
           }
           .winners-subtitle {
-            font-size: 1rem;
+            font-size: 0.9rem;
           }
           .award-medal-img {
-            width: 170px; height: 170px;
+            width: clamp(72px, 22vw, 110px);
+            height: clamp(72px, 22vw, 110px);
           }
           .award-medal-fallback {
-            width: 140px; height: 140px; font-size: 38px;
+            width: 84px; height: 84px; font-size: 24px;
+          }
+          .award-medal-wrap {
+            animation: none;
           }
           .award-label {
-            font-size: 0.875rem;
+            font-size: 0.7rem;
+            margin-top: 10px;
           }
           .award-label__rank {
-            font-size: 1rem;
+            font-size: 0.8rem;
           }
         }
 

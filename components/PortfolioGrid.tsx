@@ -17,27 +17,25 @@ const WP_IMAGES = [
   { src: 'https://triolla.io/wp-content/uploads/2025/06/White-1.png', alt: 'Portfolio work' },
 ]
 
-// Split into 3 columns for masonry effect
-const COL1 = [0, 3, 6] // indices
-const COL2 = [1, 4, 7]
-const COL3 = [2, 5, 8]
+// Desktop: 3 columns. Mobile: 2 balanced columns (6 images each from alternating picks).
+const COL_DESKTOP = [[0, 3, 6], [1, 4, 7], [2, 5, 8]]
+const COL_MOBILE  = [[0, 2, 4, 6, 8], [1, 3, 5, 7]] // odd/even split for balanced heights
 
-function MasonryColumn({ indices, delay }: { indices: number[]; delay: number }) {
+function MasonryColumn({ indices, delay, className = '' }: { indices: number[]; delay: number; className?: string }) {
   return (
-    <div className="flex flex-col gap-3 md:gap-5">
+    <div className={`flex flex-col gap-2 md:gap-5 ${className}`}>
       {indices.map((idx, i) => {
         const img = WP_IMAGES[idx]
         return (
           <m.div
             key={img.src}
-            className="shine-card group overflow-hidden rounded-2xl relative bg-[#0f0f0f]"
-            initial={{ opacity: 0, y: 36 }}
+            className="shine-card group overflow-hidden rounded-xl md:rounded-2xl relative bg-[#0f0f0f]"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.65, delay: delay + i * 0.1, ease: [...EASE.smooth] }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.55, delay: delay + i * 0.08, ease: [...EASE.smooth] }}
           >
             <img src={wpImg(img.src) ?? ''} alt={img.alt} className="w-full h-auto block" />
-            {/* hover shine sweep */}
             <div className="shine-card__shine" aria-hidden="true" />
           </m.div>
         )
@@ -48,10 +46,20 @@ function MasonryColumn({ indices, delay }: { indices: number[]; delay: number })
 
 export function PortfolioGrid() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5">
-      <MasonryColumn indices={COL1} delay={0} />
-      <MasonryColumn indices={COL2} delay={0.08} />
-      <MasonryColumn indices={COL3} delay={0.16} />
-    </div>
+    <>
+      {/* Mobile: 2 balanced masonry columns */}
+      <div className="grid grid-cols-2 gap-2 md:hidden">
+        {COL_MOBILE.map((indices, col) => (
+          <MasonryColumn key={col} indices={indices} delay={col * 0.06} />
+        ))}
+      </div>
+
+      {/* Desktop: original 3-column masonry — untouched */}
+      <div className="hidden md:grid md:grid-cols-3 md:gap-5">
+        {COL_DESKTOP.map((indices, col) => (
+          <MasonryColumn key={col} indices={indices} delay={col * 0.08} />
+        ))}
+      </div>
+    </>
   )
 }

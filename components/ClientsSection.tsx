@@ -86,7 +86,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         }
         .cs-logo-card:hover .cs-logo-img { opacity: 0.9; }
         @media (max-width: 768px) {
-          .cs-clients { padding: 52px 0 64px; }
+          .cs-clients { padding: 32px 0 36px; }
         }
       `}</style>
 
