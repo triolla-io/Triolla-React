@@ -4,10 +4,9 @@ import { GET_CONTENT_PAGE } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import { notFound } from 'next/navigation'
 import { LegalArticle } from '@/components/LegalArticle'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 
-const URI = 'privacy-policy'
-
-async function getPage() {
+async function getPage(uri: string) {
   try {
     const { data } = await client.query<{
       page: { title: string | null; content: string | null } | null
@@ -15,7 +14,7 @@ async function getPage() {
       query: gql`
         ${GET_CONTENT_PAGE}
       `,
-      variables: { uri: URI },
+      variables: { uri },
     })
     return data?.page ?? null
   } catch {
@@ -24,12 +23,14 @@ async function getPage() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await getPage()
+  const page = await getPage(PAGE_URI.privacyPolicy.en)
   return { title: page?.title ? `${page.title} | Triolla` : 'Privacy Policy | Triolla' }
 }
 
-export default async function PrivacyPolicyPage() {
-  const page = await getPage()
+export default async function PrivacyPolicyPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const page = await getPage(PAGE_URI.privacyPolicy[loc])
   if (!page || (!page.title && !page.content)) notFound()
 
   return <LegalArticle title={page.title} content={page.content} eyebrow="Legal" />
