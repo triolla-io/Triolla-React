@@ -79,7 +79,7 @@ export default async function AboutUsPage() {
     .slice(0, 6)
 
   return (
-    <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
+    <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
       {/* Grain overlay */}
       <GrainOverlay />
 
@@ -873,23 +873,26 @@ export default async function AboutUsPage() {
           .about-showcase__card--right { transform: rotate(1.4deg); animation: none; }
         }
         @media (max-width: 768px) {
-          .about-hero { padding: 96px 20px 148px; }
+          .about-hero { padding: 56px 20px 56px; min-height: auto; }
+          .about-scroll-cue { display: none; }
           .about-hero__corner { display: none; }
           .about-hero__ghost { font-size: clamp(110px, 38vw, 180px); }
-          .about-hero__index { right: 20px; top: 30px; }
-          .about-showcase { padding: 64px 0 56px; }
-          .about-showcase__stage { padding: 0 20px; }
-          .about-showcase__ticker { margin-top: 40px; }
-          .about-crafting { padding-top: 64px; }
+          .about-hero__index { right: 20px; top: 20px; }
+          .about-showcase { padding: 32px 0 28px; }
+          .about-showcase__stage { padding: 0 16px; }
+          .about-showcase__ticker { margin-top: 20px; }
+          .about-crafting { padding-top: 36px; }
           .about-crafting__inner { padding: 0 20px; }
-          .about-services { padding: 80px 0 0; }
+          .about-partners { margin-top: 32px; }
+          .about-services { padding: 44px 0 0; }
           .about-services__inner { padding: 0 20px; }
-          .about-srow { grid-template-columns: 1fr; gap: 8px; padding: 32px 0; }
-          .about-srow__cat { font-size: 1.6rem; }
-          .about-learn { padding: 80px 0 64px; }
+          .about-srow { grid-template-columns: 1fr; gap: 8px; padding: 24px 0; }
+          .about-srow__cat { font-size: 1.5rem; }
+          .about-learn { padding: 44px 0 36px; }
           .about-learn__inner { padding: 0 20px; }
-          .about-faq { padding: 80px 0 64px; }
+          .about-faq { padding: 44px 0 36px; }
           .about-faq__inner { padding: 0 20px; }
+          .about-faq__title { margin-bottom: 28px; }
         }
       `}</style>
     </main>
