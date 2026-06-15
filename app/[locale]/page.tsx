@@ -443,6 +443,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
            MOBILE-ONLY STYLES (max-width: 768px)
         ══════════════════════════════════════════ */
 
+        @media (max-width: 767px) {
+          .scroll-cue { display: none; }
+        }
+
         /* ─── Winners section ──────────────────── */
         @media (max-width: 768px) {
           .winners-section {
