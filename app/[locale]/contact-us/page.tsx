@@ -4,6 +4,7 @@ import { client } from '@/lib/apollo-client'
 import { GET_CONTACT_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 import { FadeIn } from '@/components/FadeIn'
 import { WannaChatSection } from '@/components/WannaChatSection'
 import { GlowOrb, Eyebrow } from '@/components/ui'
@@ -26,9 +27,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getContactData(): Promise<{ title: string | null; fields: ContactFields | null }> {
+async function getContactData(uri: string): Promise<{ title: string | null; fields: ContactFields | null }> {
   try {
-    const { data } = await client.query({ query: CONTACT_PAGE_QUERY })
+    const { data } = await client.query({ query: CONTACT_PAGE_QUERY, variables: { uri } })
     return {
       title: data?.page?.title ?? null,
       fields: data?.page?.template?.contactFields ?? null,
@@ -52,8 +53,10 @@ export const metadata: Metadata = {
   description: 'Get in touch with Triolla — product design & development for tech, gaming, medical, cyber, IoT and SaaS.',
 }
 
-export default async function ContactUsPage() {
-  const [{ title, fields }, ts] = await Promise.all([getContactData(), getThemeSettings()])
+export default async function ContactUsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const [{ title, fields }, ts] = await Promise.all([getContactData(PAGE_URI.contactUs[loc]), getThemeSettings()])
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
