@@ -1,5 +1,23 @@
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'Almoni ML v5 AAA';
+  src: url('https://triolla.io/wp-content/themes/triolla/fonts/AlmoniMLv5AAA-Regular.eot');
+  src:
+    url('https://triolla.io/wp-content/themes/triolla/fonts/AlmoniMLv5AAA-Regular.eot?#iefix') format('embedded-opentype'),
+    url('https://triolla.io/wp-content/themes/triolla/fonts/AlmoniMLv5AAA-Regular.woff2') format('woff2'),
+    url('https://triolla.io/wp-content/themes/triolla/fonts/AlmoniMLv5AAA-Regular.woff') format('woff'),
+    url('https://triolla.io/wp-content/themes/triolla/fonts/AlmoniMLv5AAA-Regular.ttf') format('truetype'),
+    url('https://triolla.io/wp-content/themes/triolla/fonts/AlmoniMLv5AAA-Regular.svg#AlmoniMLv5AAA-Regular') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:lang(he) {
+  font-family: 'Almoni ML v5 AAA', sans-serif;
+}
+
 :root {
   --background: #f5f5f5;
   --foreground: #171717;
