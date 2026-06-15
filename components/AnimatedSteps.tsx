@@ -36,9 +36,11 @@ export default function AnimatedSteps({ steps, title, subtext, accentColor = '#f
     const el = scrollRef.current
     if (!el) return
     const handleScroll = () => {
-      const cardWidth = el.scrollWidth / steps.length
-      const idx = Math.round(el.scrollLeft / cardWidth)
-      setActiveStep(Math.min(idx, steps.length - 1))
+      const children = el.children
+      if (children.length < 2) { setActiveStep(0); return }
+      const snapUnit = (children[1] as HTMLElement).offsetLeft - (children[0] as HTMLElement).offsetLeft
+      const idx = Math.min(Math.round(el.scrollLeft / snapUnit), steps.length - 1)
+      setActiveStep(idx)
     }
     el.addEventListener('scroll', handleScroll, { passive: true })
     return () => el.removeEventListener('scroll', handleScroll)

@@ -161,7 +161,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <span className="scroll-cue__label">{`Scroll`}</span>
         </div>
         {/* Floating mobile CTA — sentinel placed here so CTA appears once hero exits viewport */}
-        <FloatingCta href="/contact-us" label="Let's Talk" />
+        <FloatingCta href={whyCtaLink} label="Let's Talk" />
       </section>
 
       {/* ══════════════════════════════════════════════
