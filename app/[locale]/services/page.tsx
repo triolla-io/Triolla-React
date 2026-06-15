@@ -714,41 +714,54 @@ export default async function ServicesPage() {
           .section-head { margin-bottom: 24px; }
           .section-head__title { font-size: clamp(1.8rem, 7vw, 3.2rem) !important; line-height: 1.08 !important; }
 
-          /* ── Product gallery → 2-column grid on mobile ── */
+          /* ── Product gallery → horizontal snap scroll on mobile ── */
           .svc-prod__gallery {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            gap: 10px;
+            /* bleed past inner padding so cards touch edge */
+            margin-left: -18px;
+            margin-right: -18px;
+            padding-left: 18px;
+            padding-right: 18px;
+            padding-bottom: 4px;
           }
-          /* Featured card spans both columns, wide aspect */
+          .svc-prod__gallery::-webkit-scrollbar { display: none; }
+
+          /* Featured card: full width, 16/9 */
           .svc-img-card--featured {
-            grid-column: 1 / -1;
-            width: 100%;
+            flex: 0 0 88vw;
+            width: 88vw;
+            aspect-ratio: 16/10;
             margin-bottom: 0;
-            aspect-ratio: 16/9;
+            scroll-snap-align: start;
           }
-          /* Uniform 4/3 on all non-featured cards */
+          /* All other cards: 72vw wide, 4/3 aspect */
           .svc-prod__gallery .svc-img-card:not(.svc-img-card--featured) {
+            flex: 0 0 72vw;
+            width: 72vw;
             aspect-ratio: 4/3;
+            scroll-snap-align: start;
           }
-          /* Make images fill their aspect-ratio containers */
+          /* Images fill their containers */
           .svc-prod__gallery .svc-img-card__img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 100%; height: 100%; object-fit: cover;
           }
-          /* Collapse flex rows into grid children */
-          .svc-prod__row {
-            display: contents; /* rows dissolve — their children flow into the grid */
-          }
-          .svc-prod__row > * { flex: unset !important; }
+          /* Rows dissolve — children flow directly into the flex scroll */
+          .svc-prod__row { display: contents; }
+          .svc-prod__row > * { flex-shrink: 0 !important; }
           .svc-img-card--offset, .svc-img-card--up { margin-top: 0; }
           .svc-img-card { border-radius: 14px; }
           .svc-img-card:hover { transform: none; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 
-          /* Icons row → compact horizontal strip */
+          /* Icons: separate horizontal row below the scroll */
           .svc-prod__icons {
-            grid-column: 1 / -1;
+            flex: 0 0 auto;
+            flex-shrink: 0;
             padding-left: 0;
             gap: 8px;
           }
