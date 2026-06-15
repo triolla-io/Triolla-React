@@ -12,6 +12,7 @@ import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from '@/components/ui'
 import type { GetTechnologyPageData, GetThemeSettingsData, TechnologyPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 
 const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
   ${GET_TECHNOLOGY_PAGE}
@@ -32,9 +33,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getTechData(): Promise<TechnologyPageFields> {
+async function getTechData(uri: string): Promise<TechnologyPageFields> {
   try {
-    const { data } = await client.query({ query: TECH_PAGE_QUERY })
+    const { data } = await client.query({ query: TECH_PAGE_QUERY, variables: { uri } })
     return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields)
   } catch {
     return {} as TechnologyPageFields
@@ -50,8 +51,10 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export default async function TechnologyPage() {
-  const [tp, ts] = await Promise.all([getTechData(), getThemeSettings()])
+export default async function TechnologyPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const [tp, ts] = await Promise.all([getTechData(PAGE_URI.technology[loc]), getThemeSettings()])
 
   /* Brand yellow — CMS headerBgColor resolved dark, making accent elements
      (eyebrow lines, hover labels, CTA pill) invisible. Hardcode brand color. */
