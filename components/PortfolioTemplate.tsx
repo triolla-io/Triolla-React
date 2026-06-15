@@ -163,9 +163,32 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
 
         /* ─── Mobile overrides ──────────────────────── */
         @media (max-width: 768px) {
-          .cs-why-card { padding: 24px 20px 22px; border-radius: 16px; }
           .cs-stat-num { font-size: clamp(72px, 20vw, 180px); }
           .cs-stat-line { height: 48px; margin: 18px auto; }
+
+          /* Why items: editorial numbered list on mobile */
+          .cs-why-card {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            border-radius: 0;
+            padding: 24px 0 22px;
+            box-shadow: none !important;
+            transform: none !important;
+          }
+          .cs-why-card:first-child { border-top: 1px solid rgba(255,255,255,0.07); }
+          .cs-why-card__ghost { display: none; }
+          .cs-why-card__shine { display: none; }
+          .cs-why-card__bar { display: none; }
+          .cs-why-card__num {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+          }
         }
 
         /* ─── CTA strip ──────────────────────────── */
@@ -295,19 +318,26 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       ════════════════════════════════════════════ */}
       <section className="py-12 md:py-20 max-w-[1400px] mx-auto px-6 lg:px-10">
         <FadeIn className="mb-8 md:mb-14">
-          {/* WP-sourced HTML — trusted backend only */}
-          <h2 className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight">{parse(pf.whyDoHeading ?? '')}</h2>
+          <h2 className="text-[clamp(28px,6vw,70px)] font-black tracking-[-0.03em] leading-[1.05] gradient-text gradient-text--animate"
+            style={{ '--gt-gradient': `linear-gradient(135deg, #fff 35%, var(--accent) 52%, #fff 68%)` } as React.CSSProperties}>
+            {/* WP-sourced HTML — trusted backend only */}
+            {parse(pf.whyDoHeading ?? '')}
+          </h2>
         </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4">
           {whyItems.map((item: any, i: number) => (
-            <FadeIn key={i} delay={i * 0.1} yOffset={28} duration={0.65} className="cs-why-card">
+            <FadeIn key={i} delay={i * 0.08} yOffset={24} duration={0.55} className="cs-why-card">
               <div className="cs-why-card__ghost" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </div>
               <div className="cs-why-card__shine" aria-hidden="true" />
               <div className="cs-why-card__bar" />
-              <h3 className="text-[21px] font-bold mb-3 tracking-tight leading-snug text-white relative z-10">
+              {/* Mobile: accent number label */}
+              <span className="cs-why-card__num" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 className="text-[19px] md:text-[21px] font-bold mb-2 md:mb-3 tracking-tight leading-snug text-white relative z-10">
                 {/* WP-sourced HTML — trusted backend only */}
                 <span>{parse(item.whyTitle ?? '')}</span>
               </h3>
