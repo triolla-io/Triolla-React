@@ -11,14 +11,15 @@ import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow } from '@/components/ui'
 import { client } from '@/lib/apollo-client'
-import { GET_HOME_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
+import { GET_HOME_PAGE_BY_URI, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { stripHtml } from '@/lib/text'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 
 const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
-  ${GET_HOME_PAGE}
+  ${GET_HOME_PAGE_BY_URI}
 `
 
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
@@ -41,9 +42,9 @@ function parseAward(wboxTitle: string): { rank: number; label: string } {
 
 /* ── Data fetching ───────────────────────────────── */
 
-async function getHomeData(): Promise<HomePageFields> {
+async function getHomeData(uri: string): Promise<HomePageFields> {
   try {
-    const { data } = await client.query({ query: HOME_PAGE_QUERY })
+    const { data } = await client.query({ query: HOME_PAGE_QUERY, variables: { uri } })
     return data?.page?.template?.homePage ?? ({} as HomePageFields)
   } catch {
     return {} as HomePageFields
@@ -61,8 +62,10 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
 
 /* ── Page ────────────────────────────────────────── */
 
-export default async function Home() {
-  const [hp, ts] = await Promise.all([getHomeData(), getThemeSettings()])
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const [hp, ts] = await Promise.all([getHomeData(PAGE_URI.home[loc]), getThemeSettings()])
 
   const heroHeadline = stripHtml(hp.topsectitle ?? '')
   const heroSubtext = stripHtml(hp.toptext ?? '')
