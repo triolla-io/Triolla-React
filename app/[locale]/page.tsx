@@ -156,8 +156,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           />
         </div>
 
-        {/* Scroll cue */}
-        <div className="scroll-cue" aria-hidden="true">
+        {/* Scroll cue — hidden on mobile (no min-h-screen, absolute position collides) */}
+        <div className="scroll-cue hidden md:flex" aria-hidden="true">
           <div className="scroll-cue__line" />
           <span className="scroll-cue__label">{`Scroll`}</span>
         </div>
