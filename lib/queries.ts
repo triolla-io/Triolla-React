@@ -95,33 +95,6 @@ export function buildServiceDetailsQuery(uris: string[]): string {
   return `query GetServiceDetails {\n${selections}\n}`
 }
 
-export const GET_HOME_PAGE = `
-  query GetHomePage {
-    page(id: "/", idType: URI) {
-      template {
-        ... on Template_HomePageNew {
-          homePage {
-            topsectitle
-            toptext
-            uDesignHeading
-            uSortText
-            designType { dName }
-            winTitle
-            winSubtitle
-            wboxes { wboxTitle winImg { node { sourceUrl } } }
-            abthretitle
-            abtthretext
-            abthrelist {
-              abteintitle
-              abthreintext
-              abthreimage { node { sourceUrl } }
-            }
-          }
-        }
-      }
-    }
-  }
-`
 
 // Same shape as GET_HOME_PAGE but URI-parameterized so the Home route can
 // fetch the page for the active locale (en `/`, he `home-new-he`).
