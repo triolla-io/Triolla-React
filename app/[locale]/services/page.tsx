@@ -748,8 +748,8 @@ export default async function ServicesPage() {
             border-radius: 16px; overflow: hidden;
             box-shadow: 0 18px 52px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,255,255,0.05);
             z-index: 2;
-            animation: svcMcA 7s ease-in-out infinite,
-                       svcSlideLeft 0.7s cubic-bezier(0.23,1,0.32,1) 0.05s both;
+            animation: svcMcA 9s ease-in-out infinite,
+                       svcSlideLeft 1.1s cubic-bezier(0.23,1,0.32,1) 0.1s both;
           }
           /* B — slides in from RIGHT */
           .svc-mc-card--b {
@@ -762,8 +762,8 @@ export default async function ServicesPage() {
             margin-right: 4px;
             box-shadow: 0 14px 44px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
             z-index: 3;
-            animation: svcMcB 9s ease-in-out 1.2s infinite,
-                       svcSlideRight 0.7s cubic-bezier(0.23,1,0.32,1) 0.18s both;
+            animation: svcMcB 12s ease-in-out 1.5s infinite,
+                       svcSlideRight 1.1s cubic-bezier(0.23,1,0.32,1) 0.3s both;
           }
           /* C — square, slides in from BOTTOM */
           .svc-mc-card--c {
@@ -775,8 +775,8 @@ export default async function ServicesPage() {
             margin-left: 14px;
             box-shadow: 0 10px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(250,204,21,0.12);
             z-index: 4;
-            animation: svcMcC 11s ease-in-out 0.5s infinite,
-                       svcSlideUp 0.65s cubic-bezier(0.23,1,0.32,1) 0.32s both;
+            animation: svcMcC 15s ease-in-out 0.8s infinite,
+                       svcSlideUp 1.0s cubic-bezier(0.23,1,0.32,1) 0.5s both;
           }
           .svc-mc-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
