@@ -123,6 +123,36 @@ export const GET_HOME_PAGE = `
   }
 `
 
+// Same shape as GET_HOME_PAGE but URI-parameterized so the Home route can
+// fetch the page for the active locale (en `/`, he `home-new-he`).
+export const GET_HOME_PAGE_BY_URI = `
+  query GetHomePageByUri($uri: ID!) {
+    page(id: $uri, idType: URI) {
+      template {
+        ... on Template_HomePageNew {
+          homePage {
+            topsectitle
+            toptext
+            uDesignHeading
+            uSortText
+            designType { dName }
+            winTitle
+            winSubtitle
+            wboxes { wboxTitle winImg { node { sourceUrl } } }
+            abthretitle
+            abtthretext
+            abthrelist {
+              abteintitle
+              abthreintext
+              abthreimage { node { sourceUrl } }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GET_CONTACT_PAGE = `
   query GetContactPage {
     page(id: "contact-us", idType: URI) {
