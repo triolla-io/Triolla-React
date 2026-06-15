@@ -735,72 +735,71 @@ export default async function ServicesPage() {
           .section-head { margin-bottom: 24px; }
           .section-head__title { font-size: clamp(1.8rem, 7vw, 3.2rem) !important; line-height: 1.08 !important; }
 
-          /* ── Mobile collage ── */
+          /* ── Mobile collage — relative stack with overlap ── */
           .svc-mobile-collage {
-            position: relative;
-            height: 280px;
-            margin: 28px 0 32px;
+            padding: 8px 4px 24px;
           }
 
-          /* Card A — large, center-left, back */
+          /* Card A — large, left-leaning, back */
           .svc-mc-card--a {
-            position: absolute;
-            width: 63%;
-            top: 0; left: 6%;
+            position: relative;
+            width: 86%;
             aspect-ratio: 4/3;
             border-radius: 18px;
             overflow: hidden;
             box-shadow: 0 20px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
             z-index: 2;
-            transform: rotate(-2.4deg);
-            animation: svcMcA 7s ease-in-out infinite, svcMcIn 0.65s cubic-bezier(0.23,1,0.32,1) both;
-            animation-delay: 0s, 0.05s;
+            animation: svcMcA 7s ease-in-out infinite,
+                       svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.05s both;
           }
-          /* Card B — medium, upper-right, mid */
+
+          /* Card B — overlaps A from the right */
           .svc-mc-card--b {
-            position: absolute;
-            width: 52%;
-            top: 16px; right: 2%;
+            position: relative;
+            width: 72%;
             aspect-ratio: 4/3;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 14px 44px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+            margin-top: -52px;
+            margin-left: auto;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
             z-index: 3;
-            transform: rotate(2.6deg);
-            animation: svcMcB 9s ease-in-out 1.1s infinite, svcMcIn 0.65s cubic-bezier(0.23,1,0.32,1) 0.12s both;
+            animation: svcMcB 9s ease-in-out 1.2s infinite,
+                       svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.14s both;
           }
-          /* Card C — small, front-center-bottom */
+
+          /* Card C — smallest, front-left, overlaps bottom of B */
           .svc-mc-card--c {
-            position: absolute;
-            width: 40%;
-            bottom: 0; left: 32%;
+            position: relative;
+            width: 50%;
             aspect-ratio: 1/1;
             border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 10px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(250,204,21,0.1);
+            margin-top: -36px;
+            margin-left: 12px;
+            box-shadow: 0 10px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(250,204,21,0.12);
             z-index: 4;
-            transform: rotate(-1deg);
-            animation: svcMcC 11s ease-in-out 0.6s infinite, svcMcIn 0.65s cubic-bezier(0.23,1,0.32,1) 0.22s both;
+            animation: svcMcC 11s ease-in-out 0.5s infinite,
+                       svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.24s both;
           }
+
           .svc-mc-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-          /* Float keyframes — each card has different phase + amplitude */
           @keyframes svcMcA {
-            0%,100% { transform: rotate(-2.4deg) translateY(0); }
-            50%      { transform: rotate(-1.7deg) translateY(-9px); }
+            0%,100% { transform: rotate(-2.2deg) translateY(0); }
+            50%      { transform: rotate(-1.5deg) translateY(-9px); }
           }
           @keyframes svcMcB {
-            0%,100% { transform: rotate(2.6deg) translateY(0); }
-            50%      { transform: rotate(1.9deg) translateY(-7px); }
+            0%,100% { transform: rotate(2.4deg) translateY(0); }
+            50%      { transform: rotate(1.7deg) translateY(-7px); }
           }
           @keyframes svcMcC {
-            0%,100% { transform: rotate(-1deg) translateY(0); }
-            50%      { transform: rotate(-0.4deg) translateY(-5px); }
+            0%,100% { transform: rotate(-0.8deg) translateY(0); }
+            50%      { transform: rotate(-0.2deg) translateY(-5px); }
           }
-          /* Entrance: anti-gravity slide up */
           @keyframes svcMcIn {
-            from { opacity: 0; transform: translateY(28px) rotate(var(--r, 0deg)); }
-            to   { opacity: 1; transform: translateY(0) rotate(var(--r, 0deg)); }
+            from { opacity: 0; transform: translateY(26px); }
+            to   { opacity: 1; transform: translateY(0); }
           }
 
           /* Hide desktop gallery rows on mobile */
