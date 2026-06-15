@@ -740,46 +740,47 @@ export default async function ServicesPage() {
             overflow: hidden; /* clip rotation bleed */
             padding: 4px 4px 24px;
           }
-          /* A — dominant, left-anchored */
+          /* A — smaller, slides in from LEFT */
           .svc-mc-card--a {
             position: relative;
-            width: 80%;
+            width: 62%;
             aspect-ratio: 4/3;
-            border-radius: 18px; overflow: hidden;
+            border-radius: 16px; overflow: hidden;
             box-shadow: 0 18px 52px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,255,255,0.05);
             z-index: 2;
             animation: svcMcA 7s ease-in-out infinite,
-                       svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.05s both;
+                       svcSlideLeft 0.7s cubic-bezier(0.23,1,0.32,1) 0.05s both;
           }
-          /* B — overlaps from right */
+          /* B — slides in from RIGHT */
           .svc-mc-card--b {
             position: relative;
             width: 66%;
             aspect-ratio: 4/3;
             border-radius: 15px; overflow: hidden;
-            margin-top: -48px;
+            margin-top: -44px;
             margin-left: auto;
             margin-right: 4px;
             box-shadow: 0 14px 44px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
             z-index: 3;
             animation: svcMcB 9s ease-in-out 1.2s infinite,
-                       svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.14s both;
+                       svcSlideRight 0.7s cubic-bezier(0.23,1,0.32,1) 0.18s both;
           }
-          /* C — square, front-left */
+          /* C — square, slides in from BOTTOM */
           .svc-mc-card--c {
             position: relative;
             width: 46%;
             aspect-ratio: 1/1;
             border-radius: 14px; overflow: hidden;
-            margin-top: -32px;
+            margin-top: -30px;
             margin-left: 14px;
             box-shadow: 0 10px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(250,204,21,0.12);
             z-index: 4;
             animation: svcMcC 11s ease-in-out 0.5s infinite,
-                       svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.24s both;
+                       svcSlideUp 0.65s cubic-bezier(0.23,1,0.32,1) 0.32s both;
           }
           .svc-mc-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+          /* Float loops */
           @keyframes svcMcA {
             0%,100% { transform: rotate(-2deg) translateY(0); }
             50%      { transform: rotate(-1.3deg) translateY(-8px); }
@@ -792,9 +793,18 @@ export default async function ServicesPage() {
             0%,100% { transform: rotate(-0.7deg) translateY(0); }
             50%      { transform: rotate(-0.1deg) translateY(-5px); }
           }
-          @keyframes svcMcIn {
-            from { opacity: 0; transform: translateY(26px); }
-            to   { opacity: 1; transform: translateY(0); }
+          /* Slide-in entrances */
+          @keyframes svcSlideLeft {
+            from { opacity: 0; transform: translateX(-48px) rotate(-2deg); }
+            to   { opacity: 1; transform: translateX(0)    rotate(-2deg); }
+          }
+          @keyframes svcSlideRight {
+            from { opacity: 0; transform: translateX(48px) rotate(2.2deg); }
+            to   { opacity: 1; transform: translateX(0)   rotate(2.2deg); }
+          }
+          @keyframes svcSlideUp {
+            from { opacity: 0; transform: translateY(40px) rotate(-0.7deg); }
+            to   { opacity: 1; transform: translateY(0)    rotate(-0.7deg); }
           }
 
           /* Hide desktop gallery on mobile via CSS (Tailwind max-md: unreliable in v4) */
