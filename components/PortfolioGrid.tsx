@@ -2,6 +2,7 @@
 
 import { m } from 'motion/react'
 import { EASE } from '@/lib/motion'
+import { wpImg } from '@/lib/images'
 
 // Actual WP homepage grid images (hometopimage1–9 from triolla.io)
 const WP_IMAGES = [
@@ -35,7 +36,7 @@ function MasonryColumn({ indices, delay }: { indices: number[]; delay: number })
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.65, delay: delay + i * 0.1, ease: [...EASE.smooth] }}
           >
-            <img src={img.src} alt={img.alt} className="w-full h-auto block" />
+            <img src={wpImg(img.src) ?? ''} alt={img.alt} className="w-full h-auto block" />
             {/* hover shine sweep */}
             <div className="shine-card__shine" aria-hidden="true" />
           </m.div>
