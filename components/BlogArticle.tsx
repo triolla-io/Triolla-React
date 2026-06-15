@@ -4,6 +4,7 @@ import { ReadingProgress } from '@/components/ReadingProgress'
 import { WpContent } from '@/lib/wp-content'
 import { stripHtml, formatPostDate } from '@/lib/text'
 import type { SinglePost } from '@/lib/graphql-types'
+import { wpImg } from '@/lib/images'
 
 export function BlogArticle({ post }: { post: SinglePost }) {
   const title = post.title ? stripHtml(post.title) : null
@@ -52,7 +53,7 @@ export function BlogArticle({ post }: { post: SinglePost }) {
 
         {imgUrl && (
           <figure className="article-hero-img">
-            <img src={imgUrl} alt={imgAlt} />
+            <img src={wpImg(imgUrl) ?? ''} alt={imgAlt} />
           </figure>
         )}
 

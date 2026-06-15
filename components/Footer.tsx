@@ -3,6 +3,7 @@ import { client } from '@/lib/apollo-client'
 import type { Locale } from '@/lib/i18n'
 import { defaultLocale } from '@/lib/i18n'
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from '@/lib/queries'
+import { wpImg } from '@/lib/images'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import { FooterModalProvider } from '@/components/FooterServiceModal'
@@ -199,7 +200,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
                       style={{ '--mi': i } as React.CSSProperties}
                       aria-label={label}
                     >
-                      <img src={src} alt="" className="footer-mention__img" width={100} height={36} />
+                      <img src={wpImg(src) ?? ''} alt="" className="footer-mention__img" width={100} height={36} />
                     </a>
                   )
                 })}
@@ -241,7 +242,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             {/* Left: logo */}
             <Link href="/">
-              {logoUrl ? <img src={logoUrl} alt="Triolla" width={92} height={30} className="h-7 w-auto brightness-0 invert" /> : null}
+              {logoUrl ? <img src={wpImg(logoUrl) ?? ''} alt="Triolla" width={92} height={30} className="h-7 w-auto brightness-0 invert" /> : null}
             </Link>
 
             {/* Center: copyright + legal */}
@@ -334,7 +335,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               {sqlinkUrl && (
                 <a href={sqlinkUrl} target="_blank" rel="noopener noreferrer" className="footer-sqlink">
                   Part of
-                  <img src="https://triolla.io/wp-content/themes/triolla/images/sqlink_icon.png" alt="Sqlink" className="h-5 w-auto" />
+                  <img src="/wp-content/themes/triolla/images/sqlink_icon.png" alt="Sqlink" className="h-5 w-auto" />
                 </a>
               )}
               <div className="flex items-center gap-3">

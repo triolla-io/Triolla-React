@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { m } from 'motion/react'
 import { EASE } from '@/lib/motion'
+import { wpImg } from '@/lib/images'
 
 const WP_IMAGES = [
   { src: 'https://triolla.io/wp-content/uploads/2025/06/2.png', alt: 'Portfolio work' },
@@ -49,7 +50,7 @@ function MasonryColumn({
             onClick={() => onTap(idx)}
           >
             <img
-              src={img.src}
+              src={wpImg(img.src) ?? ''}
               alt={img.alt}
               className="w-full h-full object-cover block transition-transform duration-700 group-hover:scale-105"
             />

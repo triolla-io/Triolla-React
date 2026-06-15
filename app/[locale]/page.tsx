@@ -11,13 +11,14 @@ import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
 import { FloatingCta } from '@/components/FloatingCta'
 import { GrainOverlay, GlowOrb, Eyebrow } from '@/components/ui'
-import { client } from '@/lib/apollo-client'
+import { client, getLocalizedClient } from '@/lib/apollo-client'
 import { GET_HOME_PAGE_BY_URI, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { stripHtml } from '@/lib/text'
 import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
+import { wpImg } from '@/lib/images'
 
 const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
   ${GET_HOME_PAGE_BY_URI}
@@ -201,7 +202,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               <div key={i} className="award-card group" style={{ '--ai': i } as React.CSSProperties}>
                 <div className="award-medal-wrap">
                   {award.imgUrl ? (
-                    <img src={award.imgUrl} alt={award.label} className="award-medal-img" />
+                    <img src={wpImg(award.imgUrl) ?? ''} alt={award.label} className="award-medal-img" />
                   ) : (
                     <div className="award-medal-fallback">
                       #

@@ -11,6 +11,7 @@ import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from '@/components/ui'
 import type { GetTechnologyPageData, GetThemeSettingsData, TechnologyPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
+import { wpImg } from '@/lib/images'
 
 const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
   ${GET_TECHNOLOGY_PAGE}
@@ -282,7 +283,7 @@ export default async function TechnologyPage() {
         {/* Background */}
         {tp.headerBgOverlayLayer?.node?.sourceUrl ? (
           <>
-            <img src={tp.headerBgOverlayLayer.node.sourceUrl} alt="" className="tech-hero-bg" aria-hidden="true" />
+            <img src={wpImg(tp.headerBgOverlayLayer.node.sourceUrl) ?? ''} alt="" className="tech-hero-bg" aria-hidden="true" />
             <div className="tech-hero-overlay" aria-hidden="true" />
           </>
         ) : (

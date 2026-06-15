@@ -12,6 +12,7 @@ import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
 import parse from 'html-react-parser'
 import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
+import { wpImg } from '@/lib/images'
 
 const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
   ${GET_ABOUT_PAGE}
@@ -114,7 +115,7 @@ export default async function AboutUsPage() {
 
         {ap.headerBgOverlayLayer?.node?.sourceUrl && (
           <div className="about-hero__layer" aria-hidden="true">
-            <img src={ap.headerBgOverlayLayer.node.sourceUrl} alt="" />
+            <img src={wpImg(ap.headerBgOverlayLayer.node.sourceUrl) ?? ''} alt="" />
           </div>
         )}
 
@@ -317,7 +318,7 @@ export default async function AboutUsPage() {
                       <div className="about-partner__head">
                         {item.imageText && <span className="about-partner__label">{item.imageText}</span>}
                         {item.topimages?.node?.sourceUrl && (
-                          <img src={item.topimages.node.sourceUrl} alt="" className="about-partner__logo" />
+                          <img src={wpImg(item.topimages.node.sourceUrl) ?? ''} alt="" className="about-partner__logo" />
                         )}
                       </div>
                       {item.topabtext && (

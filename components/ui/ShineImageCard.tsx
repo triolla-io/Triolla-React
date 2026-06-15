@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { wpImg } from '@/lib/images'
 
 interface ShineImageCardProps {
   src: string
@@ -30,7 +31,7 @@ export function ShineImageCard({ src, alt, radius, shineAngle, imgScale, overlay
         } as React.CSSProperties
       }
     >
-      <img src={src} alt={alt} className="shine-card__img" />
+      <img src={wpImg(src) ?? ''} alt={alt} className="shine-card__img" />
       <div className="shine-card__shine" aria-hidden="true" />
       {overlay != null && <div className="shine-card__overlay">{overlay}</div>}
       {badge != null && badge}

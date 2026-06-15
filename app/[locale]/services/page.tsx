@@ -13,6 +13,7 @@ import { ServiceTechGroups, type TechGroup } from '@/components/ServiceTechGroup
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
 import parse from 'html-react-parser'
 import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
+import { wpImg } from '@/lib/images'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
@@ -177,7 +178,7 @@ export default async function ServicesPage() {
 
         {sp.headerBgOverlayLayer?.node?.sourceUrl && (
           <div className="svc-hero__layer" aria-hidden="true">
-            <img src={sp.headerBgOverlayLayer.node.sourceUrl} alt="" />
+            <img src={wpImg(sp.headerBgOverlayLayer.node.sourceUrl) ?? ''} alt="" />
           </div>
         )}
 
@@ -325,7 +326,7 @@ export default async function ServicesPage() {
                 <div className="svc-prod__row">
                   {[prodImages[3], prodImages[4], prodImages[5]].filter(Boolean).map((img, i) => (
                     <div key={i} className={`svc-img-card${i === 1 ? ' svc-img-card--up' : ''}`} style={{ flex: '1' }}>
-                      <img src={img} alt="" className="svc-img-card__img" />
+                      <img src={wpImg(img) ?? ''} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
                   ))}
@@ -335,7 +336,7 @@ export default async function ServicesPage() {
                 <div className="svc-prod__icons">
                   {[prodImages[6], prodImages[7], prodImages[8]].filter(Boolean).map((img, i) => (
                     <div key={i} className="svc-img-icon">
-                      <img src={img} alt="" className="svc-img-icon__img" />
+                      <img src={wpImg(img) ?? ''} alt="" className="svc-img-icon__img" />
                     </div>
                   ))}
                 </div>
@@ -388,7 +389,7 @@ export default async function ServicesPage() {
               {brandImages.map((img, i) => (
                 <div key={i} className="svc-polaroid" style={{ '--pi': i } as React.CSSProperties}>
                   <div className="svc-polaroid__frame">
-                    <img src={img} alt="" className="svc-polaroid__img" />
+                    <img src={wpImg(img) ?? ''} alt="" className="svc-polaroid__img" />
                   </div>
                 </div>
               ))}
@@ -431,7 +432,7 @@ export default async function ServicesPage() {
             {sp.devleftimage?.node?.sourceUrl && (
               <FadeIn delay={0.18} yOffset={32} className="svc-dev__img-wrap">
                 <div className="svc-dev__img-inner">
-                  <img src={sp.devleftimage.node.sourceUrl} alt="" className="svc-dev__img" />
+                  <img src={wpImg(sp.devleftimage.node.sourceUrl) ?? ''} alt="" className="svc-dev__img" />
                   <div className="svc-dev__img-glow" aria-hidden="true" />
                 </div>
               </FadeIn>

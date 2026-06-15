@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ShineImageCard } from '@/components/ui'
 import { stripHtml, formatPostDate } from '@/lib/text'
 import type { BlogPostNode } from '@/lib/graphql-types'
+import { wpImg } from '@/lib/images'
 
 export function BlogPostCard({ post }: { post: BlogPostNode }) {
   const title = post.title ? stripHtml(post.title) : null
@@ -17,7 +18,7 @@ export function BlogPostCard({ post }: { post: BlogPostNode }) {
   return (
     <Link href={href} className="blog-card" aria-label={title}>
       <ShineImageCard
-        src={imgUrl}
+        src={wpImg(imgUrl) ?? ''}
         alt={alt}
         radius={16}
         imgScale={1.08}

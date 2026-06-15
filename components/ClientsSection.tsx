@@ -1,6 +1,7 @@
 import React from 'react'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
+import { wpImg } from '@/lib/images'
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -138,7 +139,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         className="mb-5"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <img src={logo.url} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
+            <img src={wpImg(logo.url) ?? ''} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
           </div>
         )}
       />
@@ -154,7 +155,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         fadeColor="#080808"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <img src={logo.url} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
+            <img src={wpImg(logo.url) ?? ''} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
           </div>
         )}
       />

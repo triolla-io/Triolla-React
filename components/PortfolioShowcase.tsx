@@ -3,6 +3,7 @@
 
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
+import { wpImg } from '@/lib/images'
 
 function stripHtml(html: string): string {
   return (html ?? '').replace(/<[^>]+>/g, '').trim()
@@ -113,7 +114,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                 item.pImage?.node?.sourceUrl ? (
                   <img
                     key={i}
-                    src={item.pImage.node.sourceUrl}
+                    src={wpImg(item.pImage.node.sourceUrl) ?? ''}
                     alt=""
                     aria-hidden="true"
                     className={`ps-img ${i === activeIndex ? 'ps-img-on' : 'ps-img-off'}`}
@@ -233,7 +234,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                     }}
                   >
                     <img
-                      src={item.pImage.node.sourceUrl}
+                      src={wpImg(item.pImage.node.sourceUrl) ?? ''}
                       alt={stripHtml(item.pTitle ?? '')}
                       className="w-full h-full object-cover"
                       loading={i < 2 ? 'eager' : 'lazy'}
@@ -273,7 +274,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                     {/* Client logo */}
                     {item.pLogo?.node?.sourceUrl && (
                       <img
-                        src={item.pLogo.node.sourceUrl}
+                        src={wpImg(item.pLogo.node.sourceUrl) ?? ''}
                         alt=""
                         className="h-11 object-contain self-start mb-7"
                         style={{ filter: 'brightness(0) invert(1)' }}

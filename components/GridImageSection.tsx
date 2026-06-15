@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react'
 import { m } from 'motion/react'
 import { GlowOrb } from '@/components/ui'
+import { wpImg } from '@/lib/images'
 
 interface GridImageSectionProps {
   imageUrl?: string | null
@@ -110,8 +111,8 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
             <div className="gi-viewport">
               <div className="gi-img-inner" ref={imgInnerRef}>
                 <picture>
-                  {imageMobileUrl && <source media="(max-width: 640px)" srcSet={imageMobileUrl} />}
-                  <img src={imageUrl} alt="Selected work — Triolla design portfolio" className="gi-img" loading="lazy" />
+                  {imageMobileUrl && <source media="(max-width: 640px)" srcSet={wpImg(imageMobileUrl) ?? undefined} />}
+                  <img src={wpImg(imageUrl) ?? ''} alt="Selected work — Triolla design portfolio" className="gi-img" loading="lazy" />
                 </picture>
               </div>
 

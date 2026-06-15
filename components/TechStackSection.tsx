@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, GradientText } from '@/components/ui'
+import { wpImg } from '@/lib/images'
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -166,7 +167,7 @@ export function TechStackSection({ titleOne, titleTwo, text, midTitle, images, a
                         <div className="tss-card__face">
                           <span className="tss-card__corner tss-card__corner--tl" aria-hidden="true" />
                           <span className="tss-card__corner tss-card__corner--br" aria-hidden="true" />
-                          <img src={img.url!} alt={img.title ?? ''} className="tss-card__img" />
+                          <img src={wpImg(img.url) ?? ''} alt={img.title ?? ''} className="tss-card__img" />
                         </div>
                       </div>
                       {img.title && <span className="tss-card__label">{stripHtmlTags(img.title)}</span>}

@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
 import { GlowOrb } from '@/components/ui'
+import { wpImg } from '@/lib/images'
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -210,7 +211,7 @@ export function TechStickyFeature({
                   panel.lftimage?.node?.sourceUrl ? (
                     <img
                       key={i}
-                      src={panel.lftimage.node.sourceUrl}
+                      src={wpImg(panel.lftimage.node.sourceUrl) ?? ''}
                       alt=""
                       aria-hidden="true"
                       className={`tsf-img ${i === activeIndex ? 'tsf-img-on' : 'tsf-img-off'}`}

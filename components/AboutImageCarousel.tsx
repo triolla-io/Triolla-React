@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { ShineImageCard, GlowOrb } from '@/components/ui'
+import { wpImg } from '@/lib/images'
 
 interface AboutImageCarouselProps {
   images: (string | null)[]
@@ -156,7 +157,7 @@ export function AboutImageCarousel({ images }: AboutImageCarouselProps) {
         {validImages.map((src, i) => (
           <div key={i} className="aic-card" style={{ '--si': i } as React.CSSProperties}>
             <ShineImageCard
-              src={src}
+              src={wpImg(src) ?? ''}
               alt=""
               radius={20}
               shineAngle="135deg"
