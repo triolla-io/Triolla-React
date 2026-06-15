@@ -714,59 +714,21 @@ export default async function ServicesPage() {
           .section-head { margin-bottom: 24px; }
           .section-head__title { font-size: clamp(1.8rem, 7vw, 3.2rem) !important; line-height: 1.08 !important; }
 
-          /* ── Product gallery → horizontal snap scroll on mobile ── */
-          .svc-prod__gallery {
-            display: flex;
-            flex-direction: row;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            gap: 10px;
-            /* bleed past inner padding so cards touch edge */
-            margin-left: -18px;
-            margin-right: -18px;
-            padding-left: 18px;
-            padding-right: 18px;
-            padding-bottom: 4px;
-          }
-          .svc-prod__gallery::-webkit-scrollbar { display: none; }
-
-          /* Featured card: full width, 16/9 */
+          /* ── Product gallery — mobile: 1 hero image only ── */
+          /* Complex 9-image collage stays desktop only.
+             Mobile shows one full-width hero shot + the service list. */
           .svc-img-card--featured {
-            flex: 0 0 88vw;
-            width: 88vw;
+            width: 100%;
             aspect-ratio: 16/10;
-            margin-bottom: 0;
-            scroll-snap-align: start;
+            border-radius: 16px;
           }
-          /* All other cards: 72vw wide, 4/3 aspect */
-          .svc-prod__gallery .svc-img-card:not(.svc-img-card--featured) {
-            flex: 0 0 72vw;
-            width: 72vw;
-            aspect-ratio: 4/3;
-            scroll-snap-align: start;
-          }
-          /* Images fill their containers */
-          .svc-prod__gallery .svc-img-card__img {
+          .svc-img-card--featured .svc-img-card__img {
             width: 100%; height: 100%; object-fit: cover;
           }
-          /* Rows dissolve — children flow directly into the flex scroll */
-          .svc-prod__row { display: contents; }
-          .svc-prod__row > * { flex-shrink: 0 !important; }
-          .svc-img-card--offset, .svc-img-card--up { margin-top: 0; }
-          .svc-img-card { border-radius: 14px; }
-          .svc-img-card:hover { transform: none; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-
-          /* Icons: separate horizontal row below the scroll */
-          .svc-prod__icons {
-            flex: 0 0 auto;
-            flex-shrink: 0;
-            padding-left: 0;
-            gap: 8px;
-          }
-          .svc-img-icon { width: 68px; height: 68px; border-radius: 12px; }
-          .svc-img-icon:hover { transform: none; }
+          /* Hide secondary images and icons on mobile */
+          .svc-prod__row,
+          .svc-prod__icons { display: none; }
+          .svc-img-card:hover { transform: none; }
 
           /* ── Polaroids → 2-col, no rotation (rotations distort on mobile) ── */
           .svc-polaroid-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
