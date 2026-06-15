@@ -41,12 +41,12 @@ async function getBlogPage(uri: string): Promise<BlogPageFields | null> {
   }
 }
 
-async function getInitialPosts(): Promise<BlogPostsConnection | null> {
+async function getInitialPosts(language: string): Promise<BlogPostsConnection | null> {
   try {
     // First card is the featured spotlight; the rest seed the grid.
     const { data } = await client.query({
       query: BLOG_POSTS_QUERY,
-      variables: { first: BLOG_PAGE_SIZE + 1, after: null },
+      variables: { first: BLOG_PAGE_SIZE + 1, after: null, language },
     })
     return data?.posts ?? null
   } catch {
@@ -104,7 +104,7 @@ function FeaturedPost({ post }: { post: BlogPostNode }) {
 export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const loc = isLocale(locale) ? locale : defaultLocale
-  const [bp, postsConn, ts] = await Promise.all([getBlogPage(PAGE_URI.blog[loc]), getInitialPosts(), getThemeSettings()])
+  const [bp, postsConn, ts] = await Promise.all([getBlogPage(PAGE_URI.blog[loc]), getInitialPosts(loc), getThemeSettings()])
 
   const allPosts = postsConn?.nodes ?? []
   const featured = allPosts[0] ?? null
@@ -161,7 +161,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
       <div className="blog-body max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {featured && <FeaturedPost post={featured} />}
         <section className="blog-grid-section py-16 md:py-24">
-          <BlogPostGrid initialPosts={gridPosts} initialPageInfo={gridPageInfo} loadMoreLabel={loadMoreLabel} />
+          <BlogPostGrid initialPosts={gridPosts} initialPageInfo={gridPageInfo} loadMoreLabel={loadMoreLabel} locale={loc} />
         </section>
       </div>
 

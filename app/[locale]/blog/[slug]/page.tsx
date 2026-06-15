@@ -36,24 +36,66 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
 // Only slugs from generateStaticParams resolve; anything else 404s.
 export const dynamicParams = false
 
+/**
+ * Derive the route (locale + slug) from a WordPress post URI.
+ * WPML serves Hebrew posts under `/he/blog/<slug>/`; English under `/blog/<slug>/`.
+ */
+function derivePostRoute(uri: string | null): { locale: string; slug: string } | null {
+  if (!uri) return null
+  const trimmed = uri.replace(/^\/+|\/+$/g, '')
+  if (trimmed.startsWith('he/blog/')) {
+    const slug = trimmed.slice('he/blog/'.length)
+    return slug.length > 0 ? { locale: 'he', slug } : null
+  }
+  if (trimmed.startsWith('blog/')) {
+    const slug = trimmed.slice('blog/'.length)
+    return slug.length > 0 ? { locale: defaultLocale, slug } : null
+  }
+  return null
+}
+
+/** Hebrew slugs arrive percent-encoded from the route; normalize for comparison. */
+function decodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug)
+  } catch {
+    return slug
+  }
+}
+
 export async function generateStaticParams() {
   try {
     const { data } = await client.query({ query: POST_SLUGS_QUERY })
     const nodes = data?.posts?.nodes ?? []
     return nodes.flatMap((n) => {
-      const slug = (n?.uri ?? '').replace(/^\/?blog\//, '').replace(/^\/+|\/+$/g, '')
-      return slug.length > 0 ? [{ slug }] : []
+      const route = derivePostRoute(n?.uri ?? null)
+      return route ? [route] : []
     })
   } catch {
     return []
   }
 }
 
-async function getPost(slug: string): Promise<SinglePost | null> {
+/**
+ * Resolve a (locale, slug) route to its WordPress databaseId, then fetch the
+ * post by databaseId. Fetching by databaseId is the only reliable way to get
+ * the Hebrew variant: `/he/blog/...` URIs don't resolve via idType: URI, and
+ * shared slugs collide with their English counterpart.
+ */
+async function getPost(locale: string, slug: string): Promise<SinglePost | null> {
   try {
+    const target = decodeSlug(slug)
+    const { data: slugData } = await client.query({ query: POST_SLUGS_QUERY })
+    const nodes = slugData?.posts?.nodes ?? []
+    const match = nodes.find((n) => {
+      const route = derivePostRoute(n?.uri ?? null)
+      return route?.locale === locale && decodeSlug(route.slug) === target
+    })
+    if (match?.databaseId == null) return null
+
     const { data } = await client.query({
       query: POST_BY_URI_QUERY,
-      variables: { uri: `/blog/${slug}/` },
+      variables: { id: String(match.databaseId), idType: 'DATABASE_ID' },
     })
     return data?.post ?? null
   } catch {
@@ -61,11 +103,11 @@ async function getPost(slug: string): Promise<SinglePost | null> {
   }
 }
 
-async function getMorePosts(): Promise<BlogPostNode[]> {
+async function getMorePosts(language: string): Promise<BlogPostNode[]> {
   try {
     const { data } = await client.query({
       query: BLOG_POSTS_QUERY,
-      variables: { first: 4, after: null },
+      variables: { first: 4, after: null, language },
     })
     return data?.posts?.nodes ?? []
   } catch {
@@ -83,15 +125,16 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
-  const { slug } = await params
-  const post = await getPost(slug)
+  const { locale, slug } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const post = await getPost(loc, slug)
   return { title: post?.title ? `${stripHtml(post.title)} | Triolla` : 'Blog | Triolla' }
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params
   const loc = isLocale(locale) ? locale : defaultLocale
-  const [post, more, ts] = await Promise.all([getPost(slug), getMorePosts(), getThemeSettings()])
+  const [post, more, ts] = await Promise.all([getPost(loc, slug), getMorePosts(loc), getThemeSettings()])
 
   if (!post || (!post.title && !post.content)) notFound()
 

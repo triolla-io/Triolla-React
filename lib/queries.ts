@@ -328,6 +328,7 @@ export const GET_PORTFOLIO_SLUGS = `
     pages(first: 100) {
       nodes {
         uri
+        databaseId
         template {
           __typename
         }
@@ -337,8 +338,8 @@ export const GET_PORTFOLIO_SLUGS = `
 `
 
 export const GET_PORTFOLIO_PAGE = `
-  query GetPortfolioPage($uri: ID!) {
-    page(id: $uri, idType: URI) {
+  query GetPortfolioPage($id: ID!, $idType: PageIdType!) {
+    page(id: $id, idType: $idType) {
       template {
         ... on Template_PortfolioPage {
           portfolioFields {
@@ -545,8 +546,8 @@ export const GET_BLOG_PAGE = `
 `
 
 export const GET_BLOG_POSTS = `
-  query GetBlogPosts($first: Int!, $after: String) {
-    posts(first: $first, after: $after, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+  query GetBlogPosts($first: Int!, $after: String, $language: String) {
+    posts(first: $first, after: $after, where: { status: PUBLISH, orderby: { field: DATE, order: DESC }, wpmlLanguage: $language }) {
       pageInfo {
         hasNextPage
         endCursor
@@ -567,14 +568,15 @@ export const GET_POST_SLUGS = `
     posts(first: 200, where: { status: PUBLISH }) {
       nodes {
         uri
+        databaseId
       }
     }
   }
 `
 
 export const GET_POST_BY_URI = `
-  query GetPostByUri($uri: ID!) {
-    post(id: $uri, idType: URI) {
+  query GetPostByUri($id: ID!, $idType: PostIdType!) {
+    post(id: $id, idType: $idType) {
       title
       content
       date

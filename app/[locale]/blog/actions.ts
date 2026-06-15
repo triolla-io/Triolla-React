@@ -12,11 +12,11 @@ const BLOG_POSTS_QUERY: TypedDocumentNode<GetBlogPostsData> = gql`
 
 const EMPTY: BlogPostsConnection = { pageInfo: { hasNextPage: false, endCursor: null }, nodes: [] }
 
-export async function loadMorePosts(after: string | null): Promise<BlogPostsConnection> {
+export async function loadMorePosts(after: string | null, language?: string): Promise<BlogPostsConnection> {
   try {
     const { data } = await client.query({
       query: BLOG_POSTS_QUERY,
-      variables: { first: BLOG_PAGE_SIZE, after },
+      variables: { first: BLOG_PAGE_SIZE, after, language: language ?? null },
       fetchPolicy: 'no-cache',
     })
     return data?.posts ?? EMPTY
