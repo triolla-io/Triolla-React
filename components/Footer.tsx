@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { client } from '@/lib/apollo-client'
+import type { Locale } from '@/lib/i18n'
+import { defaultLocale } from '@/lib/i18n'
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
@@ -117,7 +119,7 @@ function GlobeIcon() {
 
 /* ── Component ──────────────────────────────────────────── */
 
-export default async function Footer() {
+export default async function Footer({ locale = defaultLocale }: { locale?: Locale } = {}) {
   const [ts, wpMenus, services] = await Promise.all([getThemeSettings(), getFooterMenus(), getAllServices()])
 
   // Map each resolved service detail page (URI path → index) so footer links
@@ -370,18 +372,19 @@ export default async function Footer() {
             <div className="hidden md:flex items-center gap-5">
               <div className="footer-lang flex items-center gap-2">
                 <GlobeIcon />
-                <a
-                  href="https://triolla.io/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer-lang__opt footer-lang__opt--active"
+                <Link
+                  href="/"
+                  className={`footer-lang__opt${locale === 'en' ? ' footer-lang__opt--active' : ''}`}
                 >
                   Eng
-                </a>
+                </Link>
                 <span className="footer-lang__sep">/</span>
-                <a href="https://triolla.io/he/" target="_blank" rel="noopener noreferrer" className="footer-lang__opt">
+                <Link
+                  href="/he"
+                  className={`footer-lang__opt${locale === 'he' ? ' footer-lang__opt--active' : ''}`}
+                >
                   Heb
-                </a>
+                </Link>
               </div>
               {sqlinkUrl && (
                 <a href={sqlinkUrl} target="_blank" rel="noopener noreferrer" className="footer-sqlink">

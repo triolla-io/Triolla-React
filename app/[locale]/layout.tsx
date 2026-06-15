@@ -44,7 +44,7 @@ export default async function RootLayout({
         <MotionProvider>
           <Header />
           <main className="grow">{children}</main>
-          <Footer />
+          <Footer locale={loc} />
           <CookieBanner />
         </MotionProvider>
         <BfcacheReloader />
