@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { GlowOrb } from '@/components/ui'
 import { submitContactForm } from '@/app/actions/contact'
 import { initialContactState, type ContactFormState } from '@/lib/contact-form'
@@ -22,10 +23,16 @@ interface WannaChatSectionProps {
   fallbackEmail?: string | null
 }
 
-const FORM_FIELDS = [
+const FORM_FIELDS_EN = [
   { key: 'name', type: 'text', label: 'Full Name', required: true },
   { key: 'phone', type: 'tel', label: 'Phone', required: false },
   { key: 'email', type: 'email', label: 'Email', required: true },
+] as const
+
+const FORM_FIELDS_HE = [
+  { key: 'name', type: 'text', label: 'שם מלא', required: true },
+  { key: 'phone', type: 'tel', label: 'טלפון', required: false },
+  { key: 'email', type: 'email', label: 'אימייל', required: true },
 ] as const
 
 export function WannaChatSection({
@@ -36,6 +43,9 @@ export function WannaChatSection({
   callUsLabel,
   fallbackEmail,
 }: WannaChatSectionProps) {
+  const params = useParams()
+  const FORM_FIELDS = params?.locale === 'he' ? FORM_FIELDS_HE : FORM_FIELDS_EN
+
   const [state, setState] = useState<ContactFormState>(initialContactState)
   const [pending, setPending] = useState(false)
   const [fields, setFields] = useState({ name: '', phone: '', email: '' })

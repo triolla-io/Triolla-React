@@ -348,7 +348,7 @@ export function HeaderClient({
           initial={{ maxWidth: 920 }}
           animate={{ maxWidth: isScrolling ? 340 : 920 }}
           transition={{ type: 'spring', stiffness: 120, damping: 28, mass: 1 }}
-          className="relative w-full flex items-center bg-[#0a0a0a] text-white rounded-full border border-white/10 shadow-2xl shadow-black/40 px-5 h-[54px] overflow-hidden"
+          className="relative w-full flex items-center gap-4 bg-[#0a0a0a] text-white rounded-full border border-white/10 shadow-2xl shadow-black/40 px-5 h-[54px] overflow-hidden"
         >
           {/* Logo — always visible */}
           <Link href="/" className="shrink-0 flex items-center">
@@ -366,7 +366,7 @@ export function HeaderClient({
             style={{ pointerEvents: isScrolling ? 'none' : 'auto' }}
             className="hidden lg:flex items-center gap-6 flex-1 min-w-0"
           >
-            <nav className="flex items-center gap-6 flex-1 min-w-0 whitespace-nowrap ml-6">
+            <nav className="flex items-center gap-6 flex-1 min-w-0 whitespace-nowrap">
               {navItems.map((item, i) => {
                 const href = toHref(item.url)
                 if (item.children.length > 0) {
@@ -389,7 +389,7 @@ export function HeaderClient({
             </nav>
 
             {/* WhatsApp + Book buttons */}
-            <div className="flex items-center gap-2.5 ml-auto shrink-0">
+            <div className="flex items-center gap-2.5 ms-auto shrink-0">
               <div className="flex items-center gap-2.5">
                 {whatsappHref && (
                   <a

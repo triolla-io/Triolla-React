@@ -62,12 +62,30 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
+async function getLocalizedThemeOptions(locale: string): Promise<Partial<ThemeOptions> | null> {
+  if (locale === 'en') return null
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_WORDPRESS_URL ?? 'https://triolla.io'}/wp-json/triolla/v1/theme-options/${locale}`,
+      { next: { revalidate: 3600 } }
+    )
+    if (!res.ok) return null
+    return await res.json()
+  } catch {
+    return null
+  }
+}
+
 /* ── Page ────────────────────────────────────────── */
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const loc = isLocale(locale) ? locale : defaultLocale
-  const [hp, ts] = await Promise.all([getHomeData(PAGE_URI.home[loc]), getThemeSettings()])
+  const [hp, ts, localizedTs] = await Promise.all([
+    getHomeData(PAGE_URI.home[loc]),
+    getThemeSettings(),
+    getLocalizedThemeOptions(loc),
+  ])
 
   const heroHeadline = stripHtml(hp.topsectitle ?? '')
   const heroSubtext = stripHtml(hp.toptext ?? '')
@@ -91,7 +109,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
   })
 
-  const faqItems = (ts?.questionAnswerList ?? []).flatMap((q: { fQuestion: string | null; fAnswer: string | null }) => {
+  const faqSource = localizedTs ?? ts
+  const faqHeading = localizedTs?.faqHeading ?? ts?.faqHeading ?? null
+  const faqShortText = localizedTs?.faqShortText ?? ts?.faqShortText ?? null
+  const faqItems = ((localizedTs?.questionAnswerList ?? ts?.questionAnswerList) ?? []).flatMap((q: { fQuestion: string | null; fAnswer: string | null }) => {
     return q?.fQuestion ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }] : []
   })
 
@@ -225,8 +246,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       ══════════════════════════════════════════════ */}
       <ClientsSection
         logos={clientLogos}
-        heading={ts?.ourClientsHeading ?? null}
-        bigText={ts?.ourClientBigText ?? null}
+        heading={localizedTs?.ourClientsHeading ?? ts?.ourClientsHeading ?? null}
+        bigText={localizedTs?.ourClientBigText ?? ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
       />
 
@@ -245,7 +266,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* ══════════════════════════════════════════════
           FAQ SECTION
       ══════════════════════════════════════════════ */}
-      <FAQSection heading={ts?.faqHeading ?? null} subtext={ts?.faqShortText ?? null} items={faqItems} />
+      <FAQSection heading={faqHeading} subtext={faqShortText} items={faqItems} />
 
       {/* ══════════════════════════════════════════════
           GRID IMAGE SECTION
@@ -258,7 +279,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* ══════════════════════════════════════════════
           CONTACT SECTION
       ══════════════════════════════════════════════ */}
-      <ContactCTA ts={ts} />
+      <ContactCTA ts={localizedTs ? { ...ts, ...localizedTs } as typeof ts : ts} />
 
       {/* ══════════════════════════════════════════════
           GLOBAL STYLES

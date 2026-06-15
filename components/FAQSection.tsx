@@ -313,7 +313,7 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
           align-items: center;
           gap: 16px;
           padding: 22px 22px;
-          text-align: left;
+          text-align: start;
           background: none;
           border: none;
           cursor: pointer;
@@ -391,6 +391,25 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
         .fq-item__ans a            { color: #facc15; text-decoration: none; border-bottom: 1px solid rgba(250,204,21,0.3); transition: border-color 0.2s; }
         .fq-item__ans a:hover      { border-color: #facc15; }
         .fq-item__ans strong       { color: rgba(255,255,255,0.68); font-weight: 600; }
+
+        /* ══════════════════════════════════════════
+           RTL overrides
+        ══════════════════════════════════════════ */
+        [dir="rtl"] .fq-item::before {
+          left: auto;
+          right: 0;
+          border-radius: 0 3px 3px 0;
+        }
+        [dir="rtl"] .fq-item__ans {
+          padding: 4px 56px 24px 22px;
+        }
+        [dir="rtl"] .fq-rule {
+          background: linear-gradient(to left, rgba(250,204,21,0.8), transparent);
+        }
+        [dir="rtl"] .fq-deco {
+          right: auto;
+          left: -16px;
+        }
 
         /* ══════════════════════════════════════════
            MOBILE — compact premium accordion
