@@ -139,7 +139,7 @@ export default async function TechnologyPage() {
   ].filter((x): x is NonNullable<typeof x> => x !== null)
 
   return (
-    <main className="overflow-x-clip bg-[#080808] text-white" style={{ '--accent': accentColor } as React.CSSProperties}>
+    <main className="overflow-x-clip bg-[#080808] text-white pb-16 md:pb-32" style={{ '--accent': accentColor } as React.CSSProperties}>
       <style>{`
         /* ─── Hero ──────────────────────────────────────── */
         .tech-hero-bg {
@@ -204,6 +204,10 @@ export default async function TechnologyPage() {
         @keyframes techScrollPulse {
           0%,100% { opacity: 0.4; }
           50%      { opacity: 1; }
+        }
+
+        @media (max-width: 767px) {
+          .tech-scroll-cue { display: none; }
         }
 
         /* ─── Marquee banner ────────────────────────────── */
@@ -279,7 +283,7 @@ export default async function TechnologyPage() {
       {/* ════════════════════════════════════════════
           HERO
       ════════════════════════════════════════════ */}
-      <section className="relative min-h-[92vh] flex items-center overflow-hidden pt-28 pb-32">
+      <section className="relative md:min-h-[92vh] flex items-center overflow-hidden pt-16 md:pt-28 pb-10 md:pb-32">
         {/* Background */}
         {tp.headerBgOverlayLayer?.node?.sourceUrl ? (
           <>
