@@ -106,7 +106,8 @@ function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathn
                       16,
                       Math.min(rect.left + rect.width / 2 - PROMO_PANEL_WIDTH / 2, window.innerWidth - PROMO_PANEL_WIDTH - 16),
                     ),
-                    minWidth: PROMO_PANEL_WIDTH,
+                    minWidth: Math.min(PROMO_PANEL_WIDTH, window.innerWidth - 32),
+                    maxWidth: window.innerWidth - 32,
                   }
                 : {
                     left: rect.left + rect.width / 2,
