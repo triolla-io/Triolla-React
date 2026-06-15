@@ -168,7 +168,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* ══════════════════════════════════════════════
           PORTFOLIO GRID
       ══════════════════════════════════════════════ */}
-      <section className="relative z-20 max-w-[1600px] mx-auto px-4 -mt-10 mb-6 md:mb-32">
+      <section className="relative z-20 max-w-[1600px] mx-auto px-4 md:-mt-10 mb-6 md:mb-32">
         <PortfolioGrid />
       </section>
 
