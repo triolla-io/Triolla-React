@@ -103,7 +103,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* ══════════════════════════════════════════════
           HERO
       ══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex flex-col items-center pt-16 md:pt-32 pb-8 md:pb-20 px-4 overflow-hidden">
+      <section className="relative md:min-h-screen flex flex-col items-center pt-16 md:pt-32 pb-8 md:pb-20 px-4 overflow-hidden">
         {/* Ambient orb cluster */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <GlowOrb
