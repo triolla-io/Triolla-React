@@ -14,6 +14,7 @@ import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/
 import parse from 'html-react-parser'
 import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
@@ -33,9 +34,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getServicesData(): Promise<ServicesPageFields> {
+async function getServicesData(uri: string): Promise<ServicesPageFields> {
   try {
-    const { data } = await client.query({ query: SERVICES_PAGE_QUERY })
+    const { data } = await client.query({ query: SERVICES_PAGE_QUERY, variables: { uri } })
     return data?.page?.template?.servicePage ?? ({} as ServicesPageFields)
   } catch {
     return {} as ServicesPageFields
@@ -51,8 +52,10 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export default async function ServicesPage() {
-  const [sp, ts] = await Promise.all([getServicesData(), getThemeSettings()])
+export default async function ServicesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const [sp, ts] = await Promise.all([getServicesData(PAGE_URI.services[loc]), getThemeSettings()])
 
   // Each menu link is normalized to { label, link } and enriched from its WP
   // detail page in parallel. Anything that doesn't resolve degrades to a plain
