@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { SectionReveal } from '@/components/SectionReveal'
 import { BlogPostCard } from '@/components/BlogPostCard'
-import { loadMorePosts } from '@/app/blog/actions'
+import { loadMorePosts } from '@/app/[locale]/blog/actions'
 import type { BlogPostNode, BlogPostsPageInfo } from '@/lib/graphql-types'
 
 interface BlogPostGridProps {
@@ -23,7 +23,7 @@ export function BlogPostGrid({ initialPosts, initialPageInfo, loadMoreLabel }: B
       const next = await loadMorePosts(pageInfo.endCursor)
       setPosts((prev) => {
         const seen = new Set(prev.map((p) => p.id))
-        return [...prev, ...next.nodes.filter((p) => !seen.has(p.id))]
+        return [...prev, ...next.nodes.filter((p: BlogPostNode) => !seen.has(p.id))]
       })
       setPageInfo(next.pageInfo)
     })

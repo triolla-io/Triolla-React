@@ -1,5 +1,6 @@
 import { client } from '@/lib/apollo-client'
 import { GET_PORTFOLIO_PAGE, GET_PORTFOLIO_SLUGS, GET_THEME_SETTINGS } from '@/lib/queries'
+import { defaultLocale } from '@/lib/i18n'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import { notFound } from 'next/navigation'
@@ -26,17 +27,18 @@ export const dynamicParams = false
 export async function generateStaticParams() {
   try {
     const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
-
     const nodes = data?.pages?.nodes ?? []
-    return nodes.flatMap((n) => {
+    const slugs = nodes.flatMap((n) => {
       if (n?.template?.__typename === 'Template_PortfolioPage') {
         const slug = (n.uri ?? '').replace(/^\/+|\/+$/g, '')
         if (slug.length > 0) {
-          return [{ slug }]
+          return [slug]
         }
       }
       return []
     })
+    // Portfolio pages are English-only for now; emit them under the default locale.
+    return slugs.map((slug) => ({ locale: defaultLocale, slug }))
   } catch {
     // Build emits no portfolio routes rather than crashing.
     return []
@@ -64,7 +66,7 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export default async function PortfolioSlugPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PortfolioSlugPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { slug } = await params
   const [pf, ts] = await Promise.all([getPortfolioData(slug), getThemeSettings()])
 
