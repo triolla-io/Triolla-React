@@ -28,28 +28,40 @@ export async function generateStaticParams() {
   try {
     const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
     const nodes = data?.pages?.nodes ?? []
-    const slugs = nodes.flatMap((n) => {
-      if (n?.template?.__typename === 'Template_PortfolioPage') {
-        const slug = (n.uri ?? '').replace(/^\/+|\/+$/g, '')
-        if (slug.length > 0) {
-          return [slug]
-        }
+
+    const params: { locale: string; slug: string }[] = []
+
+    nodes.forEach((n: { uri?: string | null; template?: { __typename: string } | null }) => {
+      if (n?.template?.__typename !== 'Template_PortfolioPage') return
+      // Strip leading/trailing slashes → "startups-tech" or "he/startups-tech"
+      const uri = (n.uri ?? '').replace(/^\/+|\/+$/g, '')
+      if (!uri) return
+
+      // Hebrew pages have URI like "he/startups-tech" or "he/אפליקציות-מובייל"
+      if (uri.startsWith('he/')) {
+        const slug = uri.slice(3) // remove "he/" prefix
+        if (slug) params.push({ locale: 'he', slug })
+      } else {
+        params.push({ locale: defaultLocale, slug: uri })
       }
-      return []
     })
-    // Portfolio pages are English-only for now; emit them under the default locale.
-    return slugs.map((slug) => ({ locale: defaultLocale, slug }))
+
+    return params
   } catch {
-    // Build emits no portfolio routes rather than crashing.
     return []
   }
 }
 
-async function getPortfolioData(slug: string): Promise<PortfolioFields | null> {
+// Reconstruct the WordPress URI from locale + slug
+function buildUri(slug: string, locale: string): string {
+  return locale === 'he' ? `he/${slug}` : slug
+}
+
+async function getPortfolioData(slug: string, locale: string): Promise<PortfolioFields | null> {
   try {
     const { data } = await client.query({
       query: PORTFOLIO_PAGE_QUERY,
-      variables: { uri: slug },
+      variables: { uri: buildUri(slug, locale) },
     })
     return data?.page?.template?.portfolioFields ?? null
   } catch {
@@ -67,11 +79,11 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
 }
 
 export default async function PortfolioSlugPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
-  const { slug } = await params
-  const [pf, ts] = await Promise.all([getPortfolioData(slug), getThemeSettings()])
+  const { slug, locale } = await params
+  const [pf, ts] = await Promise.all([getPortfolioData(slug, locale), getThemeSettings()])
 
   // Empty/failed fetch, or a page not actually on the portfolio template.
   if (!pf || Object.keys(pf).length === 0) notFound()
 
-  return <PortfolioTemplate pf={pf} ts={ts} />
+  return <PortfolioTemplate pf={pf} ts={ts} locale={locale} />
 }

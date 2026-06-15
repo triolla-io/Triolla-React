@@ -18,7 +18,8 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
+export function PortfolioTemplate({ pf, ts, locale = 'en' }: { pf: any; ts: any; locale?: string }) {
+  const isRtl = locale === 'he'
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress
       ? {
