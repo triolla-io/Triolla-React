@@ -9,6 +9,7 @@ import { ContactCTA } from '@/components/ContactCTA'
 import { WhyUsSection } from '@/components/WhyUsSection'
 import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
+import { FloatingCta } from '@/components/FloatingCta'
 import { GrainOverlay, GlowOrb, Eyebrow } from '@/components/ui'
 import { client } from '@/lib/apollo-client'
 import { GET_HOME_PAGE_BY_URI, GET_THEME_SETTINGS } from '@/lib/queries'
@@ -159,6 +160,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <div className="scroll-cue__line" />
           <span className="scroll-cue__label">{`Scroll`}</span>
         </div>
+        {/* Floating mobile CTA — sentinel placed here so CTA appears once hero exits viewport */}
+        <FloatingCta href="/contact-us" label="Let's Talk" />
       </section>
 
       {/* ══════════════════════════════════════════════
