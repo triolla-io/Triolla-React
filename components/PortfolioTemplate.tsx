@@ -172,14 +172,14 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       {/* ════════════════════════════════════════════
           HERO
       ════════════════════════════════════════════ */}
-      <section className="relative flex flex-col justify-end pt-32 pb-16 overflow-hidden">
+      <section className="relative flex flex-col justify-center min-h-[56vh] md:min-h-[62vh] pt-20 md:pt-28 pb-12 md:pb-16 overflow-hidden">
         <div className="cs-hero-dots absolute inset-0 z-0" />
         <div className="cs-hero-glow absolute inset-0 z-0 pointer-events-none" />
 
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-10 w-full">
           <FadeIn delay={0.05} yOffset={20}>
             <span
-              className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-full mb-8"
+              className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-full mb-6"
               style={{
                 background: 'color-mix(in srgb, var(--accent) 9.4%, transparent)',
                 color: 'var(--accent)',
@@ -191,30 +191,28 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           </FadeIn>
 
           <FadeIn delay={0.12} yOffset={30}>
-            <h1 className="text-[clamp(68px,11.5vw,180px)] font-black tracking-[-0.03em] leading-[0.88] mb-12 text-white">
+            <h1 className="text-[clamp(48px,10vw,160px)] font-black tracking-[-0.03em] leading-[0.9] mb-8 text-white">
               {pf.headerTitle}
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.22} yOffset={20}>
-            <div className="flex justify-end border-t border-white/10 pt-8">
-              <a
-                href="#portfolio"
-                className="inline-flex items-center gap-2.5 text-[13px] font-bold tracking-[0.06em] uppercase px-7 py-3.5 rounded-full shrink-0 transition-opacity hover:opacity-80"
-                style={{ background: 'var(--accent)', color: '#000' }}
-              >
-                {pf.buttonText}
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path
-                    d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
-            </div>
+            <a
+              href="#portfolio"
+              className="inline-flex items-center gap-2.5 text-[13px] font-bold tracking-[0.06em] uppercase px-7 py-3.5 rounded-full shrink-0 transition-opacity hover:opacity-80"
+              style={{ background: 'var(--accent)', color: '#000' }}
+            >
+              {pf.buttonText}
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                  d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
           </FadeIn>
         </div>
       </section>
@@ -222,47 +220,48 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       {/* ════════════════════════════════════════════
           INTRO
       ════════════════════════════════════════════ */}
-      <section className="py-28 max-w-[1400px] mx-auto px-6 lg:px-10 border-t border-white/[0.07]">
-        <FadeIn className="mb-8">
-          <h2 className="text-[clamp(28px,3.8vw,52px)] font-bold tracking-tight leading-[1.1] text-white max-w-3xl">{pf.boldText}</h2>
+      <section className="pt-10 pb-14 md:pt-16 md:pb-20 max-w-[1400px] mx-auto px-6 lg:px-10">
+        <FadeIn className="mb-6">
+          <h2 className="text-[clamp(24px,3.4vw,48px)] font-bold tracking-tight leading-[1.1] text-white max-w-3xl">{pf.boldText}</h2>
         </FadeIn>
-        <FadeIn delay={0.1} className="mb-4">
-          <p className="text-[19px] leading-relaxed text-gray-300 font-medium max-w-3xl">{pf.shortText}</p>
+        <FadeIn delay={0.1} className="mb-3">
+          <p className="text-[17px] md:text-[19px] leading-relaxed text-gray-300 font-medium max-w-3xl">{pf.shortText}</p>
         </FadeIn>
         <FadeIn delay={0.18}>
           {/* WP-sourced HTML — trusted backend only */}
-          <div className="text-[16px] leading-[1.85] text-gray-400 max-w-3xl">{parse(pf.moreText ?? '')}</div>
+          <div className="text-[15px] md:text-[16px] leading-[1.85] text-gray-400 max-w-3xl">{parse(pf.moreText ?? '')}</div>
         </FadeIn>
       </section>
 
       {/* ════════════════════════════════════════════
           MARQUEE BANNER
       ════════════════════════════════════════════ */}
-      <div className="overflow-hidden border-t border-b border-white/[0.07] py-5">
-        <Marquee
-          items={companies}
-          repeat={2}
-          speed={40}
-          renderItem={(c: any, i: number) => (
-            <span key={i} className="text-[13px] font-semibold tracking-[0.06em] uppercase text-gray-600 mx-6 shrink-0">
-              {c.companyName}
-              <span className="ml-12 text-gray-800">·</span>
-            </span>
-          )}
-        />
-      </div>
+      {companies.length > 0 && (
+        <div className="overflow-hidden border-y border-white/[0.05] py-4">
+          <Marquee
+            items={companies}
+            repeat={2}
+            speed={40}
+            renderItem={(c: any, i: number) => (
+              <span key={i} className="text-[12px] font-semibold tracking-[0.06em] uppercase text-gray-700 mx-6 shrink-0">
+                {c.companyName}
+                <span className="ml-10 text-gray-800">·</span>
+              </span>
+            )}
+          />
+        </div>
+      )}
 
       {/* ════════════════════════════════════════════
-          PORTFOLIO CASE STUDIES
+          PORTFOLIO CASE STUDIES — stat + showcase
       ════════════════════════════════════════════ */}
-      <section id="portfolio" className="max-w-[1400px] mx-auto px-6 lg:px-10 border-t border-white/[0.07]">
-        {/* ── Stat title ── */}
-        <FadeIn className="pt-20 pb-10 text-center">
+      <section id="portfolio" className="max-w-[1400px] mx-auto px-6 lg:px-10">
+        <FadeIn className="pt-12 pb-8 md:pt-16 md:pb-10 text-center">
           <div className="cs-stat-num">
             <CountUpNumber target={50} suffix="+" duration={1800} />
           </div>
           <span className="cs-stat-line" aria-hidden="true" />
-          <p className="text-[clamp(22px,3.2vw,44px)] font-bold tracking-tight text-white leading-tight">
+          <p className="text-[clamp(20px,3vw,40px)] font-bold tracking-tight text-white leading-tight">
             {(pf.partnerWithUsText ?? '').replace(/^\d+\+?\s*/, '')}
           </p>
         </FadeIn>
@@ -287,8 +286,8 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
       {/* ════════════════════════════════════════════
           WHY CHOOSE US
       ════════════════════════════════════════════ */}
-      <section className="py-28 max-w-[1400px] mx-auto px-6 lg:px-10 border-t border-white/[0.07]">
-        <FadeIn className="mb-16">
+      <section className="py-12 md:py-20 max-w-[1400px] mx-auto px-6 lg:px-10">
+        <FadeIn className="mb-8 md:mb-14">
           {/* WP-sourced HTML — trusted backend only */}
           <h2 className="text-[clamp(36px,5vw,70px)] font-black tracking-[-0.03em] leading-tight">{parse(pf.whyDoHeading ?? '')}</h2>
         </FadeIn>
