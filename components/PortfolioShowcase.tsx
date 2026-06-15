@@ -43,7 +43,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
   if (!items.length) return null
 
   return (
-    <section className="relative border-t border-white/[0.07]" style={{ '--accent': accentColor } as React.CSSProperties}>
+    <section className="relative" style={{ '--accent': accentColor } as React.CSSProperties}>
       <style>{`
         /* ─── Image crossfade (left, sticky) ───────── */
         .ps-img {
@@ -69,12 +69,13 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
           pointer-events: none;
         }
 
-        /* ─── Panel content reveal ─────────────────── */
+        /* ─── Panel content reveal (anti-gravity) ──── */
         .ps-item {
-          transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2,1,0.3,1);
+          transition: opacity 0.55s cubic-bezier(0.23,1,0.32,1),
+                      transform 0.55s cubic-bezier(0.23,1,0.32,1);
         }
         .ps-item-on  { opacity: 1; transform: none; }
-        .ps-item-off { opacity: 0; transform: translateY(30px); }
+        .ps-item-off { opacity: 0; transform: translateY(24px); }
 
         /* ─── Tag pills ────────────────────────────── */
         .ps-tag {
@@ -105,7 +106,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
         .ps-bar { transform-origin: left; animation: ps-bar 0.5s ease-out forwards; }
       `}</style>
 
-      <div className="lg:grid lg:grid-cols-[48fr_52fr]">
+      <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none' }}>
         {/* ═══ LEFT — sticky crossfading image ═══ */}
         <div className="hidden lg:block">
           <div className="sticky top-0 h-screen overflow-hidden bg-[#0b0b0b]">
@@ -210,7 +211,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                 ref={(el) => {
                   panelRefs.current[i] = el
                 }}
-                className="min-h-screen flex flex-col justify-center py-24 px-7 sm:px-10 lg:px-16 relative border-b border-white/6 last:border-b-0"
+                className="md:min-h-screen flex flex-col justify-center py-10 md:py-24 px-5 sm:px-8 lg:px-16 relative"
               >
                 {/* Ghost number */}
                 <div
@@ -227,10 +228,10 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                 {/* Mobile image */}
                 {item.pImage?.node?.sourceUrl && (
                   <div
-                    className="lg:hidden mb-10 rounded-[24px] overflow-hidden"
+                    className="lg:hidden mb-6 rounded-2xl overflow-hidden"
                     style={{
                       aspectRatio: '16/10',
-                      boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
+                      boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
                     }}
                   >
                     <img
@@ -244,7 +245,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
 
                 <div className="relative z-10 max-w-[560px]">
                   {/* Index + accent bar */}
-                  <div className="flex items-end gap-5 mb-9">
+                  <div className="flex items-end gap-4 mb-5 md:mb-9">
                     <span
                       className="font-black tabular-nums leading-none"
                       style={{

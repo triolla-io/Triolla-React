@@ -161,6 +161,13 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           transform: scale(1.06);
         }
 
+        /* ─── Mobile overrides ──────────────────────── */
+        @media (max-width: 768px) {
+          .cs-why-card { padding: 24px 20px 22px; border-radius: 16px; }
+          .cs-stat-num { font-size: clamp(72px, 20vw, 180px); }
+          .cs-stat-line { height: 48px; margin: 18px auto; }
+        }
+
         /* ─── CTA strip ──────────────────────────── */
         .cs-cta-strip {
           background: linear-gradient(135deg, #111 0%, #0d0d0d 100%);
@@ -177,7 +184,7 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         <div className="cs-hero-glow absolute inset-0 z-0 pointer-events-none" />
 
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-10 w-full">
-          <FadeIn delay={0.05} yOffset={20}>
+          <FadeIn delay={0.05} yOffset={24} duration={0.55}>
             <span
               className="inline-flex items-center gap-2 text-[13px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-full mb-6"
               style={{
@@ -190,13 +197,13 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
             </span>
           </FadeIn>
 
-          <FadeIn delay={0.12} yOffset={30}>
+          <FadeIn delay={0.1} yOffset={32} duration={0.7}>
             <h1 className="text-[clamp(48px,10vw,160px)] font-black tracking-[-0.03em] leading-[0.9] mb-8 text-white">
               {pf.headerTitle}
             </h1>
           </FadeIn>
 
-          <FadeIn delay={0.22} yOffset={20}>
+          <FadeIn delay={0.2} yOffset={20} duration={0.55}>
             <a
               href="#portfolio"
               className="inline-flex items-center gap-2.5 text-[13px] font-bold tracking-[0.06em] uppercase px-7 py-3.5 rounded-full shrink-0 transition-opacity hover:opacity-80"
