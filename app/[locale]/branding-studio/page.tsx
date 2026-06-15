@@ -9,6 +9,7 @@ import { FadeIn } from '@/components/FadeIn'
 import { WpContent } from '@/lib/wp-content'
 import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import type { GetBrandingStudioData, GetThemeSettingsData, ServiceDetailPage, ThemeOptions } from '@/lib/graphql-types'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 
 const BRANDING_QUERY: TypedDocumentNode<GetBrandingStudioData> = gql`
   ${GET_BRANDING_STUDIO}
@@ -18,9 +19,9 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
 `
 
-async function getBranding(): Promise<ServiceDetailPage | null> {
+async function getBranding(uri: string): Promise<ServiceDetailPage | null> {
   try {
-    const { data } = await client.query({ query: BRANDING_QUERY })
+    const { data } = await client.query({ query: BRANDING_QUERY, variables: { uri } })
     return data?.page ?? null
   } catch {
     return null
@@ -37,12 +38,14 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const page = await getBranding()
+  const page = await getBranding(PAGE_URI.brandingStudio.en)
   return { title: page?.title ? `${page.title} | Triolla` : 'Branding & Studio | Triolla' }
 }
 
-export default async function BrandingStudioPage() {
-  const [page, ts] = await Promise.all([getBranding(), getThemeSettings()])
+export default async function BrandingStudioPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const [page, ts] = await Promise.all([getBranding(PAGE_URI.brandingStudio[loc]), getThemeSettings()])
   if (!page || (!page.title && !page.content)) notFound()
 
   const title = page.title ?? ''
