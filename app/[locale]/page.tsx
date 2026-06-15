@@ -11,7 +11,7 @@ import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
 import { FloatingCta } from '@/components/FloatingCta'
 import { GrainOverlay, GlowOrb, Eyebrow } from '@/components/ui'
-import { client, getLocalizedClient } from '@/lib/apollo-client'
+import { client } from '@/lib/apollo-client'
 import { GET_HOME_PAGE_BY_URI, GET_THEME_SETTINGS } from '@/lib/queries'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
@@ -109,7 +109,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
   })
 
-  const faqSource = localizedTs ?? ts
   const faqHeading = localizedTs?.faqHeading ?? ts?.faqHeading ?? null
   const faqShortText = localizedTs?.faqShortText ?? ts?.faqShortText ?? null
   const faqItems = ((localizedTs?.questionAnswerList ?? ts?.questionAnswerList) ?? []).flatMap((q: { fQuestion: string | null; fAnswer: string | null }) => {
