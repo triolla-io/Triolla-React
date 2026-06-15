@@ -318,8 +318,8 @@ export default async function ServicesPage() {
               </div>
             )}
 
-            {/* Left: image collage (desktop only) */}
-            <div className="svc-prod__gallery max-md:hidden">
+            {/* Left: image collage (desktop only, hidden via CSS on mobile) */}
+            <div className="svc-prod__gallery">
               {prodImages[0] && (
                 <div className="svc-img-card svc-img-card--featured">
                   <img src={wpImg(prodImages[0]) ?? ''} alt="" className="svc-img-card__img" />
@@ -735,74 +735,70 @@ export default async function ServicesPage() {
           .section-head { margin-bottom: 24px; }
           .section-head__title { font-size: clamp(1.8rem, 7vw, 3.2rem) !important; line-height: 1.08 !important; }
 
-          /* ── Mobile collage — relative stack with overlap ── */
+          /* ── Mobile collage ── */
           .svc-mobile-collage {
-            padding: 8px 4px 24px;
+            overflow: hidden; /* clip rotation bleed */
+            padding: 4px 4px 24px;
           }
-
-          /* Card A — large, left-leaning, back */
+          /* A — dominant, left-anchored */
           .svc-mc-card--a {
             position: relative;
-            width: 86%;
+            width: 80%;
             aspect-ratio: 4/3;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 20px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+            border-radius: 18px; overflow: hidden;
+            box-shadow: 0 18px 52px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,255,255,0.05);
             z-index: 2;
             animation: svcMcA 7s ease-in-out infinite,
                        svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.05s both;
           }
-
-          /* Card B — overlaps A from the right */
+          /* B — overlaps from right */
           .svc-mc-card--b {
             position: relative;
-            width: 72%;
+            width: 66%;
             aspect-ratio: 4/3;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-top: -52px;
+            border-radius: 15px; overflow: hidden;
+            margin-top: -48px;
             margin-left: auto;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
+            margin-right: 4px;
+            box-shadow: 0 14px 44px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
             z-index: 3;
             animation: svcMcB 9s ease-in-out 1.2s infinite,
                        svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.14s both;
           }
-
-          /* Card C — smallest, front-left, overlaps bottom of B */
+          /* C — square, front-left */
           .svc-mc-card--c {
             position: relative;
-            width: 50%;
+            width: 46%;
             aspect-ratio: 1/1;
-            border-radius: 14px;
-            overflow: hidden;
-            margin-top: -36px;
-            margin-left: 12px;
-            box-shadow: 0 10px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(250,204,21,0.12);
+            border-radius: 14px; overflow: hidden;
+            margin-top: -32px;
+            margin-left: 14px;
+            box-shadow: 0 10px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(250,204,21,0.12);
             z-index: 4;
             animation: svcMcC 11s ease-in-out 0.5s infinite,
                        svcMcIn 0.7s cubic-bezier(0.23,1,0.32,1) 0.24s both;
           }
-
           .svc-mc-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
           @keyframes svcMcA {
-            0%,100% { transform: rotate(-2.2deg) translateY(0); }
-            50%      { transform: rotate(-1.5deg) translateY(-9px); }
+            0%,100% { transform: rotate(-2deg) translateY(0); }
+            50%      { transform: rotate(-1.3deg) translateY(-8px); }
           }
           @keyframes svcMcB {
-            0%,100% { transform: rotate(2.4deg) translateY(0); }
-            50%      { transform: rotate(1.7deg) translateY(-7px); }
+            0%,100% { transform: rotate(2.2deg) translateY(0); }
+            50%      { transform: rotate(1.5deg) translateY(-6px); }
           }
           @keyframes svcMcC {
-            0%,100% { transform: rotate(-0.8deg) translateY(0); }
-            50%      { transform: rotate(-0.2deg) translateY(-5px); }
+            0%,100% { transform: rotate(-0.7deg) translateY(0); }
+            50%      { transform: rotate(-0.1deg) translateY(-5px); }
           }
           @keyframes svcMcIn {
             from { opacity: 0; transform: translateY(26px); }
             to   { opacity: 1; transform: translateY(0); }
           }
 
-          /* Hide desktop gallery rows on mobile */
+          /* Hide desktop gallery on mobile via CSS (Tailwind max-md: unreliable in v4) */
+          .svc-prod__gallery,
           .svc-prod__row,
           .svc-prod__icons { display: none; }
           .svc-img-card:hover { transform: none; }
