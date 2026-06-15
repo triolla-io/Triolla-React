@@ -31,5 +31,15 @@ export const htmlLang: Record<Locale, string> = {
  * Extend this map (keyed by a stable route id) as more pages are localized.
  */
 export const PAGE_URI: Record<string, Record<Locale, string>> = {
-  home: { en: '/', he: 'home-new-he' },
+  home:            { en: '/',                        he: 'home-new-he' },
+  aboutUs:         { en: 'about-us',                 he: 'about' },
+  services:        { en: 'services',                 he: 'השירותים-שלנו' },
+  contactUs:       { en: 'contact-us',               he: 'contact-us' },
+  careers:         { en: 'careers',                  he: 'קריירה' },
+  technology:      { en: 'technology',               he: 'technology' },
+  brandingStudio:  { en: 'branding-studio',          he: 'מיתוג-וסטודיו' },
+  blog:            { en: '/blog/',                   he: 'בלוג' },
+  privacyPolicy:   { en: 'privacy-policy',           he: 'מדיניות-פרטיות' },
+  accessibility:   { en: 'accessibility-statement',  he: 'הצהרת-נגישות' },
+  termsOfUse:      { en: 'terms-of-use',             he: 'תנאי-שימוש' },
 }
