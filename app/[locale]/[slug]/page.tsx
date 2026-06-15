@@ -1,6 +1,6 @@
 import { client } from '@/lib/apollo-client'
 import { GET_PORTFOLIO_PAGE, GET_PORTFOLIO_SLUGS, GET_THEME_SETTINGS } from '@/lib/queries'
-import { defaultLocale } from '@/lib/i18n'
+import { locales } from '@/lib/i18n'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import { notFound } from 'next/navigation'
@@ -37,8 +37,8 @@ export async function generateStaticParams() {
       }
       return []
     })
-    // Portfolio pages are English-only for now; emit them under the default locale.
-    return slugs.map((slug) => ({ locale: defaultLocale, slug }))
+    // Emit each slug under every locale so /he/cyber-security works too.
+    return slugs.flatMap((slug) => locales.map((locale) => ({ locale, slug })))
   } catch {
     // Build emits no portfolio routes rather than crashing.
     return []
