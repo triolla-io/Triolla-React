@@ -80,6 +80,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   const whyTitle = stripHtml(hp.abthretitle ?? '')
   const whyText = stripHtml(hp.abtthretext ?? '')
+  const whyCtaText = hp.abthrebuttonText ?? null
+  const whyCtaLink = hp.abthrebuttonLink ?? '/contact-us'
   const serviceCards = hp.abthrelist ?? []
 
   const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap((item: { cLogo: WPImage | null }) => {
@@ -169,7 +171,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* ══════════════════════════════════════════════
           WHY US SECTION
       ══════════════════════════════════════════════ */}
-      <WhyUsSection title={whyTitle} text={whyText} cards={serviceCards} ctaText="Partner with us" ctaLink="/contact-us" />
+      <WhyUsSection title={whyTitle} text={whyText} cards={serviceCards} ctaText={whyCtaText} ctaLink={whyCtaLink} />
 
       {/* ══════════════════════════════════════════════
           AWARDS SECTION

@@ -147,6 +147,8 @@ export interface HomePageFields {
   wboxes: { wboxTitle: string; winImg: WPImage | null }[] | null
   abthretitle: string | null
   abtthretext: string | null
+  abthrebuttonText: string | null
+  abthrebuttonLink: string | null
   abthrelist:
     | {
         abteintitle: string | null

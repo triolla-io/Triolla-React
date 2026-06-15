@@ -114,6 +114,8 @@ export const GET_HOME_PAGE_BY_URI = `
             wboxes { wboxTitle winImg { node { sourceUrl } } }
             abthretitle
             abtthretext
+            abthrebuttonText
+            abthrebuttonLink
             abthrelist {
               abteintitle
               abthreintext
