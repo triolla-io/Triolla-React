@@ -1,5 +1,6 @@
 import { client } from '@/lib/apollo-client'
 import { GET_ABOUT_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import Link from 'next/link'
@@ -32,9 +33,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getAboutData(): Promise<AboutPageFields> {
+async function getAboutData(uri: string): Promise<AboutPageFields> {
   try {
-    const { data } = await client.query({ query: ABOUT_PAGE_QUERY })
+    const { data } = await client.query({ query: ABOUT_PAGE_QUERY, variables: { uri } })
     return data?.page?.template?.aboutPage ?? ({} as AboutPageFields)
   } catch {
     return {} as AboutPageFields
@@ -50,8 +51,10 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export default async function AboutUsPage() {
-  const [ap, ts] = await Promise.all([getAboutData(), getThemeSettings()])
+export default async function AboutUsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const [ap, ts] = await Promise.all([getAboutData(PAGE_URI.aboutUs[loc]), getThemeSettings()])
 
   const faqItems: { faqQuestion: string; faqAnswer: string }[] = ap.faqItems ?? []
   const clientLogos: { url: string; alt: string }[] = (ap.clientLogos ?? []).flatMap(
