@@ -191,6 +191,99 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           }
         }
 
+        /* ─── Portal button ──────────────────────── */
+        .cs-portal-btn {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          padding: 2px;
+          border-radius: 999px;
+          text-decoration: none;
+          background: transparent;
+          transition: transform 0.45s cubic-bezier(0.23,1,0.32,1),
+                      box-shadow 0.45s;
+          flex-shrink: 0;
+        }
+        .cs-portal-ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 999px;
+          background: conic-gradient(from 0deg,
+            var(--accent) 0deg,
+            transparent 120deg,
+            var(--accent) 240deg,
+            transparent 300deg,
+            var(--accent) 360deg
+          );
+          animation: cs-portal-spin 2.4s linear infinite;
+          opacity: 0;
+          transition: opacity 0.35s cubic-bezier(0.23,1,0.32,1);
+        }
+        .cs-portal-btn:hover .cs-portal-ring,
+        .cs-portal-btn:focus-visible .cs-portal-ring { opacity: 1; }
+        .cs-portal-inner {
+          position: relative;
+          z-index: 1;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 14px 28px;
+          border-radius: 999px;
+          background: var(--accent);
+          color: #000;
+          font-size: 13px;
+          font-weight: 800;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+          transition: background 0.35s;
+          white-space: nowrap;
+        }
+        .cs-portal-btn:hover {
+          transform: scale(1.05);
+          box-shadow:
+            0 0 36px color-mix(in srgb, var(--accent) 38%, transparent),
+            0 0 72px color-mix(in srgb, var(--accent) 14%, transparent);
+        }
+        .cs-portal-btn:hover .cs-portal-inner { background: #fff; }
+        @keyframes cs-portal-spin { to { transform: rotate(360deg); } }
+
+        /* ─── World seam ─────────────────────────── */
+        .cs-world-seam {
+          position: relative;
+          height: 1px;
+          pointer-events: none;
+        }
+        .cs-world-seam__line {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            to right,
+            transparent 0%,
+            color-mix(in srgb, var(--accent) 10%, transparent) 25%,
+            color-mix(in srgb, var(--accent) 22%, transparent) 50%,
+            color-mix(in srgb, var(--accent) 10%, transparent) 75%,
+            transparent 100%
+          );
+        }
+        .cs-world-seam__glow {
+          position: absolute;
+          left: 50%;
+          top: -18px;
+          transform: translateX(-50%);
+          width: 160px;
+          height: 36px;
+          background: radial-gradient(ellipse,
+            color-mix(in srgb, var(--accent) 14%, transparent) 0%,
+            transparent 70%
+          );
+          filter: blur(14px);
+          animation: cs-seam-pulse 3.5s ease-in-out infinite;
+        }
+        @keyframes cs-seam-pulse {
+          0%,100% { opacity: 0.55; transform: translateX(-50%) scaleX(1); }
+          50%      { opacity: 1;    transform: translateX(-50%) scaleX(1.5); }
+        }
+
         /* ─── CTA strip ──────────────────────────── */
         .cs-cta-strip {
           background: linear-gradient(135deg, #111 0%, #0d0d0d 100%);
@@ -227,25 +320,24 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
           </FadeIn>
 
           <FadeIn delay={0.2} yOffset={20} duration={0.55}>
-            <a
-              href="#portfolio"
-              className="inline-flex items-center gap-2.5 text-[13px] font-bold tracking-[0.06em] uppercase px-7 py-3.5 rounded-full shrink-0 transition-opacity hover:opacity-80"
-              style={{ background: 'var(--accent)', color: '#000' }}
-            >
-              {pf.buttonText}
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path
-                  d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+            <a href="#portfolio" className="cs-portal-btn">
+              <span className="cs-portal-ring" aria-hidden="true" />
+              <span className="cs-portal-inner">
+                {pf.buttonText}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
             </a>
           </FadeIn>
         </div>
       </section>
+
+      {/* World seam 1 — hero → intro */}
+      <div className="cs-world-seam" aria-hidden="true">
+        <span className="cs-world-seam__line" />
+        <span className="cs-world-seam__glow" />
+      </div>
 
       {/* ════════════════════════════════════════════
           INTRO
@@ -297,6 +389,12 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         </FadeIn>
       </section>
 
+      {/* World seam 2 — stat → showcase */}
+      <div className="cs-world-seam" aria-hidden="true">
+        <span className="cs-world-seam__line" />
+        <span className="cs-world-seam__glow" />
+      </div>
+
       {/* Sticky split-screen case studies — image left, copy scrolls right */}
       <PortfolioShowcase items={portfolioItems} accentColor={accentColor} />
 
@@ -313,10 +411,16 @@ export function PortfolioTemplate({ pf, ts }: { pf: any; ts: any }) {
         accentColor={accentColor}
       />
 
+      {/* World seam 3 — process → why */}
+      <div className="cs-world-seam" aria-hidden="true">
+        <span className="cs-world-seam__line" />
+        <span className="cs-world-seam__glow" />
+      </div>
+
       {/* ════════════════════════════════════════════
           WHY CHOOSE US
       ════════════════════════════════════════════ */}
-      <section className="py-12 md:py-20 max-w-[1400px] mx-auto px-6 lg:px-10">
+      <section className="py-12 md:py-20 max-w-[1400px] mx-auto px-6 lg:px-10" style={{ background: 'linear-gradient(180deg, #080808 0%, #060608 100%)' }}>
         <FadeIn className="mb-8 md:mb-14">
           <h2 className="text-[clamp(28px,6vw,70px)] font-black tracking-[-0.03em] leading-[1.05] gradient-text gradient-text--animate"
             style={{ '--gt-gradient': `linear-gradient(135deg, #fff 35%, var(--accent) 52%, #fff 68%)` } as React.CSSProperties}>
