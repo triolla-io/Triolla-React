@@ -1,6 +1,6 @@
 export const GET_SERVICES_PAGE = `
-  query GetServicesPage {
-    page(id: "services", idType: URI) {
+  query GetServicesPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
       template {
         ... on Template_ServicePage {
           servicePage {
@@ -129,8 +129,8 @@ export const GET_HOME_PAGE_BY_URI = `
 `
 
 export const GET_CONTACT_PAGE = `
-  query GetContactPage {
-    page(id: "contact-us", idType: URI) {
+  query GetContactPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
       title
       template {
         ... on Template_ContactPage {
@@ -167,8 +167,8 @@ export const GET_CONTENT_PAGE = `
 // Careers page — Template_CareerPage ACF. Hero (headerTitle/boldText/…), a job
 // list (jobsList repeater) and two image galleries (topImages, gImageList).
 export const GET_CAREERS_PAGE = `
-  query GetCareersPage {
-    page(id: "careers", idType: URI) {
+  query GetCareersPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
       template {
         ... on Template_CareerPage {
           careerFields {
@@ -204,8 +204,8 @@ export const GET_CAREERS_PAGE = `
 // promoted to its own standalone route. Pulls the title, hero image, the bold
 // lead (ACF topBoldText) and the body content HTML re-typeset on the page.
 export const GET_BRANDING_STUDIO = `
-  query GetBrandingStudio {
-    page(id: "branding-studio", idType: URI) {
+  query GetBrandingStudio($uri: ID!) {
+    page(id: $uri, idType: URI) {
       title
       featuredImage { node { sourceUrl altText } }
       content
@@ -377,8 +377,8 @@ export const GET_PORTFOLIO_PAGE = `
 `
 
 export const GET_ABOUT_PAGE = `
-  query GetAboutPage {
-    page(id: "about-us", idType: URI) {
+  query GetAboutPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
       template {
         ... on Template_AboutPage {
           aboutPage {
@@ -438,8 +438,8 @@ export const GET_ABOUT_PAGE = `
 `
 
 export const GET_TECHNOLOGY_PAGE = `
-  query GetTechnologyPage {
-    page(id: "technology", idType: URI) {
+  query GetTechnologyPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
       template {
         ... on Template_TechnologyPage {
           technologyPage {
@@ -525,8 +525,8 @@ export const GET_TECHNOLOGY_PAGE = `
 export const BLOG_PAGE_SIZE = 9
 
 export const GET_BLOG_PAGE = `
-  query GetBlogPage {
-    page(id: "/blog/", idType: URI) {
+  query GetBlogPage($uri: ID!) {
+    page(id: $uri, idType: URI) {
       template {
         ... on Template_BlogPage {
           blogPageFields {
