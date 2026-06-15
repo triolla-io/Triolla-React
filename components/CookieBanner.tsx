@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function CookieBanner() {
+  const pathname = usePathname()
+  const isHe = pathname === '/he' || pathname.startsWith('/he/')
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function CookieBanner() {
           <p>
             This website uses cookies to improve the user experience and display tailored content. By continuing to use the website, you
             agree to the{' '}
-            <Link href="/privacy-policy" className="text-yellow-400 hover:underline">
+            <Link href={isHe ? '/he/privacy-policy' : '/privacy-policy'} className="text-yellow-400 hover:underline">
               privacy policy
             </Link>
           </p>

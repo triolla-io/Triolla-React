@@ -14,7 +14,7 @@ import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/
 import parse from 'html-react-parser'
 import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
-import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
+import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
@@ -231,7 +231,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               {sp.buttonText && (
                 <FadeIn yOffset={20} delay={0.56}>
                   <Button
-                    href="/contact-us"
+                    href={localizeHref('/contact-us', loc)}
                     variant="primary"
                     style={
                       {
@@ -450,6 +450,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         heading={ts?.ourClientsHeading ?? null}
         bigText={ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
+        locale={loc}
       />
 
       {/* ══ FAQ ══ */}

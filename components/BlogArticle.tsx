@@ -5,8 +5,9 @@ import { WpContent } from '@/lib/wp-content'
 import { stripHtml, formatPostDate } from '@/lib/text'
 import type { SinglePost } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
+import { type Locale, localizeHref } from '@/lib/i18n'
 
-export function BlogArticle({ post }: { post: SinglePost }) {
+export function BlogArticle({ post, locale = 'en' }: { post: SinglePost; locale?: Locale }) {
   const title = post.title ? stripHtml(post.title) : null
   const date = formatPostDate(post.date)
   const imgUrl = post.featuredImage?.node?.sourceUrl ?? null
@@ -30,7 +31,7 @@ export function BlogArticle({ post }: { post: SinglePost }) {
 
       <article className="article-inner">
         <header className="article-head">
-          <Link href="/blog" className="article-back" aria-label="Back to blog">
+          <Link href={localizeHref('/blog', locale)} className="article-back" aria-label="Back to blog">
             <svg
               width="20"
               height="20"

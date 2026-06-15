@@ -9,7 +9,7 @@ import { FadeIn } from '@/components/FadeIn'
 import { WpContent } from '@/lib/wp-content'
 import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import type { GetBrandingStudioData, GetThemeSettingsData, ServiceDetailPage, ThemeOptions } from '@/lib/graphql-types'
-import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
+import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
 
 const BRANDING_QUERY: TypedDocumentNode<GetBrandingStudioData> = gql`
   ${GET_BRANDING_STUDIO}
@@ -115,7 +115,7 @@ export default async function BrandingStudioPage({ params }: { params: Promise<{
             {ctaText && (
               <FadeIn yOffset={20} delay={0.44}>
                 <Button
-                  href="/contact-us"
+                  href={localizeHref('/contact-us', loc)}
                   variant="primary"
                   style={{ '--btn-pad': '16px 34px', '--btn-gap': '10px', boxShadow: '0 4px 28px rgba(250,204,21,0.24)' } as React.CSSProperties}
                 >
@@ -174,7 +174,7 @@ export default async function BrandingStudioPage({ params }: { params: Promise<{
             <div className="brand-cta__inner">
               {title && <h2 className="brand-cta__title">{title}</h2>}
               <Button
-                href="/contact-us"
+                href={localizeHref('/contact-us', loc)}
                 variant="primary"
                 style={{ '--btn-pad': '17px 38px', '--btn-gap': '10px', boxShadow: '0 6px 32px rgba(250,204,21,0.28)' } as React.CSSProperties}
               >

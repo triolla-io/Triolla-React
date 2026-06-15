@@ -25,6 +25,18 @@ export const htmlLang: Record<Locale, string> = {
 }
 
 /**
+ * Prefix an internal path with `/he` when the locale is Hebrew.
+ * Strips the triolla.io domain from WordPress-sourced URLs first.
+ * External links (not starting with `/`) are returned unchanged.
+ */
+export function localizeHref(path: string, locale: Locale): string {
+  // Strip WP domain if present
+  const clean = path.replace(/^https?:\/\/triolla\.io/, '') || '/'
+  if (locale === 'en' || !clean.startsWith('/') || clean.startsWith('/he')) return clean
+  return clean === '/' ? '/he' : `/he${clean}`
+}
+
+/**
  * WordPress page URI per route, per locale, queried with `idType: URI`.
  * Verified live: en `/` and he `home-new-he` both resolve to
  * Template_HomePageNew with the homePage ACF field group.

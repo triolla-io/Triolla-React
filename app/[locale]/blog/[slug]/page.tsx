@@ -18,6 +18,7 @@ import { BlogPostCard } from '@/components/BlogPostCard'
 import { SectionReveal } from '@/components/SectionReveal'
 import { ContactCTA } from '@/components/ContactCTA'
 import { stripHtml } from '@/lib/text'
+import { isLocale, defaultLocale } from '@/lib/i18n'
 
 const POST_SLUGS_QUERY: TypedDocumentNode<GetPostSlugsData> = gql`
   ${GET_POST_SLUGS}
@@ -81,14 +82,15 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const post = await getPost(slug)
   return { title: post?.title ? `${stripHtml(post.title)} | Triolla` : 'Blog | Triolla' }
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export default async function BlogPostPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale, slug } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
   const [post, more, ts] = await Promise.all([getPost(slug), getMorePosts(), getThemeSettings()])
 
   if (!post || (!post.title && !post.content)) notFound()
@@ -98,7 +100,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <BlogArticle post={post} />
+      <BlogArticle post={post} locale={loc} />
 
       {related.length > 0 && (
         <section className="bg-[#080808] text-white">

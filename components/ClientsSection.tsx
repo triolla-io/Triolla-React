@@ -2,6 +2,7 @@ import React from 'react'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
 import { wpImg } from '@/lib/images'
+import { type Locale, localizeHref } from '@/lib/i18n'
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -19,9 +20,10 @@ interface ClientsSectionProps {
   bigText?: string | null
   ctaText?: string | null
   accentColor?: string
+  locale?: Locale
 }
 
-export function ClientsSection({ logos, heading, bigText, ctaText, accentColor = '#facc15' }: ClientsSectionProps) {
+export function ClientsSection({ logos, heading, bigText, ctaText, accentColor = '#facc15', locale = 'en' }: ClientsSectionProps) {
   if (logos.length === 0) return null
 
   const ac = accentColor
@@ -164,7 +166,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         <div className="text-center mt-12 relative z-10">
           <Button
             variant="primary"
-            href="/contact-us"
+            href={localizeHref('/contact-us', locale)}
             style={{ '--btn-pad': '14px 32px', background: 'var(--accent)' } as React.CSSProperties}
           >
             {ctaText}

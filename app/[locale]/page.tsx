@@ -228,6 +228,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         heading={ts?.ourClientsHeading ?? null}
         bigText={ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
+        locale={loc}
       />
 
       {/* ══════════════════════════════════════════════

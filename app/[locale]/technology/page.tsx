@@ -470,6 +470,7 @@ export default async function TechnologyPage({ params }: { params: Promise<{ loc
         bigText={ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
         accentColor={accentColor}
+        locale={loc}
       />
 
       {/* ════════════════════════════════════════════

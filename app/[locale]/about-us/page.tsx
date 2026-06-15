@@ -1,6 +1,6 @@
 import { client } from '@/lib/apollo-client'
 import { GET_ABOUT_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
-import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
+import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import Link from 'next/link'
@@ -68,9 +68,9 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
 
   // Showcase images for the carousel directly below the hero
   const showcaseImages = [
-    ap.abtopleftImageTop?.node?.sourceUrl,
-    ap.abtopleftImageTwo?.node?.sourceUrl,
-    ap.leftImageTopThree?.node?.sourceUrl,
+    wpImg(ap.abtopleftImageTop?.node?.sourceUrl),
+    wpImg(ap.abtopleftImageTwo?.node?.sourceUrl),
+    wpImg(ap.leftImageTopThree?.node?.sourceUrl),
   ].filter(Boolean) as string[]
 
   // Category strip at bottom of hero — derived from why-us card titles
@@ -172,7 +172,7 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
               {ap.buttonText && (
                 <FadeIn yOffset={20} delay={0.56}>
                   <Button
-                    href="/contact-us"
+                    href={localizeHref('/contact-us', loc)}
                     variant="primary"
                     style={
                       {
@@ -481,6 +481,7 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
         heading={ts?.ourClientsHeading ?? null}
         bigText={ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
+        locale={loc}
       />
 
       {/* ══ FAQ ══ */}

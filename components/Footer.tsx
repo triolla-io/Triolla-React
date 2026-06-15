@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { client } from '@/lib/apollo-client'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
+import { type Locale, defaultLocale, localizeHref as localizePath } from '@/lib/i18n'
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from '@/lib/queries'
 import { wpImg } from '@/lib/images'
 import { gql } from '@apollo/client'
@@ -119,7 +120,8 @@ function GlobeIcon() {
 
 /* ── Component ──────────────────────────────────────────── */
 
-export default async function Footer() {
+export default async function Footer({ locale = defaultLocale }: { locale?: Locale } = {}) {
+  const lp = (path: string) => localizePath(localizeHref(path), locale)
   const [ts, wpMenus, services] = await Promise.all([getThemeSettings(), getFooterMenus(), getAllServices()])
 
   // Map each resolved service detail page (URI path → index) so footer links
@@ -215,7 +217,7 @@ export default async function Footer() {
           Design) open the shared service-detail modal instead of navigating
           to pages that no longer exist on the new site.
       ══════════════════════════════════════════ */}
-      <FooterModalProvider services={services} ctaText={ts?.cButton ?? null} ctaLink="/contact-us">
+      <FooterModalProvider services={services} ctaText={ts?.cButton ?? null} ctaLink={lp('/contact-us')}>
         <div className="w-[90%] mx-auto py-6 md:py-16">
           <FooterNavAccordion
             navColumns={columns}
@@ -240,7 +242,7 @@ export default async function Footer() {
         <div className="w-[90%] mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             {/* Left: logo */}
-            <Link href="/">
+            <Link href={lp('/')}>
               {logoUrl ? <img src={wpImg(logoUrl) ?? ''} alt="Triolla" width={92} height={30} className="h-7 w-auto brightness-0 invert" /> : null}
             </Link>
 
@@ -250,7 +252,7 @@ export default async function Footer() {
               {privacyText && privacyLink && (
                 <>
                   {' | '}
-                  <Link href={localizeHref(privacyLink)} className="footer-bottom-link">
+                  <Link href={lp(privacyLink)} className="footer-bottom-link">
                     {privacyText}
                   </Link>
                 </>
@@ -258,7 +260,7 @@ export default async function Footer() {
               {termText && termLink && (
                 <>
                   {' | '}
-                  <Link href={localizeHref(termLink)} className="footer-bottom-link">
+                  <Link href={lp(termLink)} className="footer-bottom-link">
                     {termText}
                   </Link>
                 </>

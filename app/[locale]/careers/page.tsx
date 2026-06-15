@@ -8,7 +8,7 @@ import parse from 'html-react-parser'
 import { FadeIn } from '@/components/FadeIn'
 import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import type { GetCareersPageData, CareerFields } from '@/lib/graphql-types'
-import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
+import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
 
 const CAREERS_QUERY: TypedDocumentNode<GetCareersPageData> = gql`
   ${GET_CAREERS_PAGE}
@@ -119,7 +119,7 @@ export default async function CareersPage({ params }: { params: Promise<{ locale
           {cf.buttonText && (
             <FadeIn yOffset={20} delay={0.56}>
               <Button
-                href="/contact-us"
+                href={localizeHref('/contact-us', loc)}
                 variant="primary"
                 style={{ '--btn-pad': '16px 34px', '--btn-gap': '10px', boxShadow: '0 4px 28px rgba(250,204,21,0.24)' } as React.CSSProperties}
               >
