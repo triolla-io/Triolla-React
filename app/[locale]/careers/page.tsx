@@ -8,6 +8,7 @@ import parse from 'html-react-parser'
 import { FadeIn } from '@/components/FadeIn'
 import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import type { GetCareersPageData, CareerFields } from '@/lib/graphql-types'
+import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 
 const CAREERS_QUERY: TypedDocumentNode<GetCareersPageData> = gql`
   ${GET_CAREERS_PAGE}
@@ -23,9 +24,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getCareers(): Promise<CareerFields | null> {
+async function getCareers(uri: string): Promise<CareerFields | null> {
   try {
-    const { data } = await client.query({ query: CAREERS_QUERY })
+    const { data } = await client.query({ query: CAREERS_QUERY, variables: { uri } })
     return data?.page?.template?.careerFields ?? null
   } catch {
     return null
@@ -33,13 +34,15 @@ async function getCareers(): Promise<CareerFields | null> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const cf = await getCareers()
+  const cf = await getCareers(PAGE_URI.careers.en)
   const title = cf?.headerTitle ? stripHtml(cf.headerTitle) : null
   return { title: title ? `${title} | Triolla` : 'Careers | Triolla' }
 }
 
-export default async function CareersPage() {
-  const cf = await getCareers()
+export default async function CareersPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const cf = await getCareers(PAGE_URI.careers[loc])
   if (!cf) notFound()
 
   const heroTitle = stripHtml(cf.headerTitle ?? '')
