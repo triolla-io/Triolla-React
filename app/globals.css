@@ -49,6 +49,10 @@ body {
   font-family: var(--font-sans);
 }
 
+html {
+  overflow-x: hidden;
+}
+
 /* ───────────────────────── Canonical keyframes ───────────────────────── */
 
 @keyframes grain {
@@ -350,7 +354,7 @@ body {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: var(--mq-fade-w, 220px);
+    width: var(--mq-fade-w, clamp(48px, 8vw, 220px));
     z-index: 2;
     pointer-events: none;
   }
