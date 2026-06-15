@@ -70,12 +70,13 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
         }
 
         /* ─── Panel content reveal (anti-gravity) ──── */
-        .ps-item {
-          transition: opacity 0.55s cubic-bezier(0.23,1,0.32,1),
-                      transform 0.55s cubic-bezier(0.23,1,0.32,1);
-        }
+        /* Mobile: always visible — sticky split-screen only applies on lg+ */
+        .ps-item { transition: opacity 0.55s cubic-bezier(0.23,1,0.32,1), transform 0.55s cubic-bezier(0.23,1,0.32,1); }
         .ps-item-on  { opacity: 1; transform: none; }
-        .ps-item-off { opacity: 0; transform: translateY(24px); }
+        .ps-item-off { opacity: 1; transform: none; }
+        @media (min-width: 1024px) {
+          .ps-item-off { opacity: 0; transform: translateY(24px); }
+        }
 
         /* ─── Tag pills ────────────────────────────── */
         .ps-tag {
