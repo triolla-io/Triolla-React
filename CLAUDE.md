@@ -23,6 +23,12 @@ Apollo Client v4 in Server Components. Query strings live in `lib/queries.ts`; p
 
 Read `schema.graphql` before writing any query — never guess field names. Regenerate it after adding ACF fields: `npx get-graphql-schema https://triolla.io/graphql > schema.graphql`. ACF fields are camelCase in GraphQL. Image fields: `{ node { sourceUrl } }`. Repeater fields: arrays.
 
+### Internationalization (i18n)
+
+Bilingual via a `[locale]` route segment: English is the default (prefix-free URLs, internal `/en`), Hebrew is served under `/he/` (`dir="rtl"`). Config in `lib/i18n.ts`; `middleware.ts` keeps English URLs clean and redirects `/en/...`. Hebrew content lives in the SAME WordPress install (WPML) and is fetched through the existing WPGraphQL endpoint by the page's Hebrew slug — see `PAGE_URI` in `lib/i18n.ts`. Add a route's Hebrew slug there to localize it. Assets differ per locale and come from whatever WP returns for that page; render `null` when absent — never reuse the English asset.
+
+**Backend follow-up (not yet done):** Navigation menus and `themeSetting` are not translatable via WPGraphQL without the `wp-graphql-wpml` plugin. Until it is enabled, Header/Footer chrome renders English on `/he/`. Do not hardcode Hebrew chrome text.
+
 ### `use client` vs Server Components
 
 Pages (`app/**/page.tsx`) are Server Components. Client components: `HeaderClient`, `HeroHeadline`, `SectionReveal`, `FadeIn`, `CountUpNumber`, `CookieBanner`, `FAQAccordion`, `PortfolioGrid`. `Header`/`Footer` are Server Components.
