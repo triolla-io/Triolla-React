@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import Image from 'next/image'
 import { m } from 'motion/react'
 import { GlowOrb } from '@/components/ui'
 import { wpImg } from '@/lib/images'
@@ -111,13 +110,10 @@ export function GridImageSection({ imageUrl, imageMobileUrl }: GridImageSectionP
             {/* image viewport */}
             <div className="gi-viewport">
               <div className="gi-img-inner" ref={imgInnerRef}>
-                <Image
-                  src={wpImg(imageUrl) ?? imageUrl}
-                  alt="Selected work — Triolla design portfolio"
-                  fill
-                  className="gi-img"
-                  sizes="(max-width: 1400px) 100vw, 1400px"
-                />
+                <picture>
+                  {imageMobileUrl && <source media="(max-width: 640px)" srcSet={wpImg(imageMobileUrl) ?? undefined} />}
+                  <img src={wpImg(imageUrl) ?? ''} alt="Selected work — Triolla design portfolio" className="gi-img" loading="lazy" />
+                </picture>
               </div>
 
               {/* vignette + edge fades */}

@@ -1,8 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { client } from '@/lib/apollo-client'
-import { LocaleSwitcher } from '@/components/LocaleSwitcher'
-import { type Locale, defaultLocale, localizeHref as localizePath } from '@/lib/i18n'
+import type { Locale } from '@/lib/i18n'
+import { defaultLocale } from '@/lib/i18n'
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from '@/lib/queries'
 import { wpImg } from '@/lib/images'
 import { gql } from '@apollo/client'
@@ -122,7 +121,6 @@ function GlobeIcon() {
 /* ── Component ──────────────────────────────────────────── */
 
 export default async function Footer({ locale = defaultLocale }: { locale?: Locale } = {}) {
-  const lp = (path: string) => localizePath(localizeHref(path), locale)
   const [ts, wpMenus, services] = await Promise.all([getThemeSettings(), getFooterMenus(), getAllServices()])
 
   // Map each resolved service detail page (URI path → index) so footer links
@@ -202,7 +200,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
                       style={{ '--mi': i } as React.CSSProperties}
                       aria-label={label}
                     >
-                      <Image src={wpImg(src) ?? src} alt="" width={100} height={36} className="footer-mention__img" />
+                      <img src={wpImg(src) ?? ''} alt="" className="footer-mention__img" width={100} height={36} />
                     </a>
                   )
                 })}
@@ -218,7 +216,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
           Design) open the shared service-detail modal instead of navigating
           to pages that no longer exist on the new site.
       ══════════════════════════════════════════ */}
-      <FooterModalProvider services={services} ctaText={ts?.cButton ?? null} ctaLink={lp('/contact-us')}>
+      <FooterModalProvider services={services} ctaText={ts?.cButton ?? null} ctaLink="/contact-us">
         <div className="w-[90%] mx-auto py-6 md:py-16">
           <FooterNavAccordion
             navColumns={columns}
@@ -229,10 +227,11 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               nyPhone ? { label: nyLabel || 'NY Offices', href: `tel:${nyPhone.replace(/[^+\d]/g, '')}`, display: nyPhone } : null,
             ].filter((x): x is FooterContactItem => x !== null)}
             socialHeading="Social"
-            socialItems={socials.reduce<{ href: string; text: string }[]>((acc, s) => {
-              if (s.socialMediaLink && s.socialMediaText) acc.push({ href: s.socialMediaLink, text: s.socialMediaText })
-              return acc
-            }, [])}
+            socialItems={socials.flatMap((s) =>
+              s.socialMediaLink && s.socialMediaText
+                ? [{ href: s.socialMediaLink, text: s.socialMediaText }]
+                : []
+            )}
           />
         </div>
       </FooterModalProvider>
@@ -244,7 +243,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
         <div className="w-[90%] mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             {/* Left: logo */}
-            <Link href={lp('/')}>
+            <Link href="/">
               {logoUrl ? <img src={wpImg(logoUrl) ?? ''} alt="Triolla" width={92} height={30} className="h-7 w-auto brightness-0 invert" /> : null}
             </Link>
 
@@ -254,7 +253,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               {privacyText && privacyLink && (
                 <>
                   {' | '}
-                  <Link href={lp(privacyLink)} className="footer-bottom-link">
+                  <Link href={localizeHref(privacyLink)} className="footer-bottom-link">
                     {privacyText}
                   </Link>
                 </>
@@ -262,7 +261,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               {termText && termLink && (
                 <>
                   {' | '}
-                  <Link href={lp(termLink)} className="footer-bottom-link">
+                  <Link href={localizeHref(termLink)} className="footer-bottom-link">
                     {termText}
                   </Link>
                 </>
@@ -321,7 +320,19 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
             <div className="hidden md:flex items-center gap-5">
               <div className="footer-lang flex items-center gap-2">
                 <GlobeIcon />
-                <LocaleSwitcher />
+                <Link
+                  href="/"
+                  className={`footer-lang__opt${locale === 'en' ? ' footer-lang__opt--active' : ''}`}
+                >
+                  Eng
+                </Link>
+                <span className="footer-lang__sep">/</span>
+                <Link
+                  href="/he"
+                  className={`footer-lang__opt${locale === 'he' ? ' footer-lang__opt--active' : ''}`}
+                >
+                  Heb
+                </Link>
               </div>
               {sqlinkUrl && (
                 <a href={sqlinkUrl} target="_blank" rel="noopener noreferrer" className="footer-sqlink">

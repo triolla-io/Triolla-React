@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, m } from 'motion/react'
-import Image from 'next/image'
 import { wpImg } from '@/lib/images'
 
 export interface ChildItem {
@@ -38,23 +37,14 @@ function toHref(url: string): string {
   return url.replace(/^https?:\/\/triolla\.io/, '') || '/'
 }
 
-function makeLocalize(isHe: boolean) {
-  return (url: string): string => {
-    const path = toHref(url)
-    if (!isHe || !path.startsWith('/') || path.startsWith('/he')) return path
-    return path === '/' ? '/he' : `/he${path}`
-  }
-}
-
 const PROMO_PANEL_WIDTH = 900
 
-function DropdownItem({ item, pathname, isHe, menuPromoImage }: { item: NavItem; pathname: string; isHe: boolean; menuPromoImage: string | null }) {
+function DropdownItem({ item, pathname, menuPromoImage }: { item: NavItem; pathname: string; menuPromoImage: string | null }) {
   const [open, setOpen] = useState(false)
   const [rect, setRect] = useState<DOMRect | null>(null)
   const buttonRef = useRef<HTMLDivElement>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lp = makeLocalize(isHe)
-  const href = lp(item.url)
+  const href = toHref(item.url)
   const isActive = href !== '/' && pathname.startsWith(href)
 
   // Content-driven: promo pane shows only for the large (>6-child) dropdown.
@@ -193,7 +183,7 @@ function DropdownItem({ item, pathname, isHe, menuPromoImage }: { item: NavItem;
                       }}
                     >
                       <Link
-                        href={lp(child.url)}
+                        href={toHref(child.url)}
                         onClick={() => setOpen(false)}
                         className="group relative flex items-center gap-3 rounded-xl pl-4 pr-3 py-2.5 transition-colors duration-200 hover:bg-white/5 whitespace-nowrap"
                       >
@@ -312,8 +302,6 @@ export function HeaderClient({
   const [isTickerDismissed, setIsTickerDismissed] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
   const pathname = usePathname()
-  const isHe = pathname === '/he' || pathname.startsWith('/he/')
-  const lp = makeLocalize(isHe)
 
   useEffect(() => {
     let scrollTimer: ReturnType<typeof setTimeout> | null = null
@@ -363,9 +351,9 @@ export function HeaderClient({
           className="relative w-full flex items-center gap-4 bg-[#0a0a0a] text-white rounded-full border border-white/10 shadow-2xl shadow-black/40 px-5 h-[54px] overflow-hidden"
         >
           {/* Logo — always visible */}
-          <Link href={isHe ? '/he' : '/'} className="shrink-0 flex items-center">
+          <Link href="/" className="shrink-0 flex items-center">
             {logoUrl ? (
-              <Image src={wpImg(logoUrl) ?? logoUrl} alt="Triolla" width={120} height={20} className="h-5 w-auto brightness-0 invert" />
+              <img src={wpImg(logoUrl) ?? ''} alt="Triolla" className="h-5 w-auto brightness-0 invert" />
             ) : (
               <span className="text-[18px] font-bold tracking-tight text-white lowercase">triolla</span>
             )}
@@ -380,9 +368,9 @@ export function HeaderClient({
           >
             <nav className="flex items-center gap-6 flex-1 min-w-0 whitespace-nowrap">
               {navItems.map((item, i) => {
-                const href = lp(item.url)
+                const href = toHref(item.url)
                 if (item.children.length > 0) {
-                  return <DropdownItem key={`nav-${item.label}-${i}`} item={item} pathname={pathname} isHe={isHe} menuPromoImage={menuPromoImage} />
+                  return <DropdownItem key={`nav-${item.label}-${i}`} item={item} pathname={pathname} menuPromoImage={menuPromoImage} />
                 }
                 const isActive = pathname === href
                 return (
@@ -418,7 +406,7 @@ export function HeaderClient({
                 )}
                 {bookButtonHref && bookButtonText && (
                   <a
-                    href={lp(bookButtonHref)}
+                    href={toHref(bookButtonHref)}
                     target="_blank"
                     rel="noreferrer"
                     className="bg-blue-600 text-white rounded-full px-5 py-[7px] text-[13px] font-semibold hover:bg-blue-500 transition-colors flex items-center gap-1.5 whitespace-nowrap"
@@ -440,7 +428,7 @@ export function HeaderClient({
           {/* Contact us — always visible, anchored to right edge */}
           {contactButtonHref && contactButtonText && (
             <Link
-              href={lp(contactButtonHref)}
+              href={toHref(contactButtonHref)}
               className="hidden lg:block shrink-0 ml-2.5 bg-yellow-400 text-black rounded-full px-5 py-[7px] text-[13px] font-semibold hover:bg-yellow-300 transition-colors whitespace-nowrap"
             >
               {contactButtonText}
@@ -544,9 +532,9 @@ export function HeaderClient({
 
             {/* Header row */}
             <div className="relative z-10 flex items-center justify-between px-6 pt-5 pb-4 shrink-0">
-              <Link href={isHe ? '/he' : '/'} onClick={() => setIsMobileMenuOpen(false)}>
+              <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                 {logoUrl ? (
-                  <Image src={wpImg(logoUrl) ?? logoUrl} alt="Triolla" width={120} height={20} className="h-5 w-auto brightness-0 invert" />
+                  <img src={wpImg(logoUrl) ?? ''} alt="Triolla" className="h-5 w-auto brightness-0 invert" />
                 ) : (
                   <span className="text-[18px] font-bold tracking-tight text-white lowercase">triolla</span>
                 )}
@@ -582,7 +570,7 @@ export function HeaderClient({
                 className="flex flex-col gap-1"
               >
                 {mobileNavItems.map((item, i) => {
-                  const href = lp(item.url)
+                  const href = toHref(item.url)
                   const isActive = pathname === href
                   return (
                     <m.div
@@ -627,7 +615,7 @@ export function HeaderClient({
                           {item.children.map((child) => (
                             <Link
                               key={`${child.url}-${child.label}`}
-                              href={lp(child.url)}
+                              href={toHref(child.url)}
                               className="text-[12px] text-white/40 hover:text-white/70 transition-colors bg-white/5 hover:bg-white/8 px-3 py-1.5 rounded-full"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
@@ -654,7 +642,7 @@ export function HeaderClient({
               <div className="flex flex-col gap-3">
                 {contactButtonHref && contactButtonText && (
                   <Link
-                    href={lp(contactButtonHref)}
+                    href={toHref(contactButtonHref)}
                     className="flex items-center justify-center h-14 rounded-2xl bg-yellow-400 text-black font-bold text-[15px] tracking-tight hover:bg-yellow-300 transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -664,7 +652,7 @@ export function HeaderClient({
                 <div className="grid grid-cols-2 gap-3">
                   {bookButtonHref && bookButtonText && (
                     <a
-                      href={lp(bookButtonHref)}
+                      href={toHref(bookButtonHref)}
                       target="_blank"
                       rel="noreferrer"
                       className="flex items-center justify-center h-12 rounded-2xl bg-blue-600 text-white font-semibold text-[13px] hover:bg-blue-500 transition-colors"

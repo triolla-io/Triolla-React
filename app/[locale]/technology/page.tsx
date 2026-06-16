@@ -12,9 +12,6 @@ import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from '@/components/ui'
 import type { GetTechnologyPageData, GetThemeSettingsData, TechnologyPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
-import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
-import { JsonLd } from '@/components/JsonLd'
-import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
 
 const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
   ${GET_TECHNOLOGY_PAGE}
@@ -35,32 +32,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getTechData(uri: string, locale: string): Promise<TechnologyPageFields> {
+async function getTechData(): Promise<TechnologyPageFields> {
   try {
-    if (locale === 'he') {
-      // 'technology' slug is identical in EN and HE — URI fetch always returns English.
-      // Fetch the English page first to get the Hebrew translation's WordPress id,
-      // then refetch with DATABASE_ID to get the Hebrew content.
-      const { data: enData } = await client.query({
-        query: TECH_PAGE_QUERY,
-        variables: { id: PAGE_URI.technology.en, idType: 'URI' },
-      })
-      const heTrans = (enData?.page?.translations ?? []).find(
-        (t: { id: string | null; locale: string | null }) =>
-          t.locale === 'he_IL' || t.locale === 'he',
-      )
-      if (heTrans?.id) {
-        const { data } = await client.query({
-          query: TECH_PAGE_QUERY,
-          variables: { id: heTrans.id, idType: 'DATABASE_ID' },
-        })
-        return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields)
-      }
-    }
-    const { data } = await client.query({
-      query: TECH_PAGE_QUERY,
-      variables: { id: uri, idType: 'URI' },
-    })
+    const { data } = await client.query({ query: TECH_PAGE_QUERY })
     return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields)
   } catch {
     return {} as TechnologyPageFields
@@ -76,29 +50,8 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {
-  const { locale } = await params
-  const loc = isLocale(locale) ? locale : defaultLocale
-  const tp = await getTechData(PAGE_URI.technology[loc], loc)
-  const title = tp?.headerTitle ? `${stripHtml(tp.headerTitle)} | Triolla` : 'Technology | Triolla'
-  const description = stripHtml(tp?.headerSubText ?? tp?.fourtext ?? '') || undefined
-  return {
-    title,
-    ...(description ? { description } : {}),
-    alternates: { languages: { en: '/technology', he: '/he/technology' } },
-    openGraph: {
-      title,
-      ...(description ? { description } : {}),
-      locale: loc === 'he' ? 'he_IL' : 'en_US',
-      type: 'website',
-    },
-  }
-}
-
-export default async function TechnologyPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
-  const loc = isLocale(locale) ? locale : defaultLocale
-  const [tp, ts] = await Promise.all([getTechData(PAGE_URI.technology[loc], loc), getThemeSettings()])
+export default async function TechnologyPage() {
+  const [tp, ts] = await Promise.all([getTechData(), getThemeSettings()])
 
   /* Brand yellow — CMS headerBgColor resolved dark, making accent elements
      (eyebrow lines, hover labels, CTA pill) invisible. Hardcode brand color. */
@@ -185,21 +138,8 @@ export default async function TechnologyPage({ params }: { params: Promise<{ loc
     ts?.cAddressLabel && ts?.cAddress ? { label: ts.cAddressLabel, value: ts.cAddress, href: undefined } : null,
   ].filter((x): x is NonNullable<typeof x> => x !== null)
 
-  const techPath = loc === 'he' ? '/he/technology' : '/technology'
-  const techTitle = stripHtml(tp.headerTitle ?? '')
-  const techJsonLd = webPageSchema({
-    path: techPath,
-    name: techTitle || 'Technology',
-    description: tp.headerSubText ? stripHtml(tp.headerSubText) : null,
-  })
-  const techCrumbs = breadcrumbSchema(
-    [{ name: techTitle || 'Technology', path: techPath }],
-    loc === 'he' ? 'דף הבית' : 'Home',
-  )
-
   return (
     <main className="overflow-x-clip bg-[#080808] text-white pb-16 md:pb-32" style={{ '--accent': accentColor } as React.CSSProperties}>
-      {techJsonLd && <JsonLd data={[techJsonLd, techCrumbs]} />}
       <style>{`
         /* ─── Hero ──────────────────────────────────────── */
         .tech-hero-bg {
@@ -531,7 +471,6 @@ export default async function TechnologyPage({ params }: { params: Promise<{ loc
         bigText={ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
         accentColor={accentColor}
-        locale={loc}
       />
 
       {/* ════════════════════════════════════════════

@@ -1,6 +1,5 @@
 import { client } from '@/lib/apollo-client'
 import { GET_ABOUT_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
-import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import Link from 'next/link'
@@ -14,8 +13,6 @@ import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/
 import parse from 'html-react-parser'
 import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
-import { JsonLd } from '@/components/JsonLd'
-import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
 
 const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
   ${GET_ABOUT_PAGE}
@@ -35,9 +32,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getAboutData(uri: string): Promise<AboutPageFields> {
+async function getAboutData(): Promise<AboutPageFields> {
   try {
-    const { data } = await client.query({ query: ABOUT_PAGE_QUERY, variables: { uri } })
+    const { data } = await client.query({ query: ABOUT_PAGE_QUERY })
     return data?.page?.template?.aboutPage ?? ({} as AboutPageFields)
   } catch {
     return {} as AboutPageFields
@@ -53,29 +50,8 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {
-  const { locale } = await params
-  const loc = isLocale(locale) ? locale : defaultLocale
-  const ap = await getAboutData(PAGE_URI.aboutUs[loc])
-  const title = ap?.headerTitle ? `${stripHtml(ap.headerTitle)} | Triolla` : 'About Us | Triolla'
-  const description = stripHtml(ap?.boldText ?? ap?.shortText ?? '') || undefined
-  return {
-    title,
-    ...(description ? { description } : {}),
-    alternates: { languages: { en: '/about-us', he: '/he/about-us' } },
-    openGraph: {
-      title,
-      ...(description ? { description } : {}),
-      locale: loc === 'he' ? 'he_IL' : 'en_US',
-      type: 'website',
-    },
-  }
-}
-
-export default async function AboutUsPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
-  const loc = isLocale(locale) ? locale : defaultLocale
-  const [ap, ts] = await Promise.all([getAboutData(PAGE_URI.aboutUs[loc]), getThemeSettings()])
+export default async function AboutUsPage() {
+  const [ap, ts] = await Promise.all([getAboutData(), getThemeSettings()])
 
   const faqItems: { faqQuestion: string; faqAnswer: string }[] = ap.faqItems ?? []
   const clientLogos: { url: string; alt: string }[] = (ap.clientLogos ?? []).flatMap(
@@ -89,9 +65,9 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
 
   // Showcase images for the carousel directly below the hero
   const showcaseImages = [
-    wpImg(ap.abtopleftImageTop?.node?.sourceUrl),
-    wpImg(ap.abtopleftImageTwo?.node?.sourceUrl),
-    wpImg(ap.leftImageTopThree?.node?.sourceUrl),
+    ap.abtopleftImageTop?.node?.sourceUrl,
+    ap.abtopleftImageTwo?.node?.sourceUrl,
+    ap.leftImageTopThree?.node?.sourceUrl,
   ].filter(Boolean) as string[]
 
   // Category strip at bottom of hero — derived from why-us card titles
@@ -102,21 +78,8 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
     })
     .slice(0, 6)
 
-  const aboutPath = loc === 'he' ? '/he/about-us' : '/about-us'
-  const aboutJsonLd = webPageSchema({
-    path: aboutPath,
-    name: heroTitle || 'About Us',
-    description: ap.shortText ? stripHtml(ap.shortText) : null,
-    type: 'AboutPage',
-  })
-  const aboutCrumbs = breadcrumbSchema(
-    [{ name: heroTitle || 'About Us', path: aboutPath }],
-    loc === 'he' ? 'דף הבית' : 'Home',
-  )
-
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
-      {aboutJsonLd && <JsonLd data={[aboutJsonLd, aboutCrumbs]} />}
       {/* Grain overlay */}
       <GrainOverlay />
 
@@ -206,7 +169,7 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
               {ap.buttonText && (
                 <FadeIn yOffset={20} delay={0.56}>
                   <Button
-                    href={localizeHref('/contact-us', loc)}
+                    href="/contact-us"
                     variant="primary"
                     style={
                       {
@@ -515,7 +478,6 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
         heading={ts?.ourClientsHeading ?? null}
         bigText={ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
-        locale={loc}
       />
 
       {/* ══ FAQ ══ */}

@@ -14,9 +14,6 @@ import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/
 import parse from 'html-react-parser'
 import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
-import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
-import { JsonLd } from '@/components/JsonLd'
-import { breadcrumbSchema, serviceSchema } from '@/lib/jsonld'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
@@ -36,9 +33,9 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getServicesData(uri: string): Promise<ServicesPageFields> {
+async function getServicesData(): Promise<ServicesPageFields> {
   try {
-    const { data } = await client.query({ query: SERVICES_PAGE_QUERY, variables: { uri } })
+    const { data } = await client.query({ query: SERVICES_PAGE_QUERY })
     return data?.page?.template?.servicePage ?? ({} as ServicesPageFields)
   } catch {
     return {} as ServicesPageFields
@@ -54,29 +51,8 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {
-  const { locale } = await params
-  const loc = isLocale(locale) ? locale : defaultLocale
-  const sp = await getServicesData(PAGE_URI.services[loc])
-  const title = sp?.headerTitle ? `${stripHtml(sp.headerTitle)} | Triolla` : 'Services | Triolla'
-  const description = stripHtml(sp?.boldText ?? sp?.shortText ?? '') || undefined
-  return {
-    title,
-    ...(description ? { description } : {}),
-    alternates: { languages: { en: '/services', he: '/he/services' } },
-    openGraph: {
-      title,
-      ...(description ? { description } : {}),
-      locale: loc === 'he' ? 'he_IL' : 'en_US',
-      type: 'website',
-    },
-  }
-}
-
-export default async function ServicesPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
-  const loc = isLocale(locale) ? locale : defaultLocale
-  const [sp, ts] = await Promise.all([getServicesData(PAGE_URI.services[loc]), getThemeSettings()])
+export default async function ServicesPage() {
+  const [sp, ts] = await Promise.all([getServicesData(), getThemeSettings()])
 
   // Each menu link is normalized to { label, link } and enriched from its WP
   // detail page in parallel. Anything that doesn't resolve degrades to a plain
@@ -163,21 +139,8 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
     .filter((v): v is string => Boolean(v))
     .map(stripHtml)
 
-  const svcPath = loc === 'he' ? '/he/services' : '/services'
-  const svcJsonLd = serviceSchema({
-    name: heroTitle || 'Services',
-    description: sp.shortText ? stripHtml(sp.shortText) : null,
-    path: svcPath,
-    serviceType: 'Product Design & Development',
-  })
-  const svcCrumbs = breadcrumbSchema(
-    [{ name: heroTitle || 'Services', path: svcPath }],
-    loc === 'he' ? 'דף הבית' : 'Home',
-  )
-
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
-      {svcJsonLd && <JsonLd data={[svcJsonLd, svcCrumbs]} />}
       {/* Grain overlay */}
       <GrainOverlay />
 
@@ -265,7 +228,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               {sp.buttonText && (
                 <FadeIn yOffset={20} delay={0.56}>
                   <Button
-                    href={localizeHref('/contact-us', loc)}
+                    href="/contact-us"
                     variant="primary"
                     style={
                       {
@@ -505,7 +468,6 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         heading={ts?.ourClientsHeading ?? null}
         bigText={ts?.ourClientBigText ?? null}
         ctaText={ts?.cButton ?? null}
-        locale={loc}
       />
 
       {/* ══ FAQ ══ */}

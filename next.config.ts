@@ -1,10 +1,15 @@
 import type { NextConfig } from 'next'
 
+const WP_ORIGIN = 'https://triolla.io'
+
 const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'triolla.io' },
-    ],
+  async rewrites() {
+    return [
+      {
+        source: '/wp-content/:path*',
+        destination: `${WP_ORIGIN}/wp-content/:path*`,
+      },
+    ]
   },
 }
 

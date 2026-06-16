@@ -25,33 +25,11 @@ export const htmlLang: Record<Locale, string> = {
 }
 
 /**
- * Prefix an internal path with `/he` when the locale is Hebrew.
- * Strips the triolla.io domain from WordPress-sourced URLs first.
- * External links (not starting with `/`) are returned unchanged.
- */
-export function localizeHref(path: string, locale: Locale): string {
-  // Strip WP domain if present
-  const clean = path.replace(/^https?:\/\/triolla\.io/, '') || '/'
-  if (locale === 'en' || !clean.startsWith('/') || clean.startsWith('/he')) return clean
-  return clean === '/' ? '/he' : `/he${clean}`
-}
-
-/**
  * WordPress page URI per route, per locale, queried with `idType: URI`.
  * Verified live: en `/` and he `home-new-he` both resolve to
  * Template_HomePageNew with the homePage ACF field group.
  * Extend this map (keyed by a stable route id) as more pages are localized.
  */
 export const PAGE_URI: Record<string, Record<Locale, string>> = {
-  home:            { en: '/',                        he: 'home-new-he' },
-  aboutUs:         { en: 'about-us',                 he: 'about' },
-  services:        { en: 'services',                 he: 'השירותים-שלנו' },
-  contactUs:       { en: 'contact-us',               he: 'צור-קשר' },
-  careers:         { en: 'careers',                  he: 'קריירה' },
-  technology:      { en: 'technology',               he: 'technology' },
-  brandingStudio:  { en: 'branding-studio',          he: 'מיתוג-וסטודיו' },
-  blog:            { en: '/blog/',                   he: 'בלוג' },
-  privacyPolicy:   { en: 'privacy-policy',           he: 'מדיניות-פרטיות' },
-  accessibility:   { en: 'accessibility-statement',  he: 'הצהרת-נגישות' },
-  termsOfUse:      { en: 'terms-of-use',             he: 'תנאי-שימוש' },
+  home: { en: '/', he: 'home-new-he' },
 }

@@ -4,7 +4,6 @@
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
 import { wpImg } from '@/lib/images'
-import { sanitizeWpHtml } from '@/lib/text'
 
 function stripHtml(html: string): string {
   return (html ?? '').replace(/<[^>]+>/g, '').trim()
@@ -13,7 +12,6 @@ function stripHtml(html: string): string {
 interface PortfolioShowcaseProps {
   items: any[]
   accentColor: string
-  isRtl?: boolean
 }
 
 /**
@@ -22,7 +20,7 @@ interface PortfolioShowcaseProps {
  * panel enters the centre of the viewport (IntersectionObserver driven).
  * Mirrors the "WOW" scroll on the technology page (see TechStickyFeature).
  */
-export function PortfolioShowcase({ items, accentColor, isRtl = false }: PortfolioShowcaseProps) {
+export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const panelRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -107,19 +105,9 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
         /* ─── Accent progress bar ──────────────────── */
         @keyframes ps-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         .ps-bar { transform-origin: left; animation: ps-bar 0.5s ease-out forwards; }
-
-        /* ─── Reset WordPress float/inline images in body text ── */
-        .ps-body img {
-          float: none !important;
-          position: static !important;
-          display: block;
-          max-width: 100%;
-          height: auto;
-          margin: 12px 0;
-        }
       `}</style>
 
-      <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none', direction: 'ltr' }}>
+      <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none' }}>
         {/* ═══ LEFT — sticky crossfading image ═══ */}
         <div className="hidden lg:block">
           <div className="sticky top-0 h-screen overflow-hidden bg-[#0b0b0b]">
@@ -224,11 +212,11 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
                 ref={(el) => {
                   panelRefs.current[i] = el
                 }}
-                className="min-h-screen flex flex-col justify-center py-10 md:py-24 px-5 sm:px-8 lg:px-16 relative overflow-hidden"
+                className="md:min-h-screen flex flex-col justify-center py-10 md:py-24 px-5 sm:px-8 lg:px-16 relative"
               >
                 {/* Ghost number */}
                 <div
-                  className="absolute top-0 inset-e-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
+                  className="absolute top-0 right-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
                   style={{
                     fontSize: 'clamp(120px,20vw,240px)',
                     color: 'color-mix(in srgb, var(--accent) 2.7%, transparent)',
@@ -256,7 +244,7 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
                   </div>
                 )}
 
-                <div className="relative z-10 max-w-[560px]" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+                <div className="relative z-10 max-w-[560px]">
                   {/* Index + accent bar */}
                   <div className="flex items-end gap-4 mb-5 md:mb-9">
                     <span
@@ -308,14 +296,13 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
                     {/* Body */}
                     {item.sortText && (
                       <div
-                        className="ps-body leading-[1.85] mb-8"
+                        className="leading-[1.85] mb-8"
                         style={{
                           fontSize: '18px',
                           color: 'rgba(255,255,255,0.55)',
-                          overflow: 'hidden',
                         }}
                       >
-                        {parse(sanitizeWpHtml(item.sortText))}
+                        {parse(item.sortText)}
                       </div>
                     )}
 

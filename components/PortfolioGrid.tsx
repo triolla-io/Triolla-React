@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { m } from 'motion/react'
 import { EASE } from '@/lib/motion'
 import { wpImg } from '@/lib/images'
@@ -36,7 +35,7 @@ function MasonryColumn({ indices, delay, className = '' }: { indices: number[]; 
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.55, delay: delay + i * 0.08, ease: [...EASE.smooth] }}
           >
-            <Image src={wpImg(img.src) ?? img.src} alt={img.alt} width={800} height={600} className="w-full h-auto block" />
+            <img src={wpImg(img.src) ?? ''} alt={img.alt} className="w-full h-auto block" />
             <div className="shine-card__shine" aria-hidden="true" />
           </m.div>
         )

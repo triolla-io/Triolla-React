@@ -18,9 +18,6 @@ import { FadeIn } from '@/components/FadeIn'
 import { BlogPostGrid } from '@/components/BlogPostGrid'
 import { ContactCTA } from '@/components/ContactCTA'
 import { stripHtml, formatPostDate } from '@/lib/text'
-import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
-import { JsonLd } from '@/components/JsonLd'
-import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
 
 const BLOG_PAGE_QUERY: TypedDocumentNode<GetBlogPageData> = gql`
   ${GET_BLOG_PAGE}
@@ -34,21 +31,21 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
 
 export const metadata: Metadata = { title: 'Blog | Triolla' }
 
-async function getBlogPage(uri: string): Promise<BlogPageFields | null> {
+async function getBlogPage(): Promise<BlogPageFields | null> {
   try {
-    const { data } = await client.query({ query: BLOG_PAGE_QUERY, variables: { uri } })
+    const { data } = await client.query({ query: BLOG_PAGE_QUERY })
     return data?.page?.template?.blogPageFields ?? null
   } catch {
     return null
   }
 }
 
-async function getInitialPosts(language: string): Promise<BlogPostsConnection | null> {
+async function getInitialPosts(): Promise<BlogPostsConnection | null> {
   try {
     // First card is the featured spotlight; the rest seed the grid.
     const { data } = await client.query({
       query: BLOG_POSTS_QUERY,
-      variables: { first: BLOG_PAGE_SIZE + 1, after: null, language },
+      variables: { first: BLOG_PAGE_SIZE + 1, after: null },
     })
     return data?.posts ?? null
   } catch {
@@ -103,10 +100,8 @@ function FeaturedPost({ post }: { post: BlogPostNode }) {
   )
 }
 
-export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
-  const loc = isLocale(locale) ? locale : defaultLocale
-  const [bp, postsConn, ts] = await Promise.all([getBlogPage(PAGE_URI.blog[loc]), getInitialPosts(loc), getThemeSettings()])
+export default async function BlogPage() {
+  const [bp, postsConn, ts] = await Promise.all([getBlogPage(), getInitialPosts(), getThemeSettings()])
 
   const allPosts = postsConn?.nodes ?? []
   const featured = allPosts[0] ?? null
@@ -119,21 +114,8 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
   const heroLead = bp?.shortText ?? null
   const heroBold = bp?.boldText ?? null
 
-  const blogPath = loc === 'he' ? '/he/blog' : '/blog'
-  const pageJsonLd = webPageSchema({
-    path: blogPath,
-    name: heroTitle ? stripHtml(heroTitle) : 'Blog',
-    description: heroLead ? stripHtml(heroLead) : null,
-    type: 'Blog',
-  })
-  const crumbs = breadcrumbSchema(
-    [{ name: pageJsonLd?.name as string, path: blogPath }],
-    loc === 'he' ? 'דף הבית' : 'Home',
-  )
-
   return (
     <main className="blog-root bg-[#080808] text-white overflow-x-clip relative pb-16 md:pb-32">
-      {pageJsonLd && <JsonLd data={[pageJsonLd, crumbs]} />}
       <GrainOverlay />
 
       {/* ── HERO ── */}
@@ -176,7 +158,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
       <div className="blog-body max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {featured && <FeaturedPost post={featured} />}
         <section className="blog-grid-section py-8 md:py-24">
-          <BlogPostGrid initialPosts={gridPosts} initialPageInfo={gridPageInfo} loadMoreLabel={loadMoreLabel} locale={loc} />
+          <BlogPostGrid initialPosts={gridPosts} initialPageInfo={gridPageInfo} loadMoreLabel={loadMoreLabel} />
         </section>
       </div>
 

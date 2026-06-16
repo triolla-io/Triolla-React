@@ -6,9 +6,7 @@ import Footer from '@/components/Footer'
 import CookieBanner from '@/components/CookieBanner'
 import { BfcacheReloader } from '@/components/BfcacheReloader'
 import { MotionProvider } from '@/components/MotionProvider'
-import { OrganizationJsonLd } from '@/components/OrganizationJsonLd'
 import { locales, defaultLocale, isLocale, dir, htmlLang } from '@/lib/i18n'
-import { SITE_URL } from '@/lib/site'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -16,12 +14,13 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  // metadataBase makes the relative `alternates`/canonical paths on child pages
-  // resolve to absolute URLs — required for correct hreflang and OG tags that
-  // crawlers and LLMs rely on.
-  metadataBase: new URL(SITE_URL),
   title: 'Triolla | Product Design & Development',
   description: 'Product Design for Tech, Gaming, Medical, Cyber, IoT, Agritech, Mobile, SaaS Platforms & Startups',
+  other: {
+    // preconnect to WP origin early — images, fonts, GraphQL all come from there
+    'link-preconnect-wp': '<link rel="preconnect" href="https://triolla.io" crossOrigin="anonymous" />',
+    'link-dns-prefetch-wp': '<link rel="dns-prefetch" href="https://triolla.io" />',
+  },
 }
 
 export const viewport: Viewport = {
@@ -54,7 +53,6 @@ export default async function RootLayout({
           <CookieBanner />
         </MotionProvider>
         <BfcacheReloader />
-        <OrganizationJsonLd />
       </body>
     </html>
   )

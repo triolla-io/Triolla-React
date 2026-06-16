@@ -1,9 +1,7 @@
 import React from 'react'
-import Image from 'next/image'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
 import { wpImg } from '@/lib/images'
-import { type Locale, localizeHref } from '@/lib/i18n'
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -21,10 +19,9 @@ interface ClientsSectionProps {
   bigText?: string | null
   ctaText?: string | null
   accentColor?: string
-  locale?: Locale
 }
 
-export function ClientsSection({ logos, heading, bigText, ctaText, accentColor = '#facc15', locale = 'en' }: ClientsSectionProps) {
+export function ClientsSection({ logos, heading, bigText, ctaText, accentColor = '#facc15' }: ClientsSectionProps) {
   if (logos.length === 0) return null
 
   const ac = accentColor
@@ -142,7 +139,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         className="mb-5"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <Image src={wpImg(logo.url) ?? logo.url} alt={logo.alt || 'Client logo'} fill className="cs-logo-img" sizes="176px" />
+            <img src={wpImg(logo.url) ?? ''} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
           </div>
         )}
       />
@@ -158,7 +155,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         fadeColor="#080808"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <Image src={wpImg(logo.url) ?? logo.url} alt={logo.alt || 'Client logo'} fill className="cs-logo-img" sizes="176px" />
+            <img src={wpImg(logo.url) ?? ''} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
           </div>
         )}
       />
@@ -167,7 +164,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         <div className="text-center mt-12 relative z-10">
           <Button
             variant="primary"
-            href={localizeHref('/contact-us', locale)}
+            href="/contact-us"
             style={{ '--btn-pad': '14px 32px', background: 'var(--accent)' } as React.CSSProperties}
           >
             {ctaText}
