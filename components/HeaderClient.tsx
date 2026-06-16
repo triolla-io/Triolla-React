@@ -355,7 +355,7 @@ export function HeaderClient({
       )}
 
       {/* Floating pill nav */}
-      <div className="pointer-events-auto flex justify-center px-4 pt-4">
+      <div className="pointer-events-auto flex justify-center px-4 pt-4 bg-[#080808] md:bg-transparent">
         <m.div
           initial={{ maxWidth: 920 }}
           animate={{ maxWidth: isScrolling ? 340 : 920 }}
