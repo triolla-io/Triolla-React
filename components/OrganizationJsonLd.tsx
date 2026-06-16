@@ -12,6 +12,16 @@ const THEME_SETTINGS_QUERY = gql`
   ${GET_THEME_SETTINGS}
 `
 
+const WEBSITE_JSON_LD: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${SITE_URL}/#website`,
+  url: SITE_URL,
+  name: 'Triolla',
+  publisher: { '@id': `${SITE_URL}/#organization` },
+  inLanguage: ['en', 'he'],
+}
+
 // Only the subset of themeOptions consumed here; all optional since WP may
 // return null for any field.
 interface ImageNode {
@@ -63,15 +73,5 @@ export async function OrganizationJsonLd() {
     ...(sameAs.length ? { sameAs } : {}),
   }
 
-  const website: Record<string, unknown> = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    '@id': `${SITE_URL}/#website`,
-    url: SITE_URL,
-    name: 'Triolla',
-    publisher: { '@id': `${SITE_URL}/#organization` },
-    inLanguage: ['en', 'he'],
-  }
-
-  return <JsonLd data={[organization, website]} />
+  return <JsonLd data={[organization, WEBSITE_JSON_LD]} />
 }

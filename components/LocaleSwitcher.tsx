@@ -15,26 +15,20 @@ function getAlternate(lang: string): string | null {
 }
 
 /** Watches <head> for hreflang changes (Next.js swaps them on navigation). */
-function useAlternates(pathname: string) {
-  const [alternates, setAlternates] = useState<{ en: string | null; he: string | null }>(
-    () => ({ en: null, he: null }),
-  )
+function useAlternates() {
+  const [, setRenderTrigger] = useState(false)
 
   useEffect(() => {
-    function read() {
-      const en = getAlternate('en')
-      const he = getAlternate('he')
-      // Only update state when values actually change — prevents render loops
-      setAlternates(prev => (prev.en === en && prev.he === he ? prev : { en, he }))
-    }
-
-    read()
-    const mo = new MutationObserver(read)
+    const mo = new MutationObserver(() => {
+      setRenderTrigger(prev => !prev)
+    })
     mo.observe(document.head, { childList: true, subtree: true })
     return () => mo.disconnect()
-  }, [pathname])
+  }, [])
 
-  return alternates
+  const en = getAlternate('en')
+  const he = getAlternate('he')
+  return { en, he }
 }
 
 export function LocaleSwitcher() {
@@ -45,7 +39,7 @@ export function LocaleSwitcher() {
   const enFallback = isHe ? (pathname === '/he' ? '/' : pathname.slice(3)) : pathname
   const heFallback = isHe ? pathname : pathname === '/' ? '/he' : `/he${pathname}`
 
-  const { en, he } = useAlternates(pathname)
+  const { en, he } = useAlternates()
 
   const enHref = en ?? enFallback
   const heHref = he ?? heFallback
