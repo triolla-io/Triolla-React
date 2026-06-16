@@ -42,7 +42,7 @@ export default async function RootLayout({
     <html lang={htmlLang[loc]} dir={dir[loc]} className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
         <MotionProvider>
-          <Header />
+          <Header locale={loc} />
           <main className="grow">{children}</main>
           <Footer locale={loc} />
           <CookieBanner />

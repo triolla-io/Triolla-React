@@ -228,7 +228,7 @@ export default async function ContactUsPage({ params }: { params: Promise<{ loca
         .cu-office__phone:hover { color: #facc15; }
 
         @media (max-width: 768px) {
-          .cu-hero { padding: 120px 20px 24px; }
+          .cu-hero { padding: 80px 20px 20px; }
           .cu-office { min-width: 0; width: 100%; }
         }
       `}</style>

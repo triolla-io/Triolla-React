@@ -317,10 +317,10 @@ export default async function BrandingStudioPage({ params }: { params: Promise<{
           .brand-process__rail { position: static; }
         }
         @media (max-width: 768px) {
-          .brand-hero { padding: 116px 20px 72px; min-height: auto; }
-          .brand-hero__index { right: 20px; top: 30px; }
-          .brand-process { padding: 80px 20px; }
-          .brand-cta { padding: 88px 20px 96px; }
+          .brand-hero { padding: 60px 20px 52px; min-height: auto; }
+          .brand-hero__index { right: 20px; top: 20px; }
+          .brand-process { padding: 44px 20px; }
+          .brand-cta { padding: 48px 20px 52px; }
         }
       `}</style>
     </main>

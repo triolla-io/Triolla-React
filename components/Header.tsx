@@ -58,8 +58,37 @@ async function getPrimaryMenu(): Promise<{
   }
 }
 
-export default async function Header() {
-  const [ts, menus] = await Promise.all([getThemeSettings(), getPrimaryMenu()])
+async function getHebrewMenu(): Promise<{ nav: NavItem[]; mobile: NavItem[] }> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_WORDPRESS_URL ?? 'https://triolla.io'}/wp-json/triolla/v1/menu/header-menu-he/he`,
+      { next: { revalidate: 3600 } }
+    )
+    if (!res.ok) return { nav: [], mobile: [] }
+    const items: { id: number; label: string; url: string; parentId: number }[] = await res.json()
+    const mapped: MenuItemNode[] = items.map((item) => ({
+      databaseId: item.id,
+      label: item.label,
+      url: item.url,
+      parentDatabaseId: item.parentId || null,
+    }))
+    const nav = buildNavTree(mapped)
+    return { nav, mobile: nav }
+  } catch {
+    return { nav: [], mobile: [] }
+  }
+}
+
+export default async function Header({ locale }: { locale?: string }) {
+  const isHe = locale === 'he'
+  const [ts, menus, localizedTs] = await Promise.all([
+    getThemeSettings(),
+    isHe ? getHebrewMenu() : getPrimaryMenu(),
+    isHe ? fetch(
+      `${process.env.NEXT_PUBLIC_WORDPRESS_URL ?? 'https://triolla.io'}/wp-json/triolla/v1/theme-options/he`,
+      { next: { revalidate: 3600 } }
+    ).then(r => r.ok ? r.json() : null).catch(() => null) : Promise.resolve(null),
+  ])
 
   const whatsappHref = ts?.whatsappNumber
     ? `https://wa.me/${ts.whatsappNumber}${ts.whatsappMessage ? `?text=${encodeURIComponent(ts.whatsappMessage)}` : ''}`
@@ -76,10 +105,10 @@ export default async function Header() {
       mobileNavItems={mobile}
       menuPromoImage={ts?.menuBackgroundImage?.node?.sourceUrl ?? null}
       whatsappHref={whatsappHref}
-      bookButtonText={ts?.bookButton ?? 'Book a Call'}
-      bookButtonHref={ts?.bookButtonLink ?? 'https://calendly.com/triolla/pitangoux-introductory-meeting-clone'}
-      contactButtonText={ts?.contactButton ?? 'Contact Us'}
-      contactButtonHref={ts?.contactButtonLink ?? '/contact-us'}
+      bookButtonText={localizedTs?.bookButton ?? ts?.bookButton ?? 'Book a Call'}
+      bookButtonHref={localizedTs?.bookButtonLink ?? ts?.bookButtonLink ?? 'https://calendly.com/triolla/pitangoux-introductory-meeting-clone'}
+      contactButtonText={localizedTs?.contactButton ?? ts?.contactButton ?? 'Contact Us'}
+      contactButtonHref={localizedTs?.contactButtonLink ?? ts?.contactButtonLink ?? '/contact-us'}
     />
   )
 }

@@ -61,7 +61,6 @@ export async function generateStaticParams() {
       return route ? [route] : []
     })
   } catch {
-    // Build emits no portfolio routes rather than crashing.
     return []
   }
 }
@@ -165,5 +164,5 @@ export default async function PortfolioSlugPage({ params }: { params: Promise<{ 
   // Empty/failed fetch, or a page not actually on the portfolio template.
   if (!pf || Object.keys(pf).length === 0) notFound()
 
-  return <PortfolioTemplate pf={pf} ts={ts} />
+  return <PortfolioTemplate pf={pf} ts={ts} locale={locale} />
 }

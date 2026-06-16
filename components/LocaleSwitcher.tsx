@@ -2,11 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 
-/** Read <link rel="alternate" hreflang="$lang"> from <head>, or null.
- *  Next.js renders the attribute as hrefLang (camelCase), which browsers
- *  normalise to hreflang (lowercase) in the DOM — both selectors are tried. */
+/** Read <link rel="alternate" hreflang="$lang"> from <head>, or null. */
 function getAlternate(lang: string): string | null {
   if (typeof document === 'undefined') return null
   const el =
@@ -16,18 +14,27 @@ function getAlternate(lang: string): string | null {
   try { return new URL(el.href).pathname } catch { return null }
 }
 
-/** Tiny external store that re-subscribes on every pathname change. */
+/** Watches <head> for hreflang changes (Next.js swaps them on navigation). */
 function useAlternates(pathname: string) {
-  return useSyncExternalStore(
-    (cb) => {
-      // Re-read on any <head> mutation (Next.js swaps hreflang tags on navigation)
-      const mo = new MutationObserver(cb)
-      mo.observe(document.head, { childList: true, subtree: true })
-      return () => mo.disconnect()
-    },
-    () => ({ en: getAlternate('en'), he: getAlternate('he'), _path: pathname }),
-    () => ({ en: null, he: null, _path: pathname }),
+  const [alternates, setAlternates] = useState<{ en: string | null; he: string | null }>(
+    () => ({ en: null, he: null }),
   )
+
+  useEffect(() => {
+    function read() {
+      const en = getAlternate('en')
+      const he = getAlternate('he')
+      // Only update state when values actually change — prevents render loops
+      setAlternates(prev => (prev.en === en && prev.he === he ? prev : { en, he }))
+    }
+
+    read()
+    const mo = new MutationObserver(read)
+    mo.observe(document.head, { childList: true, subtree: true })
+    return () => mo.disconnect()
+  }, [pathname])
+
+  return alternates
 }
 
 export function LocaleSwitcher() {

@@ -143,7 +143,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
     .map(stripHtml)
 
   return (
-    <main className="bg-[#080808] text-white overflow-hidden pb-32 relative">
+    <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
       {/* Grain overlay */}
       <GrainOverlay />
 
@@ -300,11 +300,32 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           </FadeIn>
 
           <div className="svc-prod__body">
-            {/* Left: image collage */}
+            {/* Mobile-only: 3-card floating collage */}
+            {(prodImages[0] || prodImages[1] || prodImages[2]) && (
+              <div className="svc-mobile-collage md:hidden" aria-hidden="true">
+                {prodImages[0] && (
+                  <div className="svc-mc-card svc-mc-card--a">
+                    <img src={wpImg(prodImages[0]) ?? ''} alt="" />
+                  </div>
+                )}
+                {prodImages[1] && (
+                  <div className="svc-mc-card svc-mc-card--b">
+                    <img src={wpImg(prodImages[1]) ?? ''} alt="" />
+                  </div>
+                )}
+                {prodImages[2] && (
+                  <div className="svc-mc-card svc-mc-card--c">
+                    <img src={wpImg(prodImages[2]) ?? ''} alt="" />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Left: image collage (desktop only, hidden via CSS on mobile) */}
             <div className="svc-prod__gallery">
               {prodImages[0] && (
                 <div className="svc-img-card svc-img-card--featured">
-                  <img src={prodImages[0]} alt="" className="svc-img-card__img" />
+                  <img src={wpImg(prodImages[0]) ?? ''} alt="" className="svc-img-card__img" />
                   <div className="svc-img-card__shine" aria-hidden="true" />
                   <span className="svc-img-card__badge">UI Design</span>
                 </div>
@@ -313,13 +334,13 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                 <div className="svc-prod__row">
                   {prodImages[1] && (
                     <div className="svc-img-card" style={{ flex: '2' }}>
-                      <img src={prodImages[1]} alt="" className="svc-img-card__img" />
+                      <img src={wpImg(prodImages[1]) ?? ''} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
                   )}
                   {prodImages[2] && (
                     <div className="svc-img-card svc-img-card--offset" style={{ flex: '3' }}>
-                      <img src={prodImages[2]} alt="" className="svc-img-card__img" />
+                      <img src={wpImg(prodImages[2]) ?? ''} alt="" className="svc-img-card__img" />
                       <div className="svc-img-card__shine" aria-hidden="true" />
                     </div>
                   )}
@@ -697,19 +718,121 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           .svc-prod__menu, .svc-brand__menu { position: static; margin-top: 40px; }
         }
         @media (max-width: 768px) {
-          .svc-hero { padding: 96px 20px 148px; }
+
+          /* ── Hero ── */
+          .svc-hero { padding: 56px 20px 48px; min-height: auto; }
+          .svc-scroll-cue { display: none; }
           .svc-hero__corner { display: none; }
-          .svc-hero__ghost { font-size: clamp(110px, 38vw, 180px); }
-          .svc-hero__index { right: 20px; top: 30px; }
-          .svc-prod__inner, .svc-brand__inner, .svc-dev__inner { padding: 0 20px; }
-          .svc-prod { padding-top: 72px; }
-          .svc-dev { padding: 72px 0 96px; }
-          .svc-polaroid-grid { grid-template-columns: 1fr 1fr; }
-          .svc-prod__row { flex-direction: column; }
-          .svc-prod__row > * { flex: 1 1 auto !important; }
-          .svc-img-card--offset, .svc-img-card--up { margin-top: 0; }
-          .svc-img-card--featured { width: 100%; }
-          .svc-dev__body { gap: 52px; }
+          .svc-hero__ghost { font-size: clamp(100px, 36vw, 160px); opacity: 0.015; }
+          .svc-hero__index { right: 16px; top: 18px; }
+          .svc-hero__rule { margin-bottom: 20px; }
+          /* reduce headline mb (tailwind mb-12 = 3rem) */
+          .svc-hero__content h1 { margin-bottom: 20px !important; }
+
+          /* ── Section spacing ── */
+          .svc-prod__inner, .svc-dev__inner { padding: 0 18px; }
+          .svc-prod { padding-top: 36px; }
+          .svc-dev { padding: 36px 0 44px; }
+          .svc-brand__inner { padding: 36px 18px; }
+
+          /* ── Section heads ── */
+          .section-head { margin-bottom: 24px; }
+          .section-head__title { font-size: clamp(1.8rem, 7vw, 3.2rem) !important; line-height: 1.08 !important; }
+
+          /* ── Mobile collage ── */
+          .svc-mobile-collage {
+            overflow: hidden; /* clip rotation bleed */
+            padding: 4px 4px 24px;
+          }
+          /* A — smaller, slides in from LEFT */
+          .svc-mc-card--a {
+            position: relative;
+            width: 62%;
+            aspect-ratio: 4/3;
+            border-radius: 16px; overflow: hidden;
+            box-shadow: 0 18px 52px rgba(0,0,0,0.62), 0 0 0 1px rgba(255,255,255,0.05);
+            z-index: 2;
+            animation: svcMcA 9s ease-in-out infinite,
+                       svcSlideLeft 1.1s cubic-bezier(0.23,1,0.32,1) 0.1s both;
+          }
+          /* B — slides in from RIGHT */
+          .svc-mc-card--b {
+            position: relative;
+            width: 66%;
+            aspect-ratio: 4/3;
+            border-radius: 15px; overflow: hidden;
+            margin-top: -44px;
+            margin-left: auto;
+            margin-right: 4px;
+            box-shadow: 0 14px 44px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
+            z-index: 3;
+            animation: svcMcB 12s ease-in-out 1.5s infinite,
+                       svcSlideRight 1.1s cubic-bezier(0.23,1,0.32,1) 0.3s both;
+          }
+          /* C — square, slides in from BOTTOM */
+          .svc-mc-card--c {
+            position: relative;
+            width: 46%;
+            aspect-ratio: 1/1;
+            border-radius: 14px; overflow: hidden;
+            margin-top: -30px;
+            margin-left: 14px;
+            box-shadow: 0 10px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(250,204,21,0.12);
+            z-index: 4;
+            animation: svcMcC 15s ease-in-out 0.8s infinite,
+                       svcSlideUp 1.0s cubic-bezier(0.23,1,0.32,1) 0.5s both;
+          }
+          .svc-mc-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+          /* Float loops */
+          @keyframes svcMcA {
+            0%,100% { transform: rotate(-2deg) translateY(0); }
+            50%      { transform: rotate(-1.3deg) translateY(-8px); }
+          }
+          @keyframes svcMcB {
+            0%,100% { transform: rotate(2.2deg) translateY(0); }
+            50%      { transform: rotate(1.5deg) translateY(-6px); }
+          }
+          @keyframes svcMcC {
+            0%,100% { transform: rotate(-0.7deg) translateY(0); }
+            50%      { transform: rotate(-0.1deg) translateY(-5px); }
+          }
+          /* Slide-in entrances */
+          @keyframes svcSlideLeft {
+            from { opacity: 0; transform: translateX(-48px) rotate(-2deg); }
+            to   { opacity: 1; transform: translateX(0)    rotate(-2deg); }
+          }
+          @keyframes svcSlideRight {
+            from { opacity: 0; transform: translateX(48px) rotate(2.2deg); }
+            to   { opacity: 1; transform: translateX(0)   rotate(2.2deg); }
+          }
+          @keyframes svcSlideUp {
+            from { opacity: 0; transform: translateY(40px) rotate(-0.7deg); }
+            to   { opacity: 1; transform: translateY(0)    rotate(-0.7deg); }
+          }
+
+          /* Hide desktop gallery on mobile via CSS (Tailwind max-md: unreliable in v4) */
+          .svc-prod__gallery,
+          .svc-prod__row,
+          .svc-prod__icons { display: none; }
+          .svc-img-card:hover { transform: none; }
+          /* Remove the 40px gap the 1100px rule adds between gallery and menu */
+          .svc-prod__menu { margin-top: 12px; }
+
+          /* ── Polaroids → 2-col, no rotation (rotations distort on mobile) ── */
+          .svc-polaroid-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+          .svc-polaroid__frame { padding: 6px 6px 20px; }
+          .svc-polaroid:nth-child(n) .svc-polaroid__frame { transform: none !important; }
+          .svc-polaroid:hover .svc-polaroid__frame { transform: none !important; }
+
+          /* ── Dev / tech groups ── */
+          .svc-dev__body { gap: 36px; }
+          .svc-dev__lists { gap: 28px; }
+          .svc-tech-group__title { font-size: clamp(1.1rem, 4.5vw, 1.5rem); }
+
+          /* ── Service menus ── */
+          .svc-menu-item { padding: 14px 0; }
+          .svc-menu-item__title { font-size: clamp(1rem, 4.5vw, 1.4rem); }
         }
       `}</style>
     </main>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { GlowOrb } from '@/components/ui'
 import { submitContactForm } from '@/app/actions/contact'
 import { initialContactState, type ContactFormState } from '@/lib/contact-form'
@@ -22,10 +23,16 @@ interface WannaChatSectionProps {
   fallbackEmail?: string | null
 }
 
-const FORM_FIELDS = [
+const FORM_FIELDS_EN = [
   { key: 'name', type: 'text', label: 'Full Name', required: true },
   { key: 'phone', type: 'tel', label: 'Phone', required: false },
   { key: 'email', type: 'email', label: 'Email', required: true },
+] as const
+
+const FORM_FIELDS_HE = [
+  { key: 'name', type: 'text', label: 'שם מלא', required: true },
+  { key: 'phone', type: 'tel', label: 'טלפון', required: false },
+  { key: 'email', type: 'email', label: 'אימייל', required: true },
 ] as const
 
 export function WannaChatSection({
@@ -36,6 +43,9 @@ export function WannaChatSection({
   callUsLabel,
   fallbackEmail,
 }: WannaChatSectionProps) {
+  const params = useParams()
+  const FORM_FIELDS = params?.locale === 'he' ? FORM_FIELDS_HE : FORM_FIELDS_EN
+
   const [state, setState] = useState<ContactFormState>(initialContactState)
   const [pending, setPending] = useState(false)
   const [fields, setFields] = useState({ name: '', phone: '', email: '' })
@@ -669,69 +679,70 @@ export function WannaChatSection({
         @keyframes wcSpin { to { transform: rotate(360deg); } }
 
         /* ══════════════════════════════════════════
-           MOBILE — premium stacked contact layout
+           MOBILE — compact editorial layout
         ══════════════════════════════════════════ */
         @media (max-width: 768px) {
-          /* Section spacing */
-          .wc-root { margin-top: 56px; }
+          .wc-root { margin-top: 40px; }
 
-          /* Card corners proportional to mobile width */
-          .wc-card { border-radius: 24px; }
-          .wc-grid { border-radius: 24px; }
+          .wc-card { border-radius: 20px; }
+          .wc-grid { border-radius: 20px; }
 
-          /* Layout: tighter padding, smaller gap */
+          /* Tighter outer padding, less gap between columns */
           .wc-layout {
-            padding: 44px 22px 48px;
-            gap: 40px;
+            padding: 32px 18px 36px;
+            gap: 24px;
           }
 
-          /* Heading: fluid, commands the space */
+          /* Heading: compact */
           .wc-heading {
-            font-size: clamp(2rem, 9vw, 4.5rem);
-            margin-bottom: 20px;
+            font-size: clamp(1.7rem, 7.5vw, 3.2rem);
+            margin-bottom: 12px;
             letter-spacing: -0.03em;
           }
 
-          /* Rule + info spacing */
-          .wc-rule { margin-bottom: 28px; }
-          .wc-info { gap: 16px; }
-          .wc-item__val { font-size: 14px; }
+          /* Hide decorative rule on mobile — saves ~30px */
+          .wc-rule { display: none; }
 
-          /* Form card: breathable padding on mobile */
+          /* Contact info: 2-column card grid instead of tall vertical list */
+          .wc-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+          }
+          .wc-info__eyebrow { grid-column: 1 / -1; margin-bottom: 2px; }
+          .wc-item {
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.025);
+          }
+          .wc-item::before { display: none; }
+          .wc-item__lbl { font-size: 8.5px; }
+          .wc-item__val { font-size: 13px; }
+
+          /* Form card */
           .wc-form {
-            padding: 30px 22px 34px;
-            border-radius: 20px;
+            padding: 24px 18px 28px;
+            border-radius: 16px;
           }
-
-          /* Form heading */
           .wc-form__kicker {
-            font-size: clamp(1.25rem, 5vw, 2.2rem);
-            margin-bottom: 28px;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
           }
 
-          /* Fields: slightly tighter stack */
-          .wc-fields {
-            gap: 28px;
-            margin-bottom: 28px;
-          }
+          /* Fields */
+          .wc-fields { gap: 22px; margin-bottom: 22px; }
+          .wc-field__inp { font-size: 16px; }
+          .wc-field__lbl { font-size: 16px; }
 
-          /* Input font size: 16px minimum prevents iOS auto-zoom */
-          .wc-field__inp {
-            font-size: 16px;
-          }
-          .wc-field__lbl {
-            font-size: 16px;
-          }
-
-          /* Submit button: more touch-friendly height */
+          /* Button */
           .wc-btn {
-            padding: 18px 24px;
+            padding: 15px 20px;
             font-size: 14px;
-            border-radius: 14px;
+            border-radius: 12px;
           }
 
-          /* Dots: fewer, less distracting on small screen */
-          .wc-dot:nth-child(n+6) { display: none; }
+          .wc-dot:nth-child(n+5) { display: none; }
         }
       `}</style>
     </>
