@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { client } from '@/lib/apollo-client'
 import { GET_PORTFOLIO_PAGE, GET_PORTFOLIO_SLUGS, GET_THEME_SETTINGS } from '@/lib/queries'
 import { defaultLocale } from '@/lib/i18n'
@@ -20,10 +21,11 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
 `
 
-// Only slugs returned by generateStaticParams resolve here; any other slug 404s.
 // Static route folders (about-us, services, technology) take Next.js precedence
 // over this dynamic segment, so they are never reached by [slug].
-export const dynamicParams = false
+// dynamicParams = true so that /he/<english-slug> (from WP nav) can be caught
+// and redirected to the correct Hebrew slug instead of 404ing.
+export const dynamicParams = true
 
 /**
  * Derive the route (locale + slug) from a WordPress page URI.
@@ -159,10 +161,31 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
 
 export default async function PortfolioSlugPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params
+
+  // When in Hebrew and the slug is an English one (from WP nav links like
+  // /he/cyber-security), find the Hebrew translation and redirect to the
+  // correct Hebrew slug (/he/סייבר). This prevents 404s from WP nav links.
+  if (locale === 'he') {
+    const decodedSlug = decodeSlug(slug)
+    const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
+    const nodes = data?.pages?.nodes ?? []
+    const enNode = nodes.find((n) => {
+      if (n?.template?.__typename !== 'Template_PortfolioPage') return false
+      const route = deriveRoute(n.uri)
+      return route?.locale === 'en' && decodeSlug(route.slug) === decodedSlug
+    })
+    if (enNode) {
+      const heTrans = (enNode.translations ?? []).find((t) => t.locale === 'he_IL' || t.locale === 'he')
+      const heHref = heTrans?.href?.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '')
+      const heRoute = heHref ? deriveRoute(heHref + '/') : null
+      if (heRoute?.slug) redirect(`/he/${heRoute.slug}`)
+    }
+  }
+
   const [pf, ts] = await Promise.all([getPortfolioData(locale, slug), getThemeSettings()])
 
   // Empty/failed fetch, or a page not actually on the portfolio template.
   if (!pf || Object.keys(pf).length === 0) notFound()
 
-  return <PortfolioTemplate pf={pf} ts={ts} locale={locale} />
+  return <PortfolioTemplate pf={pf} ts={ts} />
 }
