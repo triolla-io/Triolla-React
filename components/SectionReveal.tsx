@@ -1,40 +1,29 @@
 'use client'
 
-import { m, useInView } from 'motion/react'
-import { useRef, ReactNode } from 'react'
+import { m } from 'motion/react'
+import { ReactNode } from 'react'
 
 interface SectionRevealProps {
   children: ReactNode | ReactNode[]
   className?: string
 }
 
-const container = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.12,
-    },
-  },
-}
-
-const item = {
-  hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
-}
-
 export function SectionReveal({ children, className = '' }: SectionRevealProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  // amount: 0 → fires as soon as any pixel is visible, including elements
-  // already in viewport at mount time (fixes whileInView race on SPA navigation)
-  const isInView = useInView(ref, { once: true, amount: 0 })
+  const childArray = Array.isArray(children) ? children : [children]
 
   return (
-    <m.div ref={ref} className={className} variants={container} initial="hidden" animate={isInView ? 'show' : 'hidden'}>
-      {(Array.isArray(children) ? children : [children]).map((child, i) => (
-        <m.div key={i} variants={item}>
+    <div className={className}>
+      {childArray.map((child, i) => (
+        <m.div
+          key={i}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-20px' }}
+          transition={{ duration: 0.6, delay: i * 0.12, ease: 'easeOut' }}
+        >
           {child}
         </m.div>
       ))}
-    </m.div>
+    </div>
   )
 }

@@ -216,7 +216,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
               >
                 {/* Ghost number */}
                 <div
-                  className="absolute top-0 right-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
+                  className="absolute top-0 inset-e-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
                   style={{
                     fontSize: 'clamp(120px,20vw,240px)',
                     color: 'color-mix(in srgb, var(--accent) 2.7%, transparent)',

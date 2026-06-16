@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { client } from '@/lib/apollo-client'
 import { GET_PORTFOLIO_PAGE, GET_PORTFOLIO_SLUGS, GET_THEME_SETTINGS } from '@/lib/queries'
-import { defaultLocale } from '@/lib/i18n'
+import { defaultLocale, PAGE_URI } from '@/lib/i18n'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import { notFound } from 'next/navigation'
@@ -159,14 +159,39 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
+async function getLocalizedThemeOptions(locale: string): Promise<Partial<ThemeOptions> | null> {
+  if (locale === 'en') return null
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_WORDPRESS_URL ?? 'https://triolla.io'}/wp-json/triolla/v1/theme-options/${locale}`,
+      { next: { revalidate: 3600 } }
+    )
+    if (!res.ok) return null
+    return await res.json()
+  } catch {
+    return null
+  }
+}
+
 export default async function PortfolioSlugPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params
 
-  // When in Hebrew and the slug is an English one (from WP nav links like
-  // /he/cyber-security), find the Hebrew translation and redirect to the
-  // correct Hebrew slug (/he/סייבר). This prevents 404s from WP nav links.
   if (locale === 'he') {
     const decodedSlug = decodeSlug(slug)
+
+    // If the slug is a WPML Hebrew slug for a named page (e.g. "about" for
+    // about-us, "השירותים-שלנו" for services), redirect to the Next.js path.
+    // These named pages live at fixed route folders like /he/about-us, not [slug].
+    const namedPageEntry = Object.entries(PAGE_URI).find(
+      ([, uris]) => decodeSlug(uris.he) === decodedSlug,
+    )
+    if (namedPageEntry) {
+      const enPath = namedPageEntry[1].en.replace(/^\/+|\/+$/, '')
+      redirect(`/he/${enPath}`)
+    }
+
+    // When the slug is an English portfolio slug (from WP nav like /he/cyber-security),
+    // find the Hebrew translation and redirect to the correct Hebrew slug (/he/סייבר).
     const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
     const nodes = data?.pages?.nodes ?? []
     const enNode = nodes.find((n) => {
@@ -182,10 +207,11 @@ export default async function PortfolioSlugPage({ params }: { params: Promise<{ 
     }
   }
 
-  const [pf, ts] = await Promise.all([getPortfolioData(locale, slug), getThemeSettings()])
+  const [pf, ts, localizedTs] = await Promise.all([getPortfolioData(locale, slug), getThemeSettings(), getLocalizedThemeOptions(locale)])
 
   // Empty/failed fetch, or a page not actually on the portfolio template.
   if (!pf || Object.keys(pf).length === 0) notFound()
 
-  return <PortfolioTemplate pf={pf} ts={ts} />
+  const mergedTs = localizedTs ? { ...ts, ...localizedTs } as typeof ts : ts
+  return <PortfolioTemplate pf={pf} ts={mergedTs} locale={locale} />
 }
