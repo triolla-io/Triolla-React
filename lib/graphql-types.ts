@@ -147,6 +147,8 @@ export interface HomePageFields {
   wboxes: { wboxTitle: string; winImg: WPImage | null }[] | null
   abthretitle: string | null
   abtthretext: string | null
+  abthrebuttonText: string | null
+  abthrebuttonLink: string | null
   abthrelist:
     | {
         abteintitle: string | null
@@ -284,7 +286,9 @@ export interface GetPortfolioSlugsData {
   pages: {
     nodes: {
       uri: string | null
+      databaseId: number | null
       template: { __typename: string } | null
+      translations: { href: string | null; locale: string | null }[] | null
     }[]
   } | null
 }
@@ -400,6 +404,7 @@ export interface TechnologyPageFields {
 
 export interface GetTechnologyPageData {
   page: {
+    translations: { id: string | null; locale: string | null }[] | null
     template: {
       technologyPage: TechnologyPageFields | null
     } | null
@@ -527,7 +532,11 @@ export interface GetBlogPostsData {
 
 export interface GetPostSlugsData {
   posts: {
-    nodes: { uri: string | null }[]
+    nodes: {
+      uri: string | null
+      databaseId: number | null
+      translations: { href: string | null; locale: string | null }[] | null
+    }[]
   } | null
 }
 

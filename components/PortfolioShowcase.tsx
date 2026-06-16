@@ -3,6 +3,8 @@
 
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
+import { wpImg } from '@/lib/images'
+import { sanitizeWpHtml } from '@/lib/text'
 
 function stripHtml(html: string): string {
   return (html ?? '').replace(/<[^>]+>/g, '').trim()
@@ -11,6 +13,7 @@ function stripHtml(html: string): string {
 interface PortfolioShowcaseProps {
   items: any[]
   accentColor: string
+  isRtl?: boolean
 }
 
 /**
@@ -19,7 +22,7 @@ interface PortfolioShowcaseProps {
  * panel enters the centre of the viewport (IntersectionObserver driven).
  * Mirrors the "WOW" scroll on the technology page (see TechStickyFeature).
  */
-export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps) {
+export function PortfolioShowcase({ items, accentColor, isRtl = false }: PortfolioShowcaseProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const panelRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -42,7 +45,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
   if (!items.length) return null
 
   return (
-    <section className="relative border-t border-white/[0.07]" style={{ '--accent': accentColor } as React.CSSProperties}>
+    <section className="relative" style={{ '--accent': accentColor } as React.CSSProperties}>
       <style>{`
         /* ─── Image crossfade (left, sticky) ───────── */
         .ps-img {
@@ -68,12 +71,14 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
           pointer-events: none;
         }
 
-        /* ─── Panel content reveal ─────────────────── */
-        .ps-item {
-          transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2,1,0.3,1);
-        }
+        /* ─── Panel content reveal (anti-gravity) ──── */
+        /* Mobile: always visible — sticky split-screen only applies on lg+ */
+        .ps-item { transition: opacity 0.55s cubic-bezier(0.23,1,0.32,1), transform 0.55s cubic-bezier(0.23,1,0.32,1); }
         .ps-item-on  { opacity: 1; transform: none; }
-        .ps-item-off { opacity: 0; transform: translateY(30px); }
+        .ps-item-off { opacity: 1; transform: none; }
+        @media (min-width: 1024px) {
+          .ps-item-off { opacity: 0; transform: translateY(24px); }
+        }
 
         /* ─── Tag pills ────────────────────────────── */
         .ps-tag {
@@ -102,9 +107,19 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
         /* ─── Accent progress bar ──────────────────── */
         @keyframes ps-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         .ps-bar { transform-origin: left; animation: ps-bar 0.5s ease-out forwards; }
+
+        /* ─── Reset WordPress float/inline images in body text ── */
+        .ps-body img {
+          float: none !important;
+          position: static !important;
+          display: block;
+          max-width: 100%;
+          height: auto;
+          margin: 12px 0;
+        }
       `}</style>
 
-      <div className="lg:grid lg:grid-cols-[48fr_52fr]">
+      <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none', direction: 'ltr' }}>
         {/* ═══ LEFT — sticky crossfading image ═══ */}
         <div className="hidden lg:block">
           <div className="sticky top-0 h-screen overflow-hidden bg-[#0b0b0b]">
@@ -113,7 +128,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                 item.pImage?.node?.sourceUrl ? (
                   <img
                     key={i}
-                    src={item.pImage.node.sourceUrl}
+                    src={wpImg(item.pImage.node.sourceUrl) ?? ''}
                     alt=""
                     aria-hidden="true"
                     className={`ps-img ${i === activeIndex ? 'ps-img-on' : 'ps-img-off'}`}
@@ -209,11 +224,11 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                 ref={(el) => {
                   panelRefs.current[i] = el
                 }}
-                className="min-h-screen flex flex-col justify-center py-24 px-7 sm:px-10 lg:px-16 relative border-b border-white/6 last:border-b-0"
+                className="min-h-screen flex flex-col justify-center py-10 md:py-24 px-5 sm:px-8 lg:px-16 relative overflow-hidden"
               >
                 {/* Ghost number */}
                 <div
-                  className="absolute top-0 right-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
+                  className="absolute top-0 inset-e-0 font-black select-none pointer-events-none leading-[0.85] overflow-hidden"
                   style={{
                     fontSize: 'clamp(120px,20vw,240px)',
                     color: 'color-mix(in srgb, var(--accent) 2.7%, transparent)',
@@ -226,14 +241,14 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                 {/* Mobile image */}
                 {item.pImage?.node?.sourceUrl && (
                   <div
-                    className="lg:hidden mb-10 rounded-[24px] overflow-hidden"
+                    className="lg:hidden mb-6 rounded-2xl overflow-hidden"
                     style={{
                       aspectRatio: '16/10',
-                      boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
+                      boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
                     }}
                   >
                     <img
-                      src={item.pImage.node.sourceUrl}
+                      src={wpImg(item.pImage.node.sourceUrl) ?? ''}
                       alt={stripHtml(item.pTitle ?? '')}
                       className="w-full h-full object-cover"
                       loading={i < 2 ? 'eager' : 'lazy'}
@@ -241,9 +256,9 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                   </div>
                 )}
 
-                <div className="relative z-10 max-w-[560px]">
+                <div className="relative z-10 max-w-[560px]" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
                   {/* Index + accent bar */}
-                  <div className="flex items-end gap-5 mb-9">
+                  <div className="flex items-end gap-4 mb-5 md:mb-9">
                     <span
                       className="font-black tabular-nums leading-none"
                       style={{
@@ -273,7 +288,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                     {/* Client logo */}
                     {item.pLogo?.node?.sourceUrl && (
                       <img
-                        src={item.pLogo.node.sourceUrl}
+                        src={wpImg(item.pLogo.node.sourceUrl) ?? ''}
                         alt=""
                         className="h-11 object-contain self-start mb-7"
                         style={{ filter: 'brightness(0) invert(1)' }}
@@ -293,13 +308,14 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                     {/* Body */}
                     {item.sortText && (
                       <div
-                        className="leading-[1.85] mb-8"
+                        className="ps-body leading-[1.85] mb-8"
                         style={{
                           fontSize: '18px',
                           color: 'rgba(255,255,255,0.55)',
+                          overflow: 'hidden',
                         }}
                       >
-                        {parse(item.sortText)}
+                        {parse(sanitizeWpHtml(item.sortText))}
                       </div>
                     )}
 

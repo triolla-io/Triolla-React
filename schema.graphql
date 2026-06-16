@@ -5324,6 +5324,36 @@ interface HomePageWboxes_Fields {
   winImg: AcfMediaItemConnectionEdge
 }
 
+"""Locale Info (WPML)"""
+type LanguageInfo {
+  """Language code (WPML)"""
+  code: String
+
+  """Language locale (WPML)"""
+  default_locale: String
+
+  """Language ID (WPML)"""
+  id: ID!
+
+  """Is the language hidden?"""
+  is_hidden: Boolean
+
+  """Language native name (WPML)"""
+  native_name: String
+
+  """Language translated name (WPML)"""
+  translated_name: String
+}
+
+"""Locale (WPML)"""
+type Locale {
+  """Language ID (WPML)"""
+  id: ID!
+
+  """Language locale (WPML)"""
+  locale: String
+}
+
 """File details for a Media Item"""
 type MediaDetails {
   """The filename of the mediaItem"""
@@ -5555,6 +5585,12 @@ type MediaItem implements Node & ContentNode & UniformResourceIdentifiable & Dat
   """The permalink of the post"""
   link: String
 
+  """WPML translation link"""
+  locale: Locale
+
+  """WPML localized url of the page/post"""
+  localizedWpmlUrl: String
+
   """Details about the mediaItem"""
   mediaDetails: MediaDetails
 
@@ -5641,6 +5677,12 @@ type MediaItem implements Node & ContentNode & UniformResourceIdentifiable & Dat
     """Format of the field output"""
     format: PostObjectFieldFormatEnum
   ): String
+
+  """WPML translated versions of the same post"""
+  translated: [MediaItem]
+
+  """WPML translations"""
+  translations: [Translation]
 
   """The unique resource identifier path"""
   uri: String
@@ -5862,6 +5904,9 @@ type Menu implements Node & DatabaseIdentifier {
 
   """Whether the object is restricted from the current viewer"""
   isRestricted: Boolean
+
+  """the language of the menu"""
+  language: String
 
   """The locations a menu is assigned to"""
   locations: [MenuLocationEnum]
@@ -7034,6 +7079,12 @@ type Page implements Node & ContentNode & UniformResourceIdentifiable & Database
   """The permalink of the post"""
   link: String
 
+  """WPML translation link"""
+  locale: Locale
+
+  """WPML localized url of the page/post"""
+  localizedWpmlUrl: String
+
   """
   A field used for ordering posts. This is typically used with nav menu items or
   for special ordering of hierarchical content types.
@@ -7124,6 +7175,12 @@ type Page implements Node & ContentNode & UniformResourceIdentifiable & Database
     """Format of the field output"""
     format: PostObjectFieldFormatEnum
   ): String
+
+  """WPML translated versions of the same post"""
+  translated: [Page]
+
+  """WPML translations"""
+  translations: [Translation]
 
   """The unique resource identifier path"""
   uri: String
@@ -8127,6 +8184,12 @@ type Post implements Node & ContentNode & UniformResourceIdentifiable & Database
   """The permalink of the post"""
   link: String
 
+  """WPML translation link"""
+  locale: Locale
+
+  """WPML localized url of the page/post"""
+  localizedWpmlUrl: String
+
   """
   The local modified time for a post. If a post was recently updated the
   modified field will change to match the corresponding time.
@@ -8274,6 +8337,12 @@ type Post implements Node & ContentNode & UniformResourceIdentifiable & Database
     """Format of the field output"""
     format: PostObjectFieldFormatEnum
   ): String
+
+  """WPML translated versions of the same post"""
+  translated: [Post]
+
+  """WPML translations"""
+  translations: [Translation]
 
   """The unique resource identifier path"""
   uri: String
@@ -10435,6 +10504,12 @@ type RootQuery implements WithAcfOptionsPageThemeSetting {
   """Fields of the &#039;GeneralSettings&#039; settings group"""
   generalSettings: GeneralSettings
 
+  """List available languages"""
+  languages: [LanguageInfo]
+
+  """List available locales"""
+  locales: [String]
+
   """An object of the mediaItem Type. """
   mediaItem(
     """The globally unique identifier of the object."""
@@ -11116,6 +11191,9 @@ input RootQueryToCategoryConnectionWhereArgs {
 
   """Whether to prime meta caches for matched terms. Default true."""
   updateTermMetaCache: Boolean
+
+  """Filter by WPML language code"""
+  wpmlLanguage: String
 }
 
 """Connection between the RootQuery type and the Comment type"""
@@ -11255,6 +11333,9 @@ input RootQueryToCommentConnectionWhereArgs {
 
   """Include comments for a specific user ID."""
   userId: ID
+
+  """Filter by WPML language code"""
+  wpmlLanguage: String
 }
 
 """Connection between the RootQuery type and the ContentNode type"""
@@ -11640,6 +11721,9 @@ input RootQueryToMenuConnectionWhereArgs {
   """The database ID of the object"""
   id: Int
 
+  """filters the menus by language"""
+  language: String
+
   """The menu location for the menu being queried"""
   location: MenuLocationEnum
 
@@ -11691,6 +11775,9 @@ type RootQueryToMenuItemConnectionPageInfo implements MenuItemConnectionPageInfo
 input RootQueryToMenuItemConnectionWhereArgs {
   """The database ID of the object"""
   id: Int
+
+  """filters the menu items by language"""
+  language: String
 
   """The menu location for the menu being queried"""
   location: MenuLocationEnum
@@ -11814,6 +11901,9 @@ input RootQueryToPageConnectionWhereArgs {
 
   """Title of the object"""
   title: String
+
+  """Filter by WPML language code"""
+  wpmlLanguage: String
 }
 
 """Connection between the RootQuery type and the Plugin type"""
@@ -12014,6 +12104,9 @@ input RootQueryToPostConnectionWhereArgs {
 
   """Title of the object"""
   title: String
+
+  """Filter by WPML language code"""
+  wpmlLanguage: String
 }
 
 """Connection between the RootQuery type and the postFormat type"""
@@ -15749,168 +15842,157 @@ interface ThemeConnectionPageInfo {
   startCursor: String
 }
 
-type ThemeSetting implements AcfOptionsPage & Node & WithAcfThemeSetting {
-  """The globally unique ID for the object"""
-  id: ID!
-  menuTitle: String
-  pageTitle: String
-  parentId: String
-
-  """Fields of the ThemeSetting ACF Field Group"""
-  themeSetting: ThemeSetting
-}
-
 """
-Interface representing fields of the ACF &quot;ThemeSetting&quot; Field Group
+The &quot;ThemeOptions&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
 """
-interface ThemeSetting_Fields {
+type ThemeOptions implements ThemeOptions_Fields & AcfFieldGroup & AcfFieldGroupFields {
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   bookButton: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   bookButtonLink: String
 
   """
-  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   bookButtonTarget: [String]
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cAddress: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cAddressLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cButton: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cCallUsLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cContactFormHeading: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cEmailAddress: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cEmailLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cLeftHeading: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cNyLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cNyNumber: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cTlvLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   cTlvNumber: String
 
   """
-  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
-  cTrustedLogos: [ThemeSettingCTrustedLogos]
+  cTrustedLogos: [ThemeOptionsCTrustedLogos]
 
   """
-  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
-  clientsLogos: [ThemeSettingClientsLogos]
+  clientsLogos: [ThemeOptionsClientsLogos]
 
   """
-  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   commonGridOneImage: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   commonGridOneMobile: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   contactButton: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   contactButtonLink: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   emailAddress: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   emailLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   errorButton: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   errorButtonLink: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   errorMessage: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   errorTitle: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   facebookLink: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   faqHeading: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   faqShortText: String
 
@@ -15921,99 +16003,99 @@ interface ThemeSetting_Fields {
   footerLogo: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footerMentionsLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footerPrivacyLink: String
 
   """
-  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footerPrivacyTarget: [String]
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footerPrivacyText: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footerTermLink: String
 
   """
-  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footerTermTarget: [String]
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footerTermText: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footmenuTitleFive: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footmenuTitleFour: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footmenuTitleOne: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footmenuTitleThree: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   footmenuTitleTwo: String
 
   """
-  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
-  gImageList: [ThemeSettingGImageList]
+  gImageList: [ThemeOptionsGImageList]
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   instagramLink: String
 
   """
-  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   jumpingImage1: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   jumpingImage2: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   jumpingImage3: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   linkedinLink: String
 
   """
-  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
-  mentionsLogos: [ThemeSettingMentionsLogos]
+  mentionsLogos: [ThemeOptionsMentionsLogos]
 
   """
   Width: 380px
@@ -16022,44 +16104,44 @@ interface ThemeSetting_Fields {
   menuBackgroundImage: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   mobilePhoneFooter: String
 
   """
-  Field of the &quot;checkbox&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;checkbox&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   newsCheckBox: [String]
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   newsTicker: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   nyOfficesLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   nyOfficesPhone: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   ourClientBigText: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   ourClientsHeading: String
 
   """
-  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
-  questionAnswerList: [ThemeSettingQuestionAnswerList]
+  questionAnswerList: [ThemeOptionsQuestionAnswerList]
 
   """Width:141px; Height:45px;"""
   siteLogo: AcfMediaItemConnectionEdge
@@ -16068,73 +16150,441 @@ interface ThemeSetting_Fields {
   siteLogoWhite: AcfMediaItemConnectionEdge
 
   """
-  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
-  socialMenuItems: [ThemeSettingSocialMenuItems]
+  socialMenuItems: [ThemeOptionsSocialMenuItems]
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   socialMenuLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   sqlink: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   talkTextMobile: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   talkTitleMobile: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   talkUsLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   tiktokLink: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   tlvOfficesLabel: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   tlvOfficesPhone: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   trustedText: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   whatsappMessage: String
 
   """
-  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeSetting&quot; Field Group
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
   """
   whatsappNumber: String
 }
 
 """
-The &quot;ThemeSettingClientsLogos&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
+Interface representing fields of the ACF &quot;ThemeOptions&quot; Field Group
 """
-type ThemeSettingClientsLogos implements ThemeSettingClientsLogos_Fields & AcfFieldGroup & AcfFieldGroupFields {
+interface ThemeOptions_Fields {
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  bookButton: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  bookButtonLink: String
+
+  """
+  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  bookButtonTarget: [String]
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cAddress: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cAddressLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cButton: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cCallUsLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cContactFormHeading: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cEmailAddress: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cEmailLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cLeftHeading: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cNyLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cNyNumber: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cTlvLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cTlvNumber: String
+
+  """
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  cTrustedLogos: [ThemeOptionsCTrustedLogos]
+
+  """
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  clientsLogos: [ThemeOptionsClientsLogos]
+
+  """
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  commonGridOneImage: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  commonGridOneMobile: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  contactButton: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  contactButtonLink: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  emailAddress: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  emailLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  errorButton: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  errorButtonLink: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  errorMessage: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  errorTitle: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  facebookLink: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  faqHeading: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  faqShortText: String
+
+  """The name of the field group"""
+  fieldGroupName: String @deprecated(reason: "Use __typename instead")
+
+  """width:92px; Height:30px;"""
+  footerLogo: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footerMentionsLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footerPrivacyLink: String
+
+  """
+  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footerPrivacyTarget: [String]
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footerPrivacyText: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footerTermLink: String
+
+  """
+  Field of the &quot;select&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footerTermTarget: [String]
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footerTermText: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footmenuTitleFive: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footmenuTitleFour: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footmenuTitleOne: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footmenuTitleThree: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  footmenuTitleTwo: String
+
+  """
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  gImageList: [ThemeOptionsGImageList]
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  instagramLink: String
+
+  """
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  jumpingImage1: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  jumpingImage2: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;image&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  jumpingImage3: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  linkedinLink: String
+
+  """
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  mentionsLogos: [ThemeOptionsMentionsLogos]
+
+  """
+  Width: 380px
+  Height: 340px
+  """
+  menuBackgroundImage: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  mobilePhoneFooter: String
+
+  """
+  Field of the &quot;checkbox&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  newsCheckBox: [String]
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  newsTicker: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  nyOfficesLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  nyOfficesPhone: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  ourClientBigText: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  ourClientsHeading: String
+
+  """
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  questionAnswerList: [ThemeOptionsQuestionAnswerList]
+
+  """Width:141px; Height:45px;"""
+  siteLogo: AcfMediaItemConnectionEdge
+
+  """Width:141px; Height:45px;"""
+  siteLogoWhite: AcfMediaItemConnectionEdge
+
+  """
+  Field of the &quot;repeater&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  socialMenuItems: [ThemeOptionsSocialMenuItems]
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  socialMenuLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  sqlink: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  talkTextMobile: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  talkTitleMobile: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  talkUsLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  tiktokLink: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  tlvOfficesLabel: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  tlvOfficesPhone: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  trustedText: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  whatsappMessage: String
+
+  """
+  Field of the &quot;text&quot; Field Type added to the schema as part of the &quot;ThemeOptions&quot; Field Group
+  """
+  whatsappNumber: String
+}
+
+"""
+The &quot;ThemeOptionsClientsLogos&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
+"""
+type ThemeOptionsClientsLogos implements ThemeOptionsClientsLogos_Fields & AcfFieldGroup & AcfFieldGroupFields {
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingClientsLogos&quot; Field Group
+  &quot;ThemeOptionsClientsLogos&quot; Field Group
   """
   cLogo: AcfMediaItemConnectionEdge
 
@@ -16143,12 +16593,12 @@ type ThemeSettingClientsLogos implements ThemeSettingClientsLogos_Fields & AcfFi
 }
 
 """
-Interface representing fields of the ACF &quot;ThemeSettingClientsLogos&quot; Field Group
+Interface representing fields of the ACF &quot;ThemeOptionsClientsLogos&quot; Field Group
 """
-interface ThemeSettingClientsLogos_Fields {
+interface ThemeOptionsClientsLogos_Fields {
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingClientsLogos&quot; Field Group
+  &quot;ThemeOptionsClientsLogos&quot; Field Group
   """
   cLogo: AcfMediaItemConnectionEdge
 
@@ -16157,108 +16607,108 @@ interface ThemeSettingClientsLogos_Fields {
 }
 
 """
-The &quot;ThemeSettingCTrustedLogos&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
+The &quot;ThemeOptionsCTrustedLogos&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
 """
-type ThemeSettingCTrustedLogos implements ThemeSettingCTrustedLogos_Fields & AcfFieldGroup & AcfFieldGroupFields {
+type ThemeOptionsCTrustedLogos implements ThemeOptionsCTrustedLogos_Fields & AcfFieldGroup & AcfFieldGroupFields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingCTrustedLogos&quot; Field Group
+  &quot;ThemeOptionsCTrustedLogos&quot; Field Group
   """
   tLogos: AcfMediaItemConnectionEdge
 }
 
 """
-Interface representing fields of the ACF &quot;ThemeSettingCTrustedLogos&quot; Field Group
+Interface representing fields of the ACF &quot;ThemeOptionsCTrustedLogos&quot; Field Group
 """
-interface ThemeSettingCTrustedLogos_Fields {
+interface ThemeOptionsCTrustedLogos_Fields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingCTrustedLogos&quot; Field Group
+  &quot;ThemeOptionsCTrustedLogos&quot; Field Group
   """
   tLogos: AcfMediaItemConnectionEdge
 }
 
 """
-The &quot;ThemeSettingGImageList&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
+The &quot;ThemeOptionsGImageList&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
 """
-type ThemeSettingGImageList implements ThemeSettingGImageList_Fields & AcfFieldGroup & AcfFieldGroupFields {
+type ThemeOptionsGImageList implements ThemeOptionsGImageList_Fields & AcfFieldGroup & AcfFieldGroupFields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingGImageList&quot; Field Group
+  &quot;ThemeOptionsGImageList&quot; Field Group
   """
   gImage: AcfMediaItemConnectionEdge
 }
 
 """
-Interface representing fields of the ACF &quot;ThemeSettingGImageList&quot; Field Group
+Interface representing fields of the ACF &quot;ThemeOptionsGImageList&quot; Field Group
 """
-interface ThemeSettingGImageList_Fields {
+interface ThemeOptionsGImageList_Fields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingGImageList&quot; Field Group
+  &quot;ThemeOptionsGImageList&quot; Field Group
   """
   gImage: AcfMediaItemConnectionEdge
 }
 
 """
-The &quot;ThemeSettingMentionsLogos&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
+The &quot;ThemeOptionsMentionsLogos&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
 """
-type ThemeSettingMentionsLogos implements ThemeSettingMentionsLogos_Fields & AcfFieldGroup & AcfFieldGroupFields {
+type ThemeOptionsMentionsLogos implements ThemeOptionsMentionsLogos_Fields & AcfFieldGroup & AcfFieldGroupFields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingMentionsLogos&quot; Field Group
+  &quot;ThemeOptionsMentionsLogos&quot; Field Group
   """
   mentionLogo: AcfMediaItemConnectionEdge
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingMentionsLogos&quot; Field Group
+  &quot;ThemeOptionsMentionsLogos&quot; Field Group
   """
   mentionLogoLink: String
 }
 
 """
-Interface representing fields of the ACF &quot;ThemeSettingMentionsLogos&quot; Field Group
+Interface representing fields of the ACF &quot;ThemeOptionsMentionsLogos&quot; Field Group
 """
-interface ThemeSettingMentionsLogos_Fields {
+interface ThemeOptionsMentionsLogos_Fields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;image&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingMentionsLogos&quot; Field Group
+  &quot;ThemeOptionsMentionsLogos&quot; Field Group
   """
   mentionLogo: AcfMediaItemConnectionEdge
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingMentionsLogos&quot; Field Group
+  &quot;ThemeOptionsMentionsLogos&quot; Field Group
   """
   mentionLogoLink: String
 }
 
 """
-The &quot;ThemeSettingQuestionAnswerList&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
+The &quot;ThemeOptionsQuestionAnswerList&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
 """
-type ThemeSettingQuestionAnswerList implements ThemeSettingQuestionAnswerList_Fields & AcfFieldGroup & AcfFieldGroupFields {
+type ThemeOptionsQuestionAnswerList implements ThemeOptionsQuestionAnswerList_Fields & AcfFieldGroup & AcfFieldGroupFields {
   """
   Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingQuestionAnswerList&quot; Field Group
+  &quot;ThemeOptionsQuestionAnswerList&quot; Field Group
   """
   fAnswer: String
 
@@ -16267,7 +16717,7 @@ type ThemeSettingQuestionAnswerList implements ThemeSettingQuestionAnswerList_Fi
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingQuestionAnswerList&quot; Field Group
+  &quot;ThemeOptionsQuestionAnswerList&quot; Field Group
   """
   fQuestion: String
 
@@ -16276,12 +16726,12 @@ type ThemeSettingQuestionAnswerList implements ThemeSettingQuestionAnswerList_Fi
 }
 
 """
-Interface representing fields of the ACF &quot;ThemeSettingQuestionAnswerList&quot; Field Group
+Interface representing fields of the ACF &quot;ThemeOptionsQuestionAnswerList&quot; Field Group
 """
-interface ThemeSettingQuestionAnswerList_Fields {
+interface ThemeOptionsQuestionAnswerList_Fields {
   """
   Field of the &quot;wysiwyg&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingQuestionAnswerList&quot; Field Group
+  &quot;ThemeOptionsQuestionAnswerList&quot; Field Group
   """
   fAnswer: String
 
@@ -16290,7 +16740,7 @@ interface ThemeSettingQuestionAnswerList_Fields {
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingQuestionAnswerList&quot; Field Group
+  &quot;ThemeOptionsQuestionAnswerList&quot; Field Group
   """
   fQuestion: String
 
@@ -16299,43 +16749,69 @@ interface ThemeSettingQuestionAnswerList_Fields {
 }
 
 """
-The &quot;ThemeSettingSocialMenuItems&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
+The &quot;ThemeOptionsSocialMenuItems&quot; Field Group. Added to the Schema by &quot;WPGraphQL for ACF&quot;.
 """
-type ThemeSettingSocialMenuItems implements ThemeSettingSocialMenuItems_Fields & AcfFieldGroup & AcfFieldGroupFields {
+type ThemeOptionsSocialMenuItems implements ThemeOptionsSocialMenuItems_Fields & AcfFieldGroup & AcfFieldGroupFields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingSocialMenuItems&quot; Field Group
+  &quot;ThemeOptionsSocialMenuItems&quot; Field Group
   """
   socialMediaLink: String
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingSocialMenuItems&quot; Field Group
+  &quot;ThemeOptionsSocialMenuItems&quot; Field Group
   """
   socialMediaText: String
 }
 
 """
-Interface representing fields of the ACF &quot;ThemeSettingSocialMenuItems&quot; Field Group
+Interface representing fields of the ACF &quot;ThemeOptionsSocialMenuItems&quot; Field Group
 """
-interface ThemeSettingSocialMenuItems_Fields {
+interface ThemeOptionsSocialMenuItems_Fields {
   """The name of the field group"""
   fieldGroupName: String @deprecated(reason: "Use __typename instead")
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingSocialMenuItems&quot; Field Group
+  &quot;ThemeOptionsSocialMenuItems&quot; Field Group
   """
   socialMediaLink: String
 
   """
   Field of the &quot;text&quot; Field Type added to the schema as part of the
-  &quot;ThemeSettingSocialMenuItems&quot; Field Group
+  &quot;ThemeOptionsSocialMenuItems&quot; Field Group
   """
   socialMediaText: String
+}
+
+type ThemeSetting implements AcfOptionsPage & Node & WithAcfThemeOptions {
+  """The globally unique ID for the object"""
+  id: ID!
+  menuTitle: String
+  pageTitle: String
+  parentId: String
+
+  """Fields of the ThemeOptions ACF Field Group"""
+  themeOptions: ThemeOptions
+}
+
+"""Translation (WPML)"""
+type Translation {
+  """the relative link to the translated content (WPML)"""
+  href: String
+
+  """the id of the referenced translation (WPML)"""
+  id: ID!
+
+  """Language code (WPML)"""
+  locale: String
+
+  """the title of the translated page (WPML)"""
+  post_title: String
 }
 
 """
@@ -18313,11 +18789,11 @@ interface WithAcfTechnologyPage {
 }
 
 """
-Provides access to fields of the &quot;ThemeSetting&quot; ACF Field Group via the &quot;themeSetting&quot; field
+Provides access to fields of the &quot;ThemeOptions&quot; ACF Field Group via the &quot;themeOptions&quot; field
 """
-interface WithAcfThemeSetting {
-  """Fields of the ThemeSetting ACF Field Group"""
-  themeSetting: ThemeSetting
+interface WithAcfThemeOptions {
+  """Fields of the ThemeOptions ACF Field Group"""
+  themeOptions: ThemeOptions
 }
 
 """

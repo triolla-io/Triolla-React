@@ -1,11 +1,15 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { client } from '@/lib/apollo-client'
+import { LocaleSwitcher } from '@/components/LocaleSwitcher'
+import { type Locale, defaultLocale, localizeHref as localizePath } from '@/lib/i18n'
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from '@/lib/queries'
+import { wpImg } from '@/lib/images'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
-import { SectionReveal } from '@/components/SectionReveal'
 import { FooterModalProvider } from '@/components/FooterServiceModal'
-import { FooterNavLink } from '@/components/FooterNavLink'
+import { FooterNavAccordion } from '@/components/FooterNavAccordion'
+import type { FooterContactItem } from '@/components/FooterNavAccordion'
 import { getAllServices, deriveUri } from '@/lib/service-details'
 import type { GetFooterData, GetThemeSettingsData, FooterMenu, ThemeOptions } from '@/lib/graphql-types'
 
@@ -117,7 +121,8 @@ function GlobeIcon() {
 
 /* ── Component ──────────────────────────────────────────── */
 
-export default async function Footer() {
+export default async function Footer({ locale = defaultLocale }: { locale?: Locale } = {}) {
+  const lp = (path: string) => localizePath(localizeHref(path), locale)
   const [ts, wpMenus, services] = await Promise.all([getThemeSettings(), getFooterMenus(), getAllServices()])
 
   // Map each resolved service detail page (URI path → index) so footer links
@@ -197,7 +202,7 @@ export default async function Footer() {
                       style={{ '--mi': i } as React.CSSProperties}
                       aria-label={label}
                     >
-                      <img src={src} alt="" className="footer-mention__img" width={100} height={36} />
+                      <Image src={wpImg(src) ?? src} alt="" width={100} height={36} className="footer-mention__img" />
                     </a>
                   )
                 })}
@@ -213,76 +218,22 @@ export default async function Footer() {
           Design) open the shared service-detail modal instead of navigating
           to pages that no longer exist on the new site.
       ══════════════════════════════════════════ */}
-      <FooterModalProvider services={services} ctaText={ts?.cButton ?? null} ctaLink="/contact-us">
-        <div className="w-[90%] mx-auto py-10 md:py-16">
-          <SectionReveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-5 md:gap-x-8 gap-y-10 md:gap-y-12">
-            {[
-              ...columns.flatMap((col, i) => {
-                if (col.heading || col.items.length > 0) {
-                  return [
-                    <div key={i}>
-                      {col.heading && <h3 className="footer-col-heading">{col.heading}</h3>}
-                      <ul className="space-y-3">
-                        {col.items.map((item) => (
-                          <li key={item.label}>
-                            <FooterNavLink label={item.label} url={item.url} serviceIndex={item.serviceIndex} />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>,
-                  ]
-                }
-                return []
-              }),
-              ...(socials.length > 0
-                ? [
-                    <div key="social">
-                      <h3 className="footer-col-heading">Social</h3>
-                      <ul className="space-y-3">
-                        {socials.map((s, i) => (
-                          <li key={i}>
-                            {s.socialMediaLink && s.socialMediaText ? (
-                              <a href={s.socialMediaLink} target="_blank" rel="noopener noreferrer" className="footer-nav-link">
-                                {s.socialMediaText}
-                              </a>
-                            ) : null}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>,
-                  ]
-                : []),
-              <div key="contact">
-                <h3 className="footer-col-heading">Talk to Us</h3>
-                <div className="space-y-4">
-                  {emailAddress && (
-                    <div>
-                      <div className="footer-contact-label">Mail</div>
-                      <a href={`mailto:${emailAddress}`} className="footer-nav-link">
-                        {emailAddress}
-                      </a>
-                    </div>
-                  )}
-                  {tlvPhone && (
-                    <div>
-                      <div className="footer-contact-label">{tlvLabel ?? 'TLV Offices'}</div>
-                      <a href={`tel:${tlvPhone.replace(/[^+\d]/g, '')}`} className="footer-nav-link">
-                        {tlvPhone}
-                      </a>
-                    </div>
-                  )}
-                  {nyPhone && (
-                    <div>
-                      <div className="footer-contact-label">{nyLabel ?? 'NY Offices'}</div>
-                      <a href={`tel:${nyPhone.replace(/[^+\d]/g, '')}`} className="footer-nav-link">
-                        {nyPhone}
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>,
-            ]}
-          </SectionReveal>
+      <FooterModalProvider services={services} ctaText={ts?.cButton ?? null} ctaLink={lp('/contact-us')}>
+        <div className="w-[90%] mx-auto py-6 md:py-16">
+          <FooterNavAccordion
+            navColumns={columns}
+            contactHeading="Talk to Us"
+            contactItems={[
+              emailAddress ? { label: 'Mail', href: `mailto:${emailAddress}`, display: emailAddress } : null,
+              tlvPhone ? { label: tlvLabel || 'TLV Offices', href: `tel:${tlvPhone.replace(/[^+\d]/g, '')}`, display: tlvPhone } : null,
+              nyPhone ? { label: nyLabel || 'NY Offices', href: `tel:${nyPhone.replace(/[^+\d]/g, '')}`, display: nyPhone } : null,
+            ].filter((x): x is FooterContactItem => x !== null)}
+            socialHeading="Social"
+            socialItems={socials.reduce<{ href: string; text: string }[]>((acc, s) => {
+              if (s.socialMediaLink && s.socialMediaText) acc.push({ href: s.socialMediaLink, text: s.socialMediaText })
+              return acc
+            }, [])}
+          />
         </div>
       </FooterModalProvider>
 
@@ -293,8 +244,8 @@ export default async function Footer() {
         <div className="w-[90%] mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             {/* Left: logo */}
-            <Link href="/">
-              {logoUrl ? <img src={logoUrl} alt="Triolla" width={92} height={30} className="h-7 w-auto brightness-0 invert" /> : null}
+            <Link href={lp('/')}>
+              {logoUrl ? <img src={wpImg(logoUrl) ?? ''} alt="Triolla" width={92} height={30} className="h-7 w-auto brightness-0 invert" /> : null}
             </Link>
 
             {/* Center: copyright + legal */}
@@ -303,7 +254,7 @@ export default async function Footer() {
               {privacyText && privacyLink && (
                 <>
                   {' | '}
-                  <Link href={localizeHref(privacyLink)} className="footer-bottom-link">
+                  <Link href={lp(privacyLink)} className="footer-bottom-link">
                     {privacyText}
                   </Link>
                 </>
@@ -311,7 +262,7 @@ export default async function Footer() {
               {termText && termLink && (
                 <>
                   {' | '}
-                  <Link href={localizeHref(termLink)} className="footer-bottom-link">
+                  <Link href={lp(termLink)} className="footer-bottom-link">
                     {termText}
                   </Link>
                 </>
@@ -370,23 +321,12 @@ export default async function Footer() {
             <div className="hidden md:flex items-center gap-5">
               <div className="footer-lang flex items-center gap-2">
                 <GlobeIcon />
-                <a
-                  href="https://triolla.io/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer-lang__opt footer-lang__opt--active"
-                >
-                  Eng
-                </a>
-                <span className="footer-lang__sep">/</span>
-                <a href="https://triolla.io/he/" target="_blank" rel="noopener noreferrer" className="footer-lang__opt">
-                  Heb
-                </a>
+                <LocaleSwitcher />
               </div>
               {sqlinkUrl && (
                 <a href={sqlinkUrl} target="_blank" rel="noopener noreferrer" className="footer-sqlink">
                   Part of
-                  <img src="https://triolla.io/wp-content/themes/triolla/images/sqlink_icon.png" alt="Sqlink" className="h-5 w-auto" />
+                  <img src="/wp-content/themes/triolla/images/sqlink_icon.png" alt="Sqlink" className="h-5 w-auto" />
                 </a>
               )}
               <div className="flex items-center gap-3">

@@ -1,6 +1,8 @@
 import React from 'react'
+import Image from 'next/image'
 import { SectionReveal } from '@/components/SectionReveal'
 import { GlowOrb, Button } from '@/components/ui'
+import { wpImg } from '@/lib/images'
 
 interface WhyUsCard {
   abteintitle?: string | null
@@ -33,11 +35,11 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
   const cleanText = stripHtml(text)
 
   return (
-    <section className="why-section py-16 md:py-24 mx-2 md:mx-4 lg:mx-10 px-5 md:px-8 lg:px-24 mb-16 md:mb-32 relative overflow-hidden">
+    <section className="why-section py-8 md:py-24 mx-2 md:mx-4 lg:mx-10 px-5 md:px-8 lg:px-24 mb-6 md:mb-32 relative overflow-hidden">
       <GlowOrb size={600} blur={60} color="rgba(250,204,21,0.05)" className="top-[-20%] right-[-10%]" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col lg:flex-row justify-between mb-20 gap-10">
+        <div className="flex flex-col lg:flex-row justify-between mb-8 md:mb-20 gap-6 md:gap-10">
           {cleanTitle && (
             <div>
               <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold max-w-2xl leading-tight">{cleanTitle}</h3>
@@ -53,7 +55,7 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
             <div key={i} className="service-card group">
               <div className="service-card__icon-wrap">
                 {card.abthreimage?.node?.sourceUrl ? (
-                  <img src={card.abthreimage.node.sourceUrl} alt="" className="service-card__icon-img" />
+                  <Image src={wpImg(card.abthreimage.node.sourceUrl) ?? card.abthreimage.node.sourceUrl} alt="" width={64} height={64} className="service-card__icon-img" />
                 ) : (
                   <svg
                     className="service-card__icon-img text-yellow-400"

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { SectionReveal } from '@/components/SectionReveal'
 import { BlogPostCard } from '@/components/BlogPostCard'
-import { loadMorePosts } from '@/app/blog/actions'
+import { loadMorePosts } from '@/app/[locale]/blog/actions'
 import type { BlogPostNode, BlogPostsPageInfo } from '@/lib/graphql-types'
 
 interface BlogPostGridProps {
@@ -11,19 +11,21 @@ interface BlogPostGridProps {
   initialPageInfo: BlogPostsPageInfo
   /** Load-More label from WP (moreText/buttonText); null → icon-only button. */
   loadMoreLabel: string | null
+  /** Active locale — load-more must keep fetching posts in the same language. */
+  locale?: string
 }
 
-export function BlogPostGrid({ initialPosts, initialPageInfo, loadMoreLabel }: BlogPostGridProps) {
+export function BlogPostGrid({ initialPosts, initialPageInfo, loadMoreLabel, locale }: BlogPostGridProps) {
   const [posts, setPosts] = useState<BlogPostNode[]>(initialPosts)
   const [pageInfo, setPageInfo] = useState<BlogPostsPageInfo>(initialPageInfo)
   const [isPending, startTransition] = useTransition()
 
   const onLoadMore = () => {
     startTransition(async () => {
-      const next = await loadMorePosts(pageInfo.endCursor)
+      const next = await loadMorePosts(pageInfo.endCursor, locale)
       setPosts((prev) => {
         const seen = new Set(prev.map((p) => p.id))
-        return [...prev, ...next.nodes.filter((p) => !seen.has(p.id))]
+        return [...prev, ...next.nodes.filter((p: BlogPostNode) => !seen.has(p.id))]
       })
       setPageInfo(next.pageInfo)
     })

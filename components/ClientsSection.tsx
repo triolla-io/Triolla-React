@@ -1,6 +1,9 @@
 import React from 'react'
+import Image from 'next/image'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
+import { wpImg } from '@/lib/images'
+import { type Locale, localizeHref } from '@/lib/i18n'
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -18,9 +21,10 @@ interface ClientsSectionProps {
   bigText?: string | null
   ctaText?: string | null
   accentColor?: string
+  locale?: Locale
 }
 
-export function ClientsSection({ logos, heading, bigText, ctaText, accentColor = '#facc15' }: ClientsSectionProps) {
+export function ClientsSection({ logos, heading, bigText, ctaText, accentColor = '#facc15', locale = 'en' }: ClientsSectionProps) {
   if (logos.length === 0) return null
 
   const ac = accentColor
@@ -48,12 +52,13 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         }
         .cs-logo-card {
           flex-shrink: 0;
-          width: 176px; height: 112px;
-          border-radius: 24px;
+          width: clamp(120px, 18vw, 176px);
+          height: clamp(76px, 11.5vw, 112px);
+          border-radius: clamp(16px, 3vw, 24px);
           border: 1px solid rgba(255,255,255,0.07);
           background: rgba(255,255,255,0.025);
           display: flex; align-items: center; justify-content: center;
-          padding: 14px;
+          padding: clamp(10px, 1.5vw, 14px);
           position: relative;
           transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
           overflow: hidden;
@@ -84,8 +89,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         }
         .cs-logo-card:hover .cs-logo-img { opacity: 0.9; }
         @media (max-width: 768px) {
-          .cs-clients { padding: 52px 0 64px; }
-          .cs-logo-card { width: 136px; height: 88px; border-radius: 18px; }
+          .cs-clients { padding: 32px 0 36px; }
         }
       `}</style>
 
@@ -138,7 +142,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         className="mb-5"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <img src={logo.url} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
+            <Image src={wpImg(logo.url) ?? logo.url} alt={logo.alt || 'Client logo'} fill className="cs-logo-img" sizes="176px" />
           </div>
         )}
       />
@@ -154,7 +158,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         fadeColor="#080808"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <img src={logo.url} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
+            <Image src={wpImg(logo.url) ?? logo.url} alt={logo.alt || 'Client logo'} fill className="cs-logo-img" sizes="176px" />
           </div>
         )}
       />
@@ -163,7 +167,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         <div className="text-center mt-12 relative z-10">
           <Button
             variant="primary"
-            href="/contact-us"
+            href={localizeHref('/contact-us', locale)}
             style={{ '--btn-pad': '14px 32px', background: 'var(--accent)' } as React.CSSProperties}
           >
             {ctaText}

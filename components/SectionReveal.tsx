@@ -1,40 +1,47 @@
 'use client'
 
-import { m, useInView } from 'motion/react'
-import { useRef, ReactNode } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 
 interface SectionRevealProps {
   children: ReactNode | ReactNode[]
   className?: string
 }
 
-const container = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.12,
-    },
-  },
-}
-
-const item = {
-  hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
-}
-
 export function SectionReveal({ children, className = '' }: SectionRevealProps) {
   const ref = useRef<HTMLDivElement>(null)
-  // amount: 0 → fires as soon as any pixel is visible, including elements
-  // already in viewport at mount time (fixes whileInView race on SPA navigation)
-  const isInView = useInView(ref, { once: true, amount: 0 })
+  const [visible, setVisible] = useState(false)
+  const childArray = Array.isArray(children) ? children : [children]
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <m.div ref={ref} className={className} variants={container} initial="hidden" animate={isInView ? 'show' : 'hidden'}>
-      {(Array.isArray(children) ? children : [children]).map((child, i) => (
-        <m.div key={i} variants={item}>
+    <div ref={ref} className={className}>
+      {childArray.map((child, i) => (
+        <div
+          key={i}
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'none' : 'translateY(40px)',
+            transition: `opacity 0.6s ease-out ${i * 0.12}s, transform 0.6s ease-out ${i * 0.12}s`,
+          }}
+        >
           {child}
-        </m.div>
+        </div>
       ))}
-    </m.div>
+    </div>
   )
 }

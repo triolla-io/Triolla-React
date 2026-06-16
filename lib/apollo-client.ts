@@ -8,3 +8,11 @@ export const client = new ApolloClient({
   }),
   cache: new InMemoryCache(),
 })
+
+export function getLocalizedClient(locale: string) {
+  if (locale === 'en') return client
+  return new ApolloClient({
+    link: new HttpLink({ uri: `${WORDPRESS_GRAPHQL_ENDPOINT}?lang=${locale}` }),
+    cache: new InMemoryCache(),
+  })
+}
