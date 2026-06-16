@@ -1,6 +1,7 @@
 import React from 'react'
 import { SectionReveal } from '@/components/SectionReveal'
 import { GlowOrb, Button } from '@/components/ui'
+import { stripHtml } from '@/lib/text'
 
 interface WhyUsCard {
   abteintitle?: string | null
@@ -14,16 +15,6 @@ interface WhyUsSectionProps {
   cards: WhyUsCard[]
   ctaText?: string | null
   ctaLink?: string | null
-}
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
 }
 
 export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSectionProps) {

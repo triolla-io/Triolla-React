@@ -17,7 +17,7 @@ import { GlowOrb, Eyebrow, GradientText, GrainOverlay, ShineImageCard } from '@/
 import { FadeIn } from '@/components/FadeIn'
 import { BlogPostGrid } from '@/components/BlogPostGrid'
 import { ContactCTA } from '@/components/ContactCTA'
-import { stripHtml, formatPostDate } from '@/lib/text'
+import { stripHtml, formatPostDate, filterEnglishPosts } from '@/lib/text'
 
 const BLOG_PAGE_QUERY: TypedDocumentNode<GetBlogPageData> = gql`
   ${GET_BLOG_PAGE}
@@ -103,7 +103,9 @@ function FeaturedPost({ post }: { post: BlogPostNode }) {
 export default async function BlogPage() {
   const [bp, postsConn, ts] = await Promise.all([getBlogPage(), getInitialPosts(), getThemeSettings()])
 
-  const allPosts = postsConn?.nodes ?? []
+  // WP returns both EN + HE versions of each article; render English only until
+  // i18n lands. Filter before splitting so featured + grid are all English.
+  const allPosts = filterEnglishPosts(postsConn?.nodes ?? [])
   const featured = allPosts[0] ?? null
   const gridPosts = allPosts.slice(1)
   const gridPageInfo = postsConn?.pageInfo ?? { hasNextPage: false, endCursor: null }

@@ -11,6 +11,7 @@ import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
 import { GrainOverlay, GlowOrb, Eyebrow, Marquee } from '@/components/ui'
 import type { GetTechnologyPageData, GetThemeSettingsData, TechnologyPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
+import { stripHtml } from '@/lib/text'
 
 const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
   ${GET_TECHNOLOGY_PAGE}
@@ -19,17 +20,6 @@ const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
 `
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&#8217;/g, "'")
-    .trim()
-}
 
 async function getTechData(): Promise<TechnologyPageFields> {
   try {
@@ -97,20 +87,14 @@ export default async function TechnologyPage() {
   /* ── Bottom portfolio grid image ── */
   const bottomGridImage: string | null = ts?.commonGridOneImage?.node?.sourceUrl ?? null
 
-  const faqItems = (tp.qaList ?? []).flatMap(
-    (q: { question: string; answer: string }) => {
-      return q?.question
-        ? [{ faqQuestion: q.question, faqAnswer: q.answer ?? '' }]
-        : []
-    }
-  )
+  const faqItems = (tp.qaList ?? []).flatMap((q: { question: string; answer: string }) => {
+    return q?.question ? [{ faqQuestion: q.question, faqAnswer: q.answer ?? '' }] : []
+  })
 
-  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap(
-    (item: { cLogo: WPImage | null }) => {
-      const url = item.cLogo?.node?.sourceUrl
-      return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
-    }
-  )
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap((item: { cLogo: WPImage | null }) => {
+    const url = item.cLogo?.node?.sourceUrl
+    return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
+  })
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress

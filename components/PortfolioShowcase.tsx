@@ -3,10 +3,7 @@
 
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
-
-function stripHtml(html: string): string {
-  return (html ?? '').replace(/<[^>]+>/g, '').trim()
-}
+import { stripHtml } from '@/lib/text'
 
 interface PortfolioShowcaseProps {
   items: any[]
