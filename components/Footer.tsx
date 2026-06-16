@@ -229,10 +229,11 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               nyPhone ? { label: nyLabel || 'NY Offices', href: `tel:${nyPhone.replace(/[^+\d]/g, '')}`, display: nyPhone } : null,
             ].filter((x): x is FooterContactItem => x !== null)}
             socialHeading="Social"
-            socialItems={socials.reduce<{ href: string; text: string }[]>((acc, s) => {
-              if (s.socialMediaLink && s.socialMediaText) acc.push({ href: s.socialMediaLink, text: s.socialMediaText })
-              return acc
-            }, [])}
+            socialItems={socials.flatMap((s) =>
+              s.socialMediaLink && s.socialMediaText
+                ? [{ href: s.socialMediaLink, text: s.socialMediaText }]
+                : []
+            )}
           />
         </div>
       </FooterModalProvider>
