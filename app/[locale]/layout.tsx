@@ -22,11 +22,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: 'Triolla | Product Design & Development',
   description: 'Product Design for Tech, Gaming, Medical, Cyber, IoT, Agritech, Mobile, SaaS Platforms & Startups',
-  other: {
-    // preconnect to WP origin early — images, fonts, GraphQL all come from there
-    'link-preconnect-wp': '<link rel="preconnect" href="https://triolla.io" crossOrigin="anonymous" />',
-    'link-dns-prefetch-wp': '<link rel="dns-prefetch" href="https://triolla.io" />',
-  },
 }
 
 export const viewport: Viewport = {
@@ -51,6 +46,10 @@ export default async function RootLayout({
 
   return (
     <html lang={htmlLang[loc]} dir={dir[loc]} className={`${inter.variable} h-full antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://triolla.io" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://triolla.io" />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
         <MotionProvider>
           <Header locale={loc} />

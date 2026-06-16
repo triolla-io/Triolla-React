@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, m } from 'motion/react'
 import Image from 'next/image'
 import { wpImg } from '@/lib/images'
@@ -312,8 +312,19 @@ export function HeaderClient({
   const [isTickerDismissed, setIsTickerDismissed] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const isHe = pathname === '/he' || pathname.startsWith('/he/')
   const lp = makeLocalize(isHe)
+
+  // Holds the destination of a tapped mobile-menu link. We defer the actual
+  // navigation until the close animation finishes (onExitComplete) so the
+  // slide-out runs on a clear main thread instead of being starved by the
+  // blocking route transition + incoming page render.
+  const pendingHrefRef = useRef<string | null>(null)
+  const navigateAndClose = (href: string) => {
+    pendingHrefRef.current = href
+    setIsMobileMenuOpen(false)
+  }
 
   useEffect(() => {
     let scrollTimer: ReturnType<typeof setTimeout> | null = null
@@ -483,12 +494,20 @@ export function HeaderClient({
       </div>
 
       {/* Mobile menu — full-screen vault overlay */}
-      <AnimatePresence>
+      <AnimatePresence
+        onExitComplete={() => {
+          const href = pendingHrefRef.current
+          if (href) {
+            pendingHrefRef.current = null
+            router.push(href)
+          }
+        }}
+      >
         {isMobileMenuOpen && (
           <m.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            exit={{ x: '100%', transition: { duration: 0.32, ease: [0.4, 0, 0.2, 1] } }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="pointer-events-auto lg:hidden fixed inset-0 z-9999 bg-[#080808] flex flex-col overflow-hidden"
           >
@@ -544,7 +563,13 @@ export function HeaderClient({
 
             {/* Header row */}
             <div className="relative z-10 flex items-center justify-between px-6 pt-5 pb-4 shrink-0">
-              <Link href={isHe ? '/he' : '/'} onClick={() => setIsMobileMenuOpen(false)}>
+              <Link
+                href={isHe ? '/he' : '/'}
+                onClick={(e) => {
+                  e.preventDefault()
+                  navigateAndClose(isHe ? '/he' : '/')
+                }}
+              >
                 {logoUrl ? (
                   <Image src={wpImg(logoUrl) ?? logoUrl} alt="Triolla" width={120} height={20} className="h-5 w-auto brightness-0 invert" />
                 ) : (
@@ -617,7 +642,10 @@ export function HeaderClient({
                           className={`py-3 flex-1 text-[clamp(1.5rem,7vw,2.2rem)] font-extrabold leading-tight tracking-[-0.02em] transition-colors duration-200 ${
                             isActive ? 'text-yellow-400' : 'text-white/90 hover:text-white'
                           }`}
-                          onClick={() => setIsMobileMenuOpen(false)}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            navigateAndClose(href)
+                          }}
                         >
                           {item.label}
                         </Link>
@@ -629,7 +657,10 @@ export function HeaderClient({
                               key={`${child.url}-${child.label}`}
                               href={lp(child.url)}
                               className="text-[12px] text-white/40 hover:text-white/70 transition-colors bg-white/5 hover:bg-white/8 px-3 py-1.5 rounded-full"
-                              onClick={() => setIsMobileMenuOpen(false)}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                navigateAndClose(lp(child.url))
+                              }}
                             >
                               {child.label}
                             </Link>
@@ -656,7 +687,10 @@ export function HeaderClient({
                   <Link
                     href={lp(contactButtonHref)}
                     className="flex items-center justify-center h-14 rounded-2xl bg-yellow-400 text-black font-bold text-[15px] tracking-tight hover:bg-yellow-300 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      navigateAndClose(lp(contactButtonHref))
+                    }}
                   >
                     {contactButtonText}
                   </Link>
