@@ -227,9 +227,11 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               nyPhone ? { label: nyLabel || 'NY Offices', href: `tel:${nyPhone.replace(/[^+\d]/g, '')}`, display: nyPhone } : null,
             ].filter((x): x is FooterContactItem => x !== null)}
             socialHeading="Social"
-            socialItems={socials
-              .filter((s) => s.socialMediaLink && s.socialMediaText)
-              .map((s) => ({ href: s.socialMediaLink!, text: s.socialMediaText! }))}
+            socialItems={socials.flatMap((s) =>
+              s.socialMediaLink && s.socialMediaText
+                ? [{ href: s.socialMediaLink, text: s.socialMediaText }]
+                : []
+            )}
           />
         </div>
       </FooterModalProvider>
