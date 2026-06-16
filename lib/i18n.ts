@@ -55,3 +55,9 @@ export const PAGE_URI: Record<string, Record<Locale, string>> = {
   accessibility:   { en: 'accessibility-statement',  he: 'הצהרת-נגישות' },
   termsOfUse:      { en: 'terms-of-use',             he: 'תנאי-שימוש' },
 }
+
+/** Returns a locale-prefixed path: `/he/contact-us` for Hebrew, `/contact-us` for English. */
+export function localizeHref(path: string, locale: Locale): string {
+  if (locale === 'he') return `/he${path.startsWith('/') ? path : `/${path}`}`
+  return path.startsWith('/') ? path : `/${path}`
+}
