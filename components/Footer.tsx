@@ -6,6 +6,7 @@ import type { TypedDocumentNode } from '@apollo/client'
 import { SectionReveal } from '@/components/SectionReveal'
 import { FooterModalProvider } from '@/components/FooterServiceModal'
 import { FooterNavLink } from '@/components/FooterNavLink'
+import CookieSettingsButton from '@/components/consent/CookieSettingsButton'
 import { getAllServices, deriveUri } from '@/lib/service-details'
 import type { GetFooterData, GetThemeSettingsData, FooterMenu, ThemeOptions } from '@/lib/graphql-types'
 
@@ -50,7 +51,10 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
 async function getFooterMenus(): Promise<FooterMenu[]> {
   try {
     const { data } = await client.query({ query: FOOTER_QUERY })
-    return data?.menus?.nodes ?? []
+    // Aliased single-menu lookups; drop any slug that doesn't resolve.
+    return [data?.product, data?.caseStudy, data?.technology, data?.company, data?.blog].filter(
+      (m): m is FooterMenu => Boolean(m),
+    )
   } catch {
     return []
   }
@@ -316,6 +320,8 @@ export default async function Footer() {
                   </Link>
                 </>
               )}
+              {' | '}
+              <CookieSettingsButton />
             </p>
 
             {/* Mobile social icons — premium round buttons */}

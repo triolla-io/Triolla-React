@@ -107,7 +107,11 @@ export interface FooterMenu {
 }
 
 export interface GetFooterData {
-  menus: { nodes: FooterMenu[] }
+  product: FooterMenu | null
+  caseStudy: FooterMenu | null
+  technology: FooterMenu | null
+  company: FooterMenu | null
+  blog: FooterMenu | null
 }
 
 /* ── GET_CONTACT_PAGE ───────────────────────────────────── */

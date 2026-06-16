@@ -4,6 +4,8 @@ import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CookieBanner from '@/components/CookieBanner'
+import ConsentScripts from '@/components/consent/ConsentScripts'
+import { ConsentProvider } from '@/components/consent/ConsentProvider'
 import { BfcacheReloader } from '@/components/BfcacheReloader'
 import { MotionProvider } from '@/components/MotionProvider'
 
@@ -31,12 +33,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
-        <MotionProvider>
-          <Header />
-          <main className="grow">{children}</main>
-          <Footer />
-          <CookieBanner />
-        </MotionProvider>
+        <ConsentScripts />
+        <ConsentProvider>
+          <MotionProvider>
+            <Header />
+            <main className="grow">{children}</main>
+            <Footer />
+            <CookieBanner />
+          </MotionProvider>
+        </ConsentProvider>
         <BfcacheReloader />
       </body>
     </html>
