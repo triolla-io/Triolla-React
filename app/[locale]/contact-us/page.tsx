@@ -118,7 +118,7 @@ export default async function ContactUsPage({ params }: { params: Promise<{ loca
   )
 
   return (
-    <main className="bg-[#080808] text-white overflow-x-clip relative pb-32">
+    <main className="bg-[#080808] text-white overflow-x-clip relative pb-16 md:pb-32">
       {contactJsonLd && <JsonLd data={[contactJsonLd, contactCrumbs]} />}
       {/* ══ HERO ══ */}
       <section className="cu-hero">

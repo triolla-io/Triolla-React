@@ -918,6 +918,10 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
           .about-hero__index { right: 20px; top: 20px; }
           .about-showcase { padding: 32px 0 28px; }
           .about-showcase__stage { padding: 0 16px; }
+          .about-showcase__card--left,
+          .about-showcase__card--right { display: none; }
+          .about-showcase__stage { max-width: 340px; grid-template-columns: 1fr; }
+          .about-showcase__card--main { transform: none; animation: none; aspect-ratio: 4/3; }
           .about-showcase__ticker { margin-top: 20px; }
           .about-crafting { padding-top: 36px; }
           .about-crafting__inner { padding: 0 20px; }

@@ -318,9 +318,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           GLOBAL STYLES
       ══════════════════════════════════════════════ */}
       <style>{`
-        /* ─── Fonts ─────────────────────────────── */
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
-
         /* ─── Hero grid lines ───────────────────── */
         .hero-grid {
           position: absolute;
