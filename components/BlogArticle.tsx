@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { GlowOrb } from '@/components/ui'
 import { ReadingProgress } from '@/components/ReadingProgress'
@@ -54,7 +55,7 @@ export function BlogArticle({ post, locale = 'en' }: { post: SinglePost; locale?
 
         {imgUrl && (
           <figure className="article-hero-img">
-            <img src={wpImg(imgUrl) ?? ''} alt={imgAlt} />
+            <Image src={wpImg(imgUrl) ?? imgUrl} alt={imgAlt} width={1200} height={630} className="w-full h-auto" />
           </figure>
         )}
 

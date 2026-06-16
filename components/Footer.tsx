@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { client } from '@/lib/apollo-client'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
@@ -201,7 +202,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
                       style={{ '--mi': i } as React.CSSProperties}
                       aria-label={label}
                     >
-                      <img src={wpImg(src) ?? ''} alt="" className="footer-mention__img" width={100} height={36} />
+                      <Image src={wpImg(src) ?? src} alt="" width={100} height={36} className="footer-mention__img" />
                     </a>
                   )
                 })}
@@ -228,9 +229,10 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               nyPhone ? { label: nyLabel || 'NY Offices', href: `tel:${nyPhone.replace(/[^+\d]/g, '')}`, display: nyPhone } : null,
             ].filter((x): x is FooterContactItem => x !== null)}
             socialHeading="Social"
-            socialItems={socials
-              .filter((s) => s.socialMediaLink && s.socialMediaText)
-              .map((s) => ({ href: s.socialMediaLink!, text: s.socialMediaText! }))}
+            socialItems={socials.reduce<{ href: string; text: string }[]>((acc, s) => {
+              if (s.socialMediaLink && s.socialMediaText) acc.push({ href: s.socialMediaLink, text: s.socialMediaText })
+              return acc
+            }, [])}
           />
         </div>
       </FooterModalProvider>

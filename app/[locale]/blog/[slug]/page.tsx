@@ -17,8 +17,10 @@ import { BlogArticle } from '@/components/BlogArticle'
 import { BlogPostCard } from '@/components/BlogPostCard'
 import { SectionReveal } from '@/components/SectionReveal'
 import { ContactCTA } from '@/components/ContactCTA'
+import { JsonLd } from '@/components/JsonLd'
 import { stripHtml } from '@/lib/text'
 import { isLocale, defaultLocale } from '@/lib/i18n'
+import { blogPostingSchema, breadcrumbSchema } from '@/lib/jsonld'
 
 const POST_SLUGS_QUERY: TypedDocumentNode<GetPostSlugsData> = gql`
   ${GET_POST_SLUGS}
@@ -159,9 +161,24 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale, slug } = await params
   const loc = isLocale(locale) ? locale : defaultLocale
   const [post, altPaths] = await Promise.all([getPost(loc, slug), findAlternateBlogPath(loc, slug)])
+  const title = post?.title ? `${stripHtml(post.title)} | Triolla` : 'Blog | Triolla'
+  const description = post?.postFields?.topBoldText
+    ? stripHtml(post.postFields.topBoldText)
+    : post?.content
+    ? stripHtml(post.content).slice(0, 160).trimEnd()
+    : undefined
+  const ogImage = post?.featuredImage?.node?.sourceUrl ?? undefined
   return {
-    title: post?.title ? `${stripHtml(post.title)} | Triolla` : 'Blog | Triolla',
+    title,
+    ...(description ? { description } : {}),
     alternates: { languages: { en: altPaths.en, he: altPaths.he } },
+    openGraph: {
+      title,
+      ...(description ? { description } : {}),
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      locale: loc === 'he' ? 'he_IL' : 'en_US',
+      type: 'article',
+    },
   }
 }
 
@@ -175,8 +192,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ local
   const currentUri = post.uri ? post.uri.replace(/^\/+|\/+$/g, '') : null
   const related = more.filter((p) => (p.uri ?? '').replace(/^\/+|\/+$/g, '') !== currentUri).slice(0, 3)
 
+  const postingSchema = blogPostingSchema({
+    title: post.title,
+    content: post.content,
+    date: post.date,
+    uri: post.uri,
+    imageUrl: post.featuredImage?.node?.sourceUrl ?? null,
+  })
+  const crumbLabel = post.title ? stripHtml(post.title) : 'Article'
+  const crumbPath = post.uri ? `/${post.uri.replace(/^\/+|\/+$/g, '')}` : `/blog/${slug}`
+  const blogPath = loc === 'he' ? '/he/blog' : '/blog'
+  const crumbSchema = breadcrumbSchema(
+    [
+      { name: 'Blog', path: blogPath },
+      { name: crumbLabel, path: crumbPath },
+    ],
+    loc === 'he' ? 'דף הבית' : 'Home',
+  )
+
   return (
     <>
+      {postingSchema && <JsonLd data={[postingSchema, crumbSchema]} />}
       <BlogArticle post={post} locale={loc} />
 
       {related.length > 0 && (

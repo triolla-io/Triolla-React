@@ -1,6 +1,5 @@
 'use client'
 
-import { m } from 'motion/react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 
 interface SectionRevealProps {
@@ -32,14 +31,16 @@ export function SectionReveal({ children, className = '' }: SectionRevealProps) 
   return (
     <div ref={ref} className={className}>
       {childArray.map((child, i) => (
-        <m.div
+        <div
           key={i}
-          initial={{ opacity: 0, y: 40 }}
-          animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.6, delay: visible ? i * 0.12 : 0, ease: 'easeOut' }}
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'none' : 'translateY(40px)',
+            transition: `opacity 0.6s ease-out ${i * 0.12}s, transform 0.6s ease-out ${i * 0.12}s`,
+          }}
         >
           {child}
-        </m.div>
+        </div>
       ))}
     </div>
   )

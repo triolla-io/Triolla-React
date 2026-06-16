@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { HeroHeadline } from '@/components/HeroHeadline'
 import { SectionReveal } from '@/components/SectionReveal'
 import { FadeIn } from '@/components/FadeIn'
@@ -19,6 +20,8 @@ import type { GetHomePageData, GetThemeSettingsData, HomePageFields, ThemeOption
 import { stripHtml } from '@/lib/text'
 import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 import { wpImg } from '@/lib/images'
+import { JsonLd } from '@/components/JsonLd'
+import { webPageSchema } from '@/lib/jsonld'
 
 const HOME_PAGE_QUERY: TypedDocumentNode<GetHomePageData> = gql`
   ${GET_HOME_PAGE_BY_URI}
@@ -76,6 +79,27 @@ async function getLocalizedThemeOptions(locale: string): Promise<Partial<ThemeOp
   }
 }
 
+/* ── Metadata ────────────────────────────────────── */
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const hp = await getHomeData(PAGE_URI.home[loc])
+  const title = hp?.topsectitle ? `${stripHtml(hp.topsectitle)} | Triolla` : 'Triolla | Product Design & Development'
+  const description = stripHtml(hp?.toptext ?? '') || 'Product Design for Tech, Gaming, Medical, Cyber, IoT, Agritech, Mobile, SaaS Platforms & Startups'
+  return {
+    title,
+    description,
+    alternates: { languages: { en: '/', he: '/he' } },
+    openGraph: {
+      title,
+      description,
+      locale: loc === 'he' ? 'he_IL' : 'en_US',
+      type: 'website',
+    },
+  }
+}
+
 /* ── Page ────────────────────────────────────────── */
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
@@ -115,8 +139,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     return q?.fQuestion ? [{ faqQuestion: q.fQuestion, faqAnswer: q.fAnswer ?? '' }] : []
   })
 
+  const homePath = loc === 'he' ? '/he' : '/'
+  const homePageJsonLd = webPageSchema({
+    path: homePath,
+    name: heroHeadline || 'Triolla',
+    description: heroSubtext || null,
+    type: 'WebPage',
+  })
+
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
+      {homePageJsonLd && <JsonLd data={homePageJsonLd} />}
       {/* ── Grain noise overlay ── */}
       <GrainOverlay />
 

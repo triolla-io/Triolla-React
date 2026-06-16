@@ -14,6 +14,8 @@ import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/
 import parse from 'html-react-parser'
 import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
 
 const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
   ${GET_ABOUT_PAGE}
@@ -51,6 +53,25 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const ap = await getAboutData(PAGE_URI.aboutUs[loc])
+  const title = ap?.headerTitle ? `${stripHtml(ap.headerTitle)} | Triolla` : 'About Us | Triolla'
+  const description = stripHtml(ap?.boldText ?? ap?.shortText ?? '') || undefined
+  return {
+    title,
+    ...(description ? { description } : {}),
+    alternates: { languages: { en: '/about-us', he: '/he/about-us' } },
+    openGraph: {
+      title,
+      ...(description ? { description } : {}),
+      locale: loc === 'he' ? 'he_IL' : 'en_US',
+      type: 'website',
+    },
+  }
+}
+
 export default async function AboutUsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const loc = isLocale(locale) ? locale : defaultLocale
@@ -81,8 +102,21 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
     })
     .slice(0, 6)
 
+  const aboutPath = loc === 'he' ? '/he/about-us' : '/about-us'
+  const aboutJsonLd = webPageSchema({
+    path: aboutPath,
+    name: heroTitle || 'About Us',
+    description: ap.shortText ? stripHtml(ap.shortText) : null,
+    type: 'AboutPage',
+  })
+  const aboutCrumbs = breadcrumbSchema(
+    [{ name: heroTitle || 'About Us', path: aboutPath }],
+    loc === 'he' ? 'דף הבית' : 'Home',
+  )
+
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
+      {aboutJsonLd && <JsonLd data={[aboutJsonLd, aboutCrumbs]} />}
       {/* Grain overlay */}
       <GrainOverlay />
 

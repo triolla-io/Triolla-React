@@ -8,6 +8,8 @@ import type { TypedDocumentNode } from '@apollo/client'
 import { notFound } from 'next/navigation'
 import { PortfolioTemplate } from '@/components/PortfolioTemplate'
 import type { GetPortfolioSlugsData, GetPortfolioPageData, GetThemeSettingsData, PortfolioFields, ThemeOptions } from '@/lib/graphql-types'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
 
 const PORTFOLIO_SLUGS_QUERY: TypedDocumentNode<GetPortfolioSlugsData> = gql`
   ${GET_PORTFOLIO_SLUGS}
@@ -192,19 +194,25 @@ export default async function PortfolioSlugPage({ params }: { params: Promise<{ 
 
     // When the slug is an English portfolio slug (from WP nav like /he/cyber-security),
     // find the Hebrew translation and redirect to the correct Hebrew slug (/he/סייבר).
-    const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
-    const nodes = data?.pages?.nodes ?? []
-    const enNode = nodes.find((n) => {
-      if (n?.template?.__typename !== 'Template_PortfolioPage') return false
-      const route = deriveRoute(n.uri)
-      return route?.locale === 'en' && decodeSlug(route.slug) === decodedSlug
-    })
-    if (enNode) {
-      const heTrans = (enNode.translations ?? []).find((t) => t.locale === 'he_IL' || t.locale === 'he')
-      const heHref = heTrans?.href?.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '')
-      const heRoute = heHref ? deriveRoute(heHref + '/') : null
-      if (heRoute?.slug) redirect(`/he/${heRoute.slug}`)
+    let portfolioRedirectTo: string | null = null
+    try {
+      const { data } = await client.query({ query: PORTFOLIO_SLUGS_QUERY })
+      const nodes = data?.pages?.nodes ?? []
+      const enNode = nodes.find((n) => {
+        if (n?.template?.__typename !== 'Template_PortfolioPage') return false
+        const route = deriveRoute(n.uri)
+        return route?.locale === 'en' && decodeSlug(route.slug) === decodedSlug
+      })
+      if (enNode) {
+        const heTrans = (enNode.translations ?? []).find((t) => t.locale === 'he_IL' || t.locale === 'he')
+        const heHref = heTrans?.href?.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '')
+        const heRoute = heHref ? deriveRoute(heHref + '/') : null
+        if (heRoute?.slug) portfolioRedirectTo = `/he/${heRoute.slug}`
+      }
+    } catch {
+      // WP unavailable — fall through to portfolio lookup below
     }
+    if (portfolioRedirectTo) redirect(portfolioRedirectTo)
   }
 
   const [pf, ts, localizedTs] = await Promise.all([getPortfolioData(locale, slug), getThemeSettings(), getLocalizedThemeOptions(locale)])
@@ -213,5 +221,24 @@ export default async function PortfolioSlugPage({ params }: { params: Promise<{ 
   if (!pf || Object.keys(pf).length === 0) notFound()
 
   const mergedTs = localizedTs ? { ...ts, ...localizedTs } as typeof ts : ts
-  return <PortfolioTemplate pf={pf} ts={mergedTs} locale={locale} />
+
+  const portfolioPath = locale === 'he' ? `/he/${slug}` : `/${slug}`
+  const portfolioTitle = pf.headerTitle ? pf.headerTitle.replace(/<[^>]+>/g, '').trim() : null
+  const portfolioJsonLd = webPageSchema({
+    path: portfolioPath,
+    name: portfolioTitle,
+    description: pf.shortText ? pf.shortText.replace(/<[^>]+>/g, '').trim() : null,
+    type: 'WebPage',
+  })
+  const portfolioCrumbs = breadcrumbSchema(
+    [{ name: portfolioTitle ?? slug, path: portfolioPath }],
+    locale === 'he' ? 'דף הבית' : 'Home',
+  )
+
+  return (
+    <>
+      {portfolioJsonLd && <JsonLd data={[portfolioJsonLd, portfolioCrumbs]} />}
+      <PortfolioTemplate pf={pf} ts={mergedTs} locale={locale} />
+    </>
+  )
 }

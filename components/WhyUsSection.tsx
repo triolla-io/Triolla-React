@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { SectionReveal } from '@/components/SectionReveal'
 import { GlowOrb, Button } from '@/components/ui'
 import { wpImg } from '@/lib/images'
@@ -54,7 +55,7 @@ export function WhyUsSection({ title, text, cards, ctaText, ctaLink }: WhyUsSect
             <div key={i} className="service-card group">
               <div className="service-card__icon-wrap">
                 {card.abthreimage?.node?.sourceUrl ? (
-                  <img src={wpImg(card.abthreimage.node.sourceUrl) ?? ''} alt="" className="service-card__icon-img" />
+                  <Image src={wpImg(card.abthreimage.node.sourceUrl) ?? card.abthreimage.node.sourceUrl} alt="" width={64} height={64} className="service-card__icon-img" />
                 ) : (
                   <svg
                     className="service-card__icon-img text-yellow-400"

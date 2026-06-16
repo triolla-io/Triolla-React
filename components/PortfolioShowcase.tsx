@@ -4,6 +4,7 @@
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
 import { wpImg } from '@/lib/images'
+import { sanitizeWpHtml } from '@/lib/text'
 
 function stripHtml(html: string): string {
   return (html ?? '').replace(/<[^>]+>/g, '').trim()
@@ -106,6 +107,16 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
         /* ─── Accent progress bar ──────────────────── */
         @keyframes ps-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
         .ps-bar { transform-origin: left; animation: ps-bar 0.5s ease-out forwards; }
+
+        /* ─── Reset WordPress float/inline images in body text ── */
+        .ps-body img {
+          float: none !important;
+          position: static !important;
+          display: block;
+          max-width: 100%;
+          height: auto;
+          margin: 12px 0;
+        }
       `}</style>
 
       <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none', direction: 'ltr' }}>
@@ -297,13 +308,14 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
                     {/* Body */}
                     {item.sortText && (
                       <div
-                        className="leading-[1.85] mb-8"
+                        className="ps-body leading-[1.85] mb-8"
                         style={{
                           fontSize: '18px',
                           color: 'rgba(255,255,255,0.55)',
+                          overflow: 'hidden',
                         }}
                       >
-                        {parse(item.sortText)}
+                        {parse(sanitizeWpHtml(item.sortText))}
                       </div>
                     )}
 

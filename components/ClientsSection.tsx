@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
 import { wpImg } from '@/lib/images'
@@ -141,7 +142,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         className="mb-5"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <img src={wpImg(logo.url) ?? ''} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
+            <Image src={wpImg(logo.url) ?? logo.url} alt={logo.alt || 'Client logo'} fill className="cs-logo-img" sizes="176px" />
           </div>
         )}
       />
@@ -157,7 +158,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
         fadeColor="#080808"
         renderItem={(logo, i) => (
           <div key={i} className="cs-logo-card">
-            <img src={wpImg(logo.url) ?? ''} alt={logo.alt || 'Client logo'} className="cs-logo-img" />
+            <Image src={wpImg(logo.url) ?? logo.url} alt={logo.alt || 'Client logo'} fill className="cs-logo-img" sizes="176px" />
           </div>
         )}
       />

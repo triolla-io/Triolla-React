@@ -9,6 +9,8 @@ import { FadeIn } from '@/components/FadeIn'
 import { WannaChatSection } from '@/components/WannaChatSection'
 import { GlowOrb, Eyebrow } from '@/components/ui'
 import type { GetContactPageData, GetThemeSettingsData, ContactFields, ThemeOptions } from '@/lib/graphql-types'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
 
 const CONTACT_PAGE_QUERY: TypedDocumentNode<GetContactPageData> = gql`
   ${GET_CONTACT_PAGE}
@@ -104,8 +106,20 @@ export default async function ContactUsPage({ params }: { params: Promise<{ loca
   const heroTitle = stripHtml(title ?? '')
   const heroLead = stripHtml(fields?.contactTitle ?? '')
 
+  const contactPath = loc === 'he' ? '/he/contact-us' : '/contact-us'
+  const contactJsonLd = webPageSchema({
+    path: contactPath,
+    name: heroTitle || heroLead || 'Contact Us',
+    type: 'ContactPage',
+  })
+  const contactCrumbs = breadcrumbSchema(
+    [{ name: heroTitle || 'Contact', path: contactPath }],
+    loc === 'he' ? 'דף הבית' : 'Home',
+  )
+
   return (
     <main className="bg-[#080808] text-white overflow-x-clip relative pb-32">
+      {contactJsonLd && <JsonLd data={[contactJsonLd, contactCrumbs]} />}
       {/* ══ HERO ══ */}
       <section className="cu-hero">
         <GlowOrb

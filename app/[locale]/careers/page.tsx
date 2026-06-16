@@ -9,6 +9,8 @@ import { FadeIn } from '@/components/FadeIn'
 import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import type { GetCareersPageData, CareerFields } from '@/lib/graphql-types'
 import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbSchema, webPageSchema, jobPostingSchema } from '@/lib/jsonld'
 
 const CAREERS_QUERY: TypedDocumentNode<GetCareersPageData> = gql`
   ${GET_CAREERS_PAGE}
@@ -33,10 +35,23 @@ async function getCareers(uri: string): Promise<CareerFields | null> {
   }
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const cf = await getCareers(PAGE_URI.careers.en)
-  const title = cf?.headerTitle ? stripHtml(cf.headerTitle) : null
-  return { title: title ? `${title} | Triolla` : 'Careers | Triolla' }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const cf = await getCareers(PAGE_URI.careers[loc])
+  const title = cf?.headerTitle ? `${stripHtml(cf.headerTitle)} | Triolla` : 'Careers | Triolla'
+  const description = stripHtml(cf?.boldText ?? cf?.shortText ?? '') || undefined
+  return {
+    title,
+    ...(description ? { description } : {}),
+    alternates: { languages: { en: '/careers', he: '/he/careers' } },
+    openGraph: {
+      title,
+      ...(description ? { description } : {}),
+      locale: loc === 'he' ? 'he_IL' : 'en_US',
+      type: 'website',
+    },
+  }
 }
 
 export default async function CareersPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -47,8 +62,28 @@ export default async function CareersPage({ params }: { params: Promise<{ locale
 
   const heroTitle = stripHtml(cf.headerTitle ?? '')
 
+  const careersPath = loc === 'he' ? '/he/careers' : '/careers'
+  const careersJsonLd = webPageSchema({
+    path: careersPath,
+    name: heroTitle || 'Careers',
+    description: cf.shortText ? stripHtml(cf.shortText) : null,
+  })
+  const careersCrumbs = breadcrumbSchema(
+    [{ name: heroTitle || 'Careers', path: careersPath }],
+    loc === 'he' ? 'דף הבית' : 'Home',
+  )
+  const jobSchemas = (cf.jobsList ?? []).flatMap((job) => {
+    const s = jobPostingSchema({
+      title: job.jobName,
+      description: job.aboutDescription,
+      applyEmail: job.applyEmail,
+    })
+    return s ? [s] : []
+  })
+
   return (
     <main className="careers-root bg-[#080808] text-white overflow-hidden relative">
+      {careersJsonLd && <JsonLd data={[careersJsonLd, careersCrumbs, ...jobSchemas]} />}
       <GrainOverlay />
 
       {/* ══ HERO ══ */}

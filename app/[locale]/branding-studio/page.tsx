@@ -10,6 +10,8 @@ import { WpContent } from '@/lib/wp-content'
 import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import type { GetBrandingStudioData, GetThemeSettingsData, ServiceDetailPage, ThemeOptions } from '@/lib/graphql-types'
 import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbSchema, serviceSchema } from '@/lib/jsonld'
 
 const BRANDING_QUERY: TypedDocumentNode<GetBrandingStudioData> = gql`
   ${GET_BRANDING_STUDIO}
@@ -37,9 +39,25 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
   }
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const page = await getBranding(PAGE_URI.brandingStudio.en)
-  return { title: page?.title ? `${page.title} | Triolla` : 'Branding & Studio | Triolla' }
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const page = await getBranding(PAGE_URI.brandingStudio[loc])
+  const title = page?.title ? `${page.title} | Triolla` : 'Branding & Studio | Triolla'
+  const description = page?.template?.postFields?.topBoldText ?? undefined
+  const ogImage = page?.featuredImage?.node?.sourceUrl ?? undefined
+  return {
+    title,
+    ...(description ? { description } : {}),
+    alternates: { languages: { en: '/branding-studio', he: '/he/branding-studio' } },
+    openGraph: {
+      title,
+      ...(description ? { description } : {}),
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      locale: loc === 'he' ? 'he_IL' : 'en_US',
+      type: 'website',
+    },
+  }
 }
 
 export default async function BrandingStudioPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -55,8 +73,21 @@ export default async function BrandingStudioPage({ params }: { params: Promise<{
   const content = page.content ?? null
   const ctaText = ts?.cButton ?? null
 
+  const brandPath = loc === 'he' ? '/he/branding-studio' : '/branding-studio'
+  const brandJsonLd = serviceSchema({
+    name: title || null,
+    description: lead ? lead.replace(/<[^>]+>/g, '').trim() : null,
+    path: brandPath,
+    serviceType: 'Branding & Studio',
+  })
+  const brandCrumbs = breadcrumbSchema(
+    [{ name: title || 'Branding Studio', path: brandPath }],
+    loc === 'he' ? 'דף הבית' : 'Home',
+  )
+
   return (
     <main className="brand-root bg-[#080808] text-white overflow-hidden relative">
+      {brandJsonLd && <JsonLd data={[brandJsonLd, brandCrumbs]} />}
       <GrainOverlay />
 
       {/* ══ HERO ══ */}

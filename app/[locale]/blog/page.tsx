@@ -19,6 +19,8 @@ import { BlogPostGrid } from '@/components/BlogPostGrid'
 import { ContactCTA } from '@/components/ContactCTA'
 import { stripHtml, formatPostDate } from '@/lib/text'
 import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
 
 const BLOG_PAGE_QUERY: TypedDocumentNode<GetBlogPageData> = gql`
   ${GET_BLOG_PAGE}
@@ -117,8 +119,21 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
   const heroLead = bp?.shortText ?? null
   const heroBold = bp?.boldText ?? null
 
+  const blogPath = loc === 'he' ? '/he/blog' : '/blog'
+  const pageJsonLd = webPageSchema({
+    path: blogPath,
+    name: heroTitle ? stripHtml(heroTitle) : 'Blog',
+    description: heroLead ? stripHtml(heroLead) : null,
+    type: 'Blog',
+  })
+  const crumbs = breadcrumbSchema(
+    [{ name: pageJsonLd?.name as string, path: blogPath }],
+    loc === 'he' ? 'דף הבית' : 'Home',
+  )
+
   return (
     <main className="blog-root bg-[#080808] text-white overflow-x-clip relative pb-16 md:pb-32">
+      {pageJsonLd && <JsonLd data={[pageJsonLd, crumbs]} />}
       <GrainOverlay />
 
       {/* ── HERO ── */}

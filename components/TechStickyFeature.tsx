@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import Image from 'next/image'
 import parse from 'html-react-parser'
 import { GlowOrb } from '@/components/ui'
 import { wpImg } from '@/lib/images'
@@ -209,11 +210,13 @@ export function TechStickyFeature({
               <div className="absolute inset-0">
                 {panels.map((panel, i) =>
                   panel.lftimage?.node?.sourceUrl ? (
-                    <img
+                    <Image
                       key={i}
-                      src={wpImg(panel.lftimage.node.sourceUrl) ?? ''}
+                      src={wpImg(panel.lftimage.node.sourceUrl) ?? panel.lftimage.node.sourceUrl}
                       alt=""
                       aria-hidden="true"
+                      fill
+                      sizes="45vw"
                       className={`tsf-img ${i === activeIndex ? 'tsf-img-on' : 'tsf-img-off'}`}
                     />
                   ) : null,
@@ -308,8 +311,8 @@ export function TechStickyFeature({
                   </div>
                   {/* Mobile image */}
                   {panel.lftimage?.node?.sourceUrl && (
-                    <div className="lg:hidden mb-10 rounded-[24px] overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                      <img src={panel.lftimage.node.sourceUrl} alt="" className="w-full h-full object-cover" />
+                    <div className="lg:hidden mb-10 rounded-[24px] overflow-hidden relative" style={{ aspectRatio: '16/9' }}>
+                      <Image src={wpImg(panel.lftimage.node.sourceUrl) ?? panel.lftimage.node.sourceUrl} alt="" fill sizes="100vw" className="object-cover" />
                     </div>
                   )}
                   <div className="relative z-10 max-w-[560px]">

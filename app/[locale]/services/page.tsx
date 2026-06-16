@@ -15,6 +15,8 @@ import parse from 'html-react-parser'
 import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
 import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
+import { JsonLd } from '@/components/JsonLd'
+import { breadcrumbSchema, serviceSchema } from '@/lib/jsonld'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
@@ -49,6 +51,25 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
     return data?.themeSetting?.themeOptions ?? null
   } catch {
     return null
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<import('next').Metadata> {
+  const { locale } = await params
+  const loc = isLocale(locale) ? locale : defaultLocale
+  const sp = await getServicesData(PAGE_URI.services[loc])
+  const title = sp?.headerTitle ? `${stripHtml(sp.headerTitle)} | Triolla` : 'Services | Triolla'
+  const description = stripHtml(sp?.boldText ?? sp?.shortText ?? '') || undefined
+  return {
+    title,
+    ...(description ? { description } : {}),
+    alternates: { languages: { en: '/services', he: '/he/services' } },
+    openGraph: {
+      title,
+      ...(description ? { description } : {}),
+      locale: loc === 'he' ? 'he_IL' : 'en_US',
+      type: 'website',
+    },
   }
 }
 
@@ -142,8 +163,21 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
     .filter((v): v is string => Boolean(v))
     .map(stripHtml)
 
+  const svcPath = loc === 'he' ? '/he/services' : '/services'
+  const svcJsonLd = serviceSchema({
+    name: heroTitle || 'Services',
+    description: sp.shortText ? stripHtml(sp.shortText) : null,
+    path: svcPath,
+    serviceType: 'Product Design & Development',
+  })
+  const svcCrumbs = breadcrumbSchema(
+    [{ name: heroTitle || 'Services', path: svcPath }],
+    loc === 'he' ? 'דף הבית' : 'Home',
+  )
+
   return (
     <main className="bg-[#080808] text-white overflow-hidden pb-16 md:pb-32 relative">
+      {svcJsonLd && <JsonLd data={[svcJsonLd, svcCrumbs]} />}
       {/* Grain overlay */}
       <GrainOverlay />
 
