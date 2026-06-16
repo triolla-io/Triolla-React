@@ -747,7 +747,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
 
         /* ─── Responsive ─────────────────────────── */
         @media (max-width: 1100px) {
-          .svc-prod__body, .svc-brand__body { grid-template-columns: 1fr; }
+          .svc-prod__body, .svc-brand__body { grid-template-columns: 1fr; gap: 32px; }
           .svc-dev__body { grid-template-columns: 1fr; }
           .svc-prod__menu, .svc-brand__menu { position: static; margin-top: 40px; }
         }
