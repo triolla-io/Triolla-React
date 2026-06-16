@@ -336,11 +336,11 @@ export function HeaderClient({
   }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full pointer-events-none">
+    <header className="sticky top-0 z-50 w-full pointer-events-none bg-[#080808] md:bg-transparent">
       {/* Ticker — full width, above the pill */}
       {ticker && !isTickerDismissed && (
         <div className="pointer-events-auto bg-yellow-400 text-black py-1.5 md:py-2 px-10 text-center text-[11px] md:text-[13px] font-medium relative flex items-center justify-center">
-          <span>{ticker}</span>
+          <span dangerouslySetInnerHTML={{ __html: ticker }} />
           <button
             type="button"
             className="absolute right-4 text-black hover:opacity-60 transition-opacity"
