@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef } from 'react'
 
 // Injects a JSON-LD <script> for Schema.org structured data. LLMs and search
