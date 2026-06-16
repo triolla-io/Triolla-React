@@ -397,7 +397,7 @@ export function PortfolioTemplate({ pf, ts, locale = 'en' }: { pf: any; ts: any;
       </div>
 
       {/* Sticky split-screen case studies — image left, copy scrolls right */}
-      <PortfolioShowcase items={portfolioItems} accentColor={accentColor} />
+      <PortfolioShowcase items={portfolioItems} accentColor={accentColor} isRtl={isRtl} />
 
       {/* ════════════════════════════════════════════
           DESIGN PROCESS

@@ -404,6 +404,7 @@ export interface TechnologyPageFields {
 
 export interface GetTechnologyPageData {
   page: {
+    translations: { id: string | null; locale: string | null }[] | null
     template: {
       technologyPage: TechnologyPageFields | null
     } | null

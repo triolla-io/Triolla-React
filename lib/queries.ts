@@ -443,8 +443,9 @@ export const GET_ABOUT_PAGE = `
 `
 
 export const GET_TECHNOLOGY_PAGE = `
-  query GetTechnologyPage($uri: ID!) {
-    page(id: $uri, idType: URI) {
+  query GetTechnologyPage($id: ID!, $idType: PageIdType!) {
+    page(id: $id, idType: $idType) {
+      translations { id locale }
       template {
         ... on Template_TechnologyPage {
           technologyPage {

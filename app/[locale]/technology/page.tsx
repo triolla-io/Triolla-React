@@ -33,9 +33,32 @@ function stripHtml(html: string): string {
     .trim()
 }
 
-async function getTechData(uri: string): Promise<TechnologyPageFields> {
+async function getTechData(uri: string, locale: string): Promise<TechnologyPageFields> {
   try {
-    const { data } = await client.query({ query: TECH_PAGE_QUERY, variables: { uri } })
+    if (locale === 'he') {
+      // 'technology' slug is identical in EN and HE — URI fetch always returns English.
+      // Fetch the English page first to get the Hebrew translation's WordPress id,
+      // then refetch with DATABASE_ID to get the Hebrew content.
+      const { data: enData } = await client.query({
+        query: TECH_PAGE_QUERY,
+        variables: { id: PAGE_URI.technology.en, idType: 'URI' },
+      })
+      const heTrans = (enData?.page?.translations ?? []).find(
+        (t: { id: string | null; locale: string | null }) =>
+          t.locale === 'he_IL' || t.locale === 'he',
+      )
+      if (heTrans?.id) {
+        const { data } = await client.query({
+          query: TECH_PAGE_QUERY,
+          variables: { id: heTrans.id, idType: 'DATABASE_ID' },
+        })
+        return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields)
+      }
+    }
+    const { data } = await client.query({
+      query: TECH_PAGE_QUERY,
+      variables: { id: uri, idType: 'URI' },
+    })
     return data?.page?.template?.technologyPage ?? ({} as TechnologyPageFields)
   } catch {
     return {} as TechnologyPageFields
@@ -54,7 +77,7 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
 export default async function TechnologyPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const loc = isLocale(locale) ? locale : defaultLocale
-  const [tp, ts] = await Promise.all([getTechData(PAGE_URI.technology[loc]), getThemeSettings()])
+  const [tp, ts] = await Promise.all([getTechData(PAGE_URI.technology[loc], loc), getThemeSettings()])
 
   /* Brand yellow — CMS headerBgColor resolved dark, making accent elements
      (eyebrow lines, hover labels, CTA pill) invisible. Hardcode brand color. */

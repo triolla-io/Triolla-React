@@ -46,7 +46,7 @@ export const PAGE_URI: Record<string, Record<Locale, string>> = {
   home:            { en: '/',                        he: 'home-new-he' },
   aboutUs:         { en: 'about-us',                 he: 'about' },
   services:        { en: 'services',                 he: 'השירותים-שלנו' },
-  contactUs:       { en: 'contact-us',               he: 'contact-us' },
+  contactUs:       { en: 'contact-us',               he: 'צור-קשר' },
   careers:         { en: 'careers',                  he: 'קריירה' },
   technology:      { en: 'technology',               he: 'technology' },
   brandingStudio:  { en: 'branding-studio',          he: 'מיתוג-וסטודיו' },

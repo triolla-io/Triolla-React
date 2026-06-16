@@ -12,6 +12,7 @@ function stripHtml(html: string): string {
 interface PortfolioShowcaseProps {
   items: any[]
   accentColor: string
+  isRtl?: boolean
 }
 
 /**
@@ -20,7 +21,7 @@ interface PortfolioShowcaseProps {
  * panel enters the centre of the viewport (IntersectionObserver driven).
  * Mirrors the "WOW" scroll on the technology page (see TechStickyFeature).
  */
-export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps) {
+export function PortfolioShowcase({ items, accentColor, isRtl = false }: PortfolioShowcaseProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const panelRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -107,7 +108,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
         .ps-bar { transform-origin: left; animation: ps-bar 0.5s ease-out forwards; }
       `}</style>
 
-      <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none' }}>
+      <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none', direction: 'ltr' }}>
         {/* ═══ LEFT — sticky crossfading image ═══ */}
         <div className="hidden lg:block">
           <div className="sticky top-0 h-screen overflow-hidden bg-[#0b0b0b]">
@@ -212,7 +213,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                 ref={(el) => {
                   panelRefs.current[i] = el
                 }}
-                className="md:min-h-screen flex flex-col justify-center py-10 md:py-24 px-5 sm:px-8 lg:px-16 relative"
+                className="min-h-screen flex flex-col justify-center py-10 md:py-24 px-5 sm:px-8 lg:px-16 relative overflow-hidden"
               >
                 {/* Ghost number */}
                 <div
@@ -244,7 +245,7 @@ export function PortfolioShowcase({ items, accentColor }: PortfolioShowcaseProps
                   </div>
                 )}
 
-                <div className="relative z-10 max-w-[560px]">
+                <div className="relative z-10 max-w-[560px]" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
                   {/* Index + accent bar */}
                   <div className="flex items-end gap-4 mb-5 md:mb-9">
                     <span
