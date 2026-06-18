@@ -452,7 +452,7 @@ export function HeaderClient({
           {contactButtonHref && contactButtonText && (
             <Link
               href={lp(contactButtonHref)}
-              className="hidden lg:block shrink-0 ml-2.5 bg-yellow-400 text-black rounded-full px-5 py-[7px] text-[13px] font-semibold hover:bg-yellow-300 transition-colors whitespace-nowrap"
+              className="hidden lg:block shrink-0 -ml-1.5 bg-yellow-400 text-black rounded-full px-5 py-[7px] text-[13px] font-semibold hover:bg-yellow-300 transition-colors whitespace-nowrap"
             >
               {contactButtonText}
             </Link>
