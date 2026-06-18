@@ -54,40 +54,17 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
           flex-shrink: 0;
           width: clamp(120px, 18vw, 176px);
           height: clamp(76px, 11.5vw, 112px);
-          border-radius: clamp(16px, 3vw, 24px);
-          border: 1px solid rgba(255,255,255,0.07);
-          background: rgba(255,255,255,0.025);
           display: flex; align-items: center; justify-content: center;
           padding: clamp(10px, 1.5vw, 14px);
           position: relative;
-          transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
-          overflow: hidden;
-          backdrop-filter: blur(2px);
-        }
-        /* Inset radial glow — revealed on hover via pseudo-element, zero overflow */
-        .cs-logo-card::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 70%);
-          opacity: 0;
           transition: opacity 0.35s ease;
-          pointer-events: none;
         }
-        .cs-logo-card:hover {
-          border-color: color-mix(in srgb, var(--accent) 28%, transparent);
-          background: color-mix(in srgb, var(--accent) 3.5%, transparent);
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent);
-        }
-        .cs-logo-card:hover::after { opacity: 1; }
         .cs-logo-img {
           width: 100%; height: 100%;
           object-fit: contain; object-position: center;
-          border-radius: 10px;
           transition: opacity 0.35s ease;
         }
-        .cs-logo-card:hover .cs-logo-img { opacity: 0.9; }
+        .cs-logo-card:hover .cs-logo-img { opacity: 0.7; }
         @media (max-width: 768px) {
           .cs-clients { padding: 32px 0 36px; }
         }

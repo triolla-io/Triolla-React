@@ -10,7 +10,7 @@ import { HeroHeadline } from '@/components/HeroHeadline'
 import { ClientsSection } from '@/components/ClientsSection'
 import { ServiceModalMenu } from '@/components/ServiceModalMenu'
 import { ServiceTechGroups, type TechGroup } from '@/components/ServiceTechGroups'
-import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
 import parse from 'html-react-parser'
 import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
@@ -410,8 +410,6 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           </div>
         </div>
 
-        {/* Wave: dark → cream */}
-        <WaveDivider to="#f0eeea" />
       </section>
 
       {/* ══ BRANDING ══ */}
@@ -462,8 +460,6 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
           </div>
         </div>
 
-        {/* Wave: cream → dark */}
-        <WaveDivider to="#080808" />
       </section>
 
       {/* ══ ENGINEERING ══ */}

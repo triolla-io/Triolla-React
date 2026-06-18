@@ -10,7 +10,7 @@ import { AboutImageCarousel } from '@/components/AboutImageCarousel'
 import { WhyUsSection } from '@/components/WhyUsSection'
 import AnimatedSteps from '@/components/AnimatedSteps'
 import { ClientsSection } from '@/components/ClientsSection'
-import { GrainOverlay, GlowOrb, Eyebrow, Marquee, WaveDivider, Button } from '@/components/ui'
+import { GrainOverlay, GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
 import parse from 'html-react-parser'
 import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
@@ -370,8 +370,6 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
           )}
         </div>
 
-        {/* Wave: dark → cream */}
-        <WaveDivider to="#f0eeea" />
       </section>
 
       {/* ══ SERVICES ══ */}
@@ -449,8 +447,6 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
           </div>
         </div>
 
-        {/* Wave: cream → dark */}
-        <WaveDivider to="#080808" />
       </section>
 
       {/* ══ WHY US ══ */}
