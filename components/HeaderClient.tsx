@@ -351,7 +351,7 @@ export function HeaderClient({
       {/* Ticker — full width, above the pill */}
       {ticker && !isTickerDismissed && (
         <div className="pointer-events-auto bg-yellow-400 text-black py-1.5 md:py-2 px-10 text-center text-[11px] md:text-[13px] font-medium relative flex items-center justify-center">
-          <span dangerouslySetInnerHTML={{ __html: ticker }} />
+          <span dangerouslySetInnerHTML={{ __html: ticker.replace(/<br\s*\/?>/gi, ' ') }} />
           <button
             type="button"
             className="absolute right-4 text-black hover:opacity-60 transition-opacity"

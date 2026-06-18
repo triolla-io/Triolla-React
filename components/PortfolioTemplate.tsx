@@ -205,23 +205,6 @@ export function PortfolioTemplate({ pf, ts, locale = 'en' }: { pf: any; ts: any;
                       box-shadow 0.45s;
           flex-shrink: 0;
         }
-        .cs-portal-ring {
-          position: absolute;
-          inset: 0;
-          border-radius: 999px;
-          background: conic-gradient(from 0deg,
-            var(--accent) 0deg,
-            transparent 120deg,
-            var(--accent) 240deg,
-            transparent 300deg,
-            var(--accent) 360deg
-          );
-          animation: cs-portal-spin 2.4s linear infinite;
-          opacity: 0;
-          transition: opacity 0.35s cubic-bezier(0.23,1,0.32,1);
-        }
-        .cs-portal-btn:hover .cs-portal-ring,
-        .cs-portal-btn:focus-visible .cs-portal-ring { opacity: 1; }
         .cs-portal-inner {
           position: relative;
           z-index: 1;
@@ -246,7 +229,6 @@ export function PortfolioTemplate({ pf, ts, locale = 'en' }: { pf: any; ts: any;
             0 0 72px color-mix(in srgb, var(--accent) 14%, transparent);
         }
         .cs-portal-btn:hover .cs-portal-inner { background: #fff; }
-        @keyframes cs-portal-spin { to { transform: rotate(360deg); } }
 
         /* ─── World seam ─────────────────────────── */
         .cs-world-seam {
@@ -322,7 +304,6 @@ export function PortfolioTemplate({ pf, ts, locale = 'en' }: { pf: any; ts: any;
 
           <FadeIn delay={0.2} yOffset={20} duration={0.55}>
             <a href="#portfolio" className="cs-portal-btn">
-              <span className="cs-portal-ring" aria-hidden="true" />
               <span className="cs-portal-inner">
                 {pf.buttonText}
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
