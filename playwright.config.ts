@@ -9,6 +9,12 @@ export default defineConfig({
   reporter: [['html', { open: 'never' }]],
   use: {
     baseURL: 'http://localhost:3000',
+    // reducedMotion must go through contextOptions here — the bare `reducedMotion`
+    // use-option isn't in this Playwright version's typed UseOptions and is
+    // silently ignored at runtime.
+    contextOptions: { reducedMotion: 'reduce' },
+    // Reduced motion => no ScrollSmoother => normal document flow => fullPage
+    // screenshots capture the whole page and stay stable across runs.
     // Freeze animations at frame 0 so live timing differences never flake the diff.
     // The static rendered frame is what we gate on.
   },
