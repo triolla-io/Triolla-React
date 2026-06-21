@@ -534,13 +534,16 @@ export interface GetBlogPostsData {
   posts: BlogPostsConnection | null
 }
 
-export interface GetPostSlugsData {
+export interface PostSlugNode {
+  uri: string | null
+  databaseId: number | null
+  translations: { href: string | null; locale: string | null }[] | null
+}
+
+export interface GetPostSlugsPageData {
   posts: {
-    nodes: {
-      uri: string | null
-      databaseId: number | null
-      translations: { href: string | null; locale: string | null }[] | null
-    }[]
+    pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    nodes: PostSlugNode[]
   } | null
 }
 

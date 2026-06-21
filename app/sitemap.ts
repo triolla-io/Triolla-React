@@ -1,7 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { gql } from '@apollo/client'
-import { client } from '@/lib/apollo-client'
-import { GET_POST_SLUGS } from '@/lib/queries'
+import { fetchAllPostSlugs } from '@/lib/posts'
 import { SITE_URL } from '@/lib/site'
 
 // Dynamic sitemap covering both locales (EN at the clean root, HE under /he/).
@@ -31,15 +29,6 @@ const STATIC_ROUTES: { en: string; he: string; priority: number }[] = [
   { en: '/accessibility-statement', he: '/he/accessibility-statement', priority: 0.3 },
 ]
 
-const POST_SLUGS_QUERY = gql`
-  ${GET_POST_SLUGS}
-`
-
-interface PostSlugNode {
-  uri: string | null
-  translations?: { href: string | null; locale: string | null }[] | null
-}
-
 /** Turn a WP href/uri into a clean, absolute-path-only Next.js route. */
 function toPath(value: string | null): string | null {
   if (!value) return null
@@ -49,10 +38,7 @@ function toPath(value: string | null): string | null {
 
 async function getPostEntries(): Promise<MetadataRoute.Sitemap> {
   try {
-    const { data } = await client.query<{ posts?: { nodes?: PostSlugNode[] } }>({
-      query: POST_SLUGS_QUERY,
-    })
-    const nodes: PostSlugNode[] = data?.posts?.nodes ?? []
+    const nodes = await fetchAllPostSlugs()
 
     return nodes.flatMap((node) => {
       const self = toPath(node.uri)

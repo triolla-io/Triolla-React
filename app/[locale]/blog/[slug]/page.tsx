@@ -3,9 +3,9 @@ import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
 import { notFound } from 'next/navigation'
 import { client } from '@/lib/apollo-client'
-import { GET_POST_SLUGS, GET_POST_BY_URI, GET_BLOG_POSTS, GET_THEME_SETTINGS } from '@/lib/queries'
+import { GET_POST_BY_URI, GET_BLOG_POSTS, GET_THEME_SETTINGS } from '@/lib/queries'
+import { fetchAllPostSlugs } from '@/lib/posts'
 import type {
-  GetPostSlugsData,
   GetPostByUriData,
   GetBlogPostsData,
   GetThemeSettingsData,
@@ -22,9 +22,6 @@ import { stripHtml } from '@/lib/text'
 import { isLocale, defaultLocale } from '@/lib/i18n'
 import { blogPostingSchema, breadcrumbSchema } from '@/lib/jsonld'
 
-const POST_SLUGS_QUERY: TypedDocumentNode<GetPostSlugsData> = gql`
-  ${GET_POST_SLUGS}
-`
 const POST_BY_URI_QUERY: TypedDocumentNode<GetPostByUriData> = gql`
   ${GET_POST_BY_URI}
 `
@@ -67,8 +64,7 @@ function decodeSlug(slug: string): string {
 
 export async function generateStaticParams() {
   try {
-    const { data } = await client.query({ query: POST_SLUGS_QUERY })
-    const nodes = data?.posts?.nodes ?? []
+    const nodes = await fetchAllPostSlugs()
     return nodes.flatMap((n) => {
       const route = derivePostRoute(n?.uri ?? null)
       return route ? [route] : []
@@ -87,8 +83,7 @@ export async function generateStaticParams() {
 async function getPost(locale: string, slug: string): Promise<SinglePost | null> {
   try {
     const target = decodeSlug(slug)
-    const { data: slugData } = await client.query({ query: POST_SLUGS_QUERY })
-    const nodes = slugData?.posts?.nodes ?? []
+    const nodes = await fetchAllPostSlugs()
     const match = nodes.find((n) => {
       const route = derivePostRoute(n?.uri ?? null)
       return route?.locale === locale && decodeSlug(route.slug) === target
@@ -129,8 +124,7 @@ async function getThemeSettings(): Promise<ThemeOptions | null> {
 async function findAlternateBlogPath(locale: string, slug: string): Promise<{ en: string; he: string }> {
   const target = decodeSlug(slug)
   try {
-    const { data } = await client.query({ query: POST_SLUGS_QUERY })
-    const nodes = data?.posts?.nodes ?? []
+    const nodes = await fetchAllPostSlugs()
     const node = nodes.find((n) => {
       const route = derivePostRoute(n?.uri ?? null)
       return route?.locale === locale && decodeSlug(route.slug) === target

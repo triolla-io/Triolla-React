@@ -576,9 +576,16 @@ export const GET_BLOG_POSTS = `
   }
 `
 
-export const GET_POST_SLUGS = `
-  query GetPostSlugs {
-    posts(first: 200, where: { status: PUBLISH }) {
+// WPGraphQL silently caps `posts(first:)` at 100, so callers that need the
+// whole archive (static params, sitemap) must paginate via the Relay cursor —
+// see `fetchAllPostSlugs()` in lib/posts.ts.
+export const GET_POST_SLUGS_PAGE = `
+  query GetPostSlugsPage($after: String) {
+    posts(first: 100, after: $after, where: { status: PUBLISH }) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       nodes {
         uri
         databaseId
