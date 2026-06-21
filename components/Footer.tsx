@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { client } from '@/lib/apollo-client'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
-import { type Locale, defaultLocale, localizeHref as localizePath } from '@/lib/i18n'
+import { type Locale, defaultLocale, localizeHref as localizePath, PAGE_URI } from '@/lib/i18n'
 import { GET_FOOTER_DATA, GET_THEME_SETTINGS } from '@/lib/queries'
 import { wpImg } from '@/lib/images'
 import { gql } from '@apollo/client'
@@ -126,7 +126,10 @@ function GlobeIcon() {
 
 export default async function Footer({ locale = defaultLocale }: { locale?: Locale } = {}) {
   const lp = (path: string) => localizePath(localizeHref(path), locale)
-  const [ts, wpMenus, services] = await Promise.all([getThemeSettings(), getFooterMenus(), getAllServices()])
+  // The footer menus render English on every locale until wp-graphql-wpml lands,
+  // so match service links against the English services page: the Hebrew page's
+  // links use /he/… slugs that wouldn't match the English footer menu URLs.
+  const [ts, wpMenus, services] = await Promise.all([getThemeSettings(), getFooterMenus(), getAllServices(PAGE_URI.services[defaultLocale])])
 
   // Map each resolved service detail page (URI path → index) so footer links
   // that point at one render as a modal trigger instead of a dead link.

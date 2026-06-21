@@ -74,12 +74,13 @@ export async function enrichServiceDetails(menu: Array<{ label?: string | null; 
  *  Branding and Engineering as a single flat, enriched `ServiceDetail[]`.
  *  This is the same set rendered as modals on `/services`, so consumers like
  *  the footer can match their own links against it and open the same modal
- *  instead of navigating to a page that no longer exists. On any failure it
- *  returns `[]`, so the footer simply keeps its plain links. */
-export async function getAllServices(): Promise<ServiceDetail[]> {
+ *  instead of navigating to a page that no longer exists. Pass the locale's
+ *  services page URI (e.g. `PAGE_URI.services[locale]`) — it's required by the
+ *  query. On any failure it returns `[]`, so the footer keeps its plain links. */
+export async function getAllServices(uri: string): Promise<ServiceDetail[]> {
   let sp: ServicesPageFields = {} as ServicesPageFields
   try {
-    const { data } = await client.query({ query: SERVICES_PAGE_QUERY })
+    const { data } = await client.query({ query: SERVICES_PAGE_QUERY, variables: { uri } })
     sp = data?.page?.template?.servicePage ?? ({} as ServicesPageFields)
   } catch {
     return []
