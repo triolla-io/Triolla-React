@@ -341,15 +341,20 @@ export function PortfolioTemplate({ pf, ts, locale = 'en' }: { pf: any; ts: any;
           MARQUEE BANNER
       ════════════════════════════════════════════ */}
       {companies.length > 0 && (
-        <div className="overflow-hidden border-y border-white/[0.05] py-4">
+        <div className="relative overflow-hidden border-t border-b border-white/[0.07] py-7">
           <Marquee
             items={companies}
             repeat={2}
-            speed={40}
+            speed={55}
+            pauseOnHover
+            fade
+            fadeColor="#080808"
             renderItem={(c: any, i: number) => (
-              <span key={i} className="text-[12px] font-semibold tracking-[0.06em] uppercase text-gray-700 mx-6 shrink-0">
-                {c.companyName}
-                <span className="ml-10 text-gray-800">·</span>
+              <span key={i} className="brand-marquee-item">
+                <span className="brand-marquee-name">{c.companyName}</span>
+                <span className="brand-marquee-sep" aria-hidden="true">
+                  ✦
+                </span>
               </span>
             )}
           />

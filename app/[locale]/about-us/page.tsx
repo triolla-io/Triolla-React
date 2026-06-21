@@ -246,10 +246,11 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
               items={heroStripWords as string[]}
               repeat={4}
               speed={44}
+              pauseOnHover
               renderItem={(w, i) => (
-                <span key={i} className="about-hero__strip-item">
-                  {w}
-                  <span className="about-hero__strip-dot">✦</span>
+                <span key={i} className="brand-marquee-item">
+                  <span className="brand-marquee-name">{w}</span>
+                  <span className="brand-marquee-sep" aria-hidden="true">✦</span>
                 </span>
               )}
             />
@@ -623,17 +624,13 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
         @keyframes aboutScrollPulse { 0%,100%{opacity:0.4;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.1)} }
         .about-hero__strip {
           position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
-          height: 52px; overflow: hidden;
+          overflow: hidden;
           display: flex; align-items: center;
+          padding: clamp(10px, 1.2vw, 18px) 0;
           border-top: 1px solid rgba(255,255,255,0.06);
           background: rgba(10,10,10,0.6); backdrop-filter: blur(12px);
         }
-        .about-hero__strip-item {
-          display: inline-flex; align-items: center; gap: 14px; padding: 0 28px;
-          font-size: 9px; font-weight: 700; letter-spacing: 0.32em; text-transform: uppercase;
-          color: rgba(255,255,255,0.28);
-        }
-        .about-hero__strip-dot { color: #facc15; font-size: 7px; }
+        /* Strip items use the shared .brand-marquee-* classes (globals.css). */
 
         /* ─── SHOWCASE (carousel below hero) ─── */
         .about-showcase {
