@@ -7,10 +7,10 @@
  * provider). The browser-only helpers are clearly marked.
  */
 
-export const CONSENT_COOKIE = 'triolla_consent'
-export const CONSENT_VERSION = 1
+const CONSENT_COOKIE = 'triolla_consent'
+const CONSENT_VERSION = 1
 /** Re-ask for consent after ~6 months (in seconds). */
-export const CONSENT_MAX_AGE = 60 * 60 * 24 * 182
+const CONSENT_MAX_AGE = 60 * 60 * 24 * 182
 
 /** GTM container — mirrors the live WordPress site; overridable per environment. */
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-5J25W22P'
@@ -75,7 +75,7 @@ export function parseConsent(raw: string | undefined | null): ConsentState | nul
   }
 }
 
-export function serializeConsent(state: ConsentState): string {
+function serializeConsent(state: ConsentState): string {
   return encodeURIComponent(JSON.stringify(state))
 }
 

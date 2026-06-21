@@ -2,8 +2,8 @@
 
 import {
   createContext,
+  use,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -29,7 +29,7 @@ interface ConsentContextValue {
 const ConsentContext = createContext<ConsentContextValue | null>(null)
 
 export function useConsent(): ConsentContextValue {
-  const ctx = useContext(ConsentContext)
+  const ctx = use(ConsentContext)
   if (!ctx) throw new Error('useConsent must be used within <ConsentProvider>')
   return ctx
 }

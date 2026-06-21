@@ -1,3 +1,4 @@
+import Script from 'next/script'
 import { toGtagConsent, GTM_ID } from '@/lib/consent'
 
 /**
@@ -30,10 +31,16 @@ f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID
 
   return (
     <>
-      {/* 1. Consent defaults — runs before any tag fires */}
-      <script id="consent-default" dangerouslySetInnerHTML={{ __html: consentDefault }} />
+      {/* 1. Consent defaults — runs before any tag fires. `beforeInteractive`
+          keeps these in the server HTML and guarantees execution order, so the
+          deny-by-default consent state is set before GTM loads. The lint rule
+          below predates the App Router (it points at pages/_document.js); the
+          root layout is the documented home for beforeInteractive in App Router. */}
+      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+      <Script id="consent-default" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: consentDefault }} />
       {/* 2. Google Tag Manager */}
-      <script id="gtm-loader" dangerouslySetInnerHTML={{ __html: gtmLoader }} />
+      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+      <Script id="gtm-loader" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: gtmLoader }} />
       {/* GTM fallback for no-JS clients */}
       <noscript>
         <iframe
@@ -42,6 +49,7 @@ f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID
           width="0"
           style={{ display: 'none', visibility: 'hidden' }}
           title="Google Tag Manager"
+          sandbox=""
         />
       </noscript>
     </>
