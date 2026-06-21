@@ -3,7 +3,6 @@ import { GET_SERVICES_PAGE, GET_THEME_SETTINGS } from '@/lib/queries'
 import { enrichServiceDetails } from '@/lib/service-details'
 import { gql } from '@apollo/client'
 import type { TypedDocumentNode } from '@apollo/client'
-import { SectionReveal } from '@/components/SectionReveal'
 import { FadeIn } from '@/components/FadeIn'
 import { FAQSection } from '@/components/FAQSection'
 import { Reveal } from '@/components/gsap/Reveal'
@@ -11,6 +10,7 @@ import { SplitReveal } from '@/components/gsap/SplitReveal'
 import { Parallax } from '@/components/gsap/Parallax'
 import { HeroMarquee } from '@/components/services/HeroMarquee'
 import { ProductGalleryScene } from '@/components/services/ProductGalleryScene'
+import { BrandingMenuPin } from '@/components/services/BrandingMenuPin'
 import { ClientsSection } from '@/components/ClientsSection'
 import { ServiceModalMenu } from '@/components/ServiceModalMenu'
 import { ServiceTechGroups, type TechGroup } from '@/components/ServiceTechGroups'
@@ -421,7 +421,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         <div className="svc-brand__dots" aria-hidden="true" />
 
         <div className="svc-brand__inner">
-          <FadeIn className="section-head" style={{ '--sh-title-color': '#0a0a0a', '--sh-sub-color': '#4b5563' } as React.CSSProperties}>
+          <Reveal className="section-head" style={{ '--sh-title-color': '#0a0a0a', '--sh-sub-color': '#4b5563' } as React.CSSProperties}>
             <Eyebrow
               ornament="line"
               align="center"
@@ -441,11 +441,11 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             {sp.brandtitle && <h2 className="section-head__title">{stripHtml(sp.brandtitle)}</h2>}
             {/* WP-sourced HTML — trusted backend only */}
             {sp.brandtext && <div className="section-head__sub">{parse(sp.brandtext)}</div>}
-          </FadeIn>
+          </Reveal>
 
           <div className="svc-brand__body">
-            {/* Left: polaroid gallery */}
-            <SectionReveal className="svc-polaroid-grid">
+            {/* Left: polaroid gallery — staggered reveal cascade */}
+            <Reveal stagger={0.11} className="svc-polaroid-grid">
               {brandImages.map((img, i) => (
                 <div key={i} className="svc-polaroid" style={{ '--pi': i } as React.CSSProperties}>
                   <div className="svc-polaroid__frame">
@@ -453,14 +453,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                   </div>
                 </div>
               ))}
-            </SectionReveal>
+            </Reveal>
 
             {/* Right: sticky numbered menu — each item opens the shared
                 service-detail modal (light variant); falls back to a plain link
                 if its detail page didn't resolve. */}
-            <div className="svc-brand__menu">
+            <BrandingMenuPin sectionSelector=".svc-brand__body">
               <ServiceModalMenu services={brandServices} ctaText={sp.buttonText ?? null} ctaLink="/contact-us" variant="light" />
-            </div>
+            </BrandingMenuPin>
           </div>
         </div>
 
@@ -662,7 +662,9 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
 
         /* Numbered menus */
         .svc-prod__menu { position: sticky; top: 96px; padding-top: 8px; }
-        .svc-brand__menu { position: sticky; top: 96px; padding-top: 8px; }
+        /* .svc-brand__menu is pinned via BrandingMenuPin on desktop+motion; keep
+           padding only (no CSS sticky, which breaks under ScrollSmoother). */
+        .svc-brand__menu { padding-top: 8px; }
         .svc-menu-list { list-style: none; padding: 0; margin: 0; }
         .svc-menu-item {
           position: relative; padding: 22px 0;
@@ -704,11 +706,8 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         .svc-brand__inner { max-width: 1400px; margin: 0 auto; padding: 80px 32px; position: relative; z-index: 1; }
         .svc-brand__body { display: grid; grid-template-columns: 3fr 1fr; gap: 64px; align-items: start; }
         .svc-polaroid-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .svc-polaroid {
-          animation: svcPolaroidIn 0.65s cubic-bezier(.23,1,.32,1) both;
-          animation-delay: calc(var(--pi, 0) * 0.11s + 0.15s);
-        }
-        @keyframes svcPolaroidIn { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+        /* Entry is driven by the <Reveal stagger> wrapper now; only the resting
+           rotations + hover remain here. */
         .svc-polaroid:nth-child(1) .svc-polaroid__frame { transform: rotate(-2.5deg); }
         .svc-polaroid:nth-child(2) .svc-polaroid__frame { transform: rotate(1.8deg); }
         .svc-polaroid:nth-child(3) .svc-polaroid__frame { transform: rotate(-1.2deg); }
