@@ -8,6 +8,7 @@ import ConsentScripts from '@/components/consent/ConsentScripts'
 import { ConsentProvider } from '@/components/consent/ConsentProvider'
 import { BfcacheReloader } from '@/components/BfcacheReloader'
 import { MotionProvider } from '@/components/MotionProvider'
+import { SmoothScroll } from '@/components/gsap/SmoothScroll'
 import { OrganizationJsonLd } from '@/components/OrganizationJsonLd'
 import { locales, defaultLocale, isLocale, dir, htmlLang } from '@/lib/i18n'
 import { SITE_URL } from '@/lib/site'
@@ -51,14 +52,23 @@ export default async function RootLayout({
       <head>
         <link rel="preconnect" href="https://triolla.io" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://triolla.io" />
+        <script
+          // Hide reveal targets before first paint ONLY when motion is allowed, so
+          // no-JS / reduced-motion users always see content. Pairs with globals.css.
+          dangerouslySetInnerHTML={{
+            __html: `try{if(matchMedia('(prefers-reduced-motion: no-preference)').matches){document.documentElement.classList.add('gsap')}}catch(e){}`,
+          }}
+        />
       </head>
-      <body className="min-h-full flex flex-col font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
+      <body className="font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
         <ConsentScripts />
         <ConsentProvider>
           <MotionProvider>
             <Header locale={loc} />
-            <main className="grow">{children}</main>
-            <Footer locale={loc} />
+            <SmoothScroll>
+              <main className="grow">{children}</main>
+              <Footer locale={loc} />
+            </SmoothScroll>
             <CookieBanner />
           </MotionProvider>
         </ConsentProvider>

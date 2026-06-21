@@ -440,3 +440,15 @@ html {
     display: block;
   }
 }
+
+/* ── GSAP reveal gate ─────────────────────────────────────────────────────
+   html.gsap is added pre-paint by the layout head script ONLY when the user
+   allows motion. Reveal targets start hidden so GSAP can animate them in
+   without a flash. No-JS / reduced-motion users never get the class, so they
+   see fully visible content. */
+html.gsap [data-reveal] { opacity: 0; }
+html.gsap [data-reveal-stagger] > * { opacity: 0; }
+
+/* ScrollSmoother requires the content to size naturally; guard against the old
+   sticky-footer flex collapsing it. */
+#smooth-wrapper { width: 100%; }
