@@ -6,6 +6,7 @@ import parse from 'html-react-parser'
 import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollSmoother } from 'gsap/ScrollSmoother'
 import { GlowOrb } from '@/components/ui'
 import { wpImg } from '@/lib/images'
 import { registerGsap, Q_DESKTOP } from '@/lib/gsap'
@@ -278,12 +279,13 @@ export function TechStickyFeature({
                     key={i}
                     type="button"
                     aria-label={`Panel ${i + 1}`}
-                    onClick={() =>
-                      panelRefs.current[i]?.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
-                      })
-                    }
+                    onClick={() => {
+                      const el = panelRefs.current[i]
+                      if (!el) return
+                      const smoother = ScrollSmoother.get()
+                      if (smoother) smoother.scrollTo(el, true, 'center center')
+                      else el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    }}
                     className="tsf-dot"
                     style={{
                       width: i === activeIndex ? '10px' : '5px',

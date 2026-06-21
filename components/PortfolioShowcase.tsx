@@ -6,6 +6,7 @@ import parse from 'html-react-parser'
 import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollSmoother } from 'gsap/ScrollSmoother'
 import { wpImg } from '@/lib/images'
 import { sanitizeWpHtml, stripHtml } from '@/lib/text'
 import { registerGsap, Q_DESKTOP } from '@/lib/gsap'
@@ -189,12 +190,13 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
                   key={i}
                   type="button"
                   aria-label={`Case study ${i + 1}`}
-                  onClick={() =>
-                    panelRefs.current[i]?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'center',
-                    })
-                  }
+                  onClick={() => {
+                    const el = panelRefs.current[i]
+                    if (!el) return
+                    const smoother = ScrollSmoother.get()
+                    if (smoother) smoother.scrollTo(el, true, 'center center')
+                    else el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  }}
                   className="ps-dot"
                   style={{
                     width: i === activeIndex ? '10px' : '5px',
