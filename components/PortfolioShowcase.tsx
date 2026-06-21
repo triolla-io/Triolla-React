@@ -3,8 +3,14 @@
 
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
+import { useGSAP } from '@gsap/react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { wpImg } from '@/lib/images'
 import { sanitizeWpHtml, stripHtml } from '@/lib/text'
+import { registerGsap, Q_DESKTOP } from '@/lib/gsap'
+
+registerGsap()
 
 interface PortfolioShowcaseProps {
   items: any[]
@@ -21,6 +27,8 @@ interface PortfolioShowcaseProps {
 export function PortfolioShowcase({ items, accentColor, isRtl = false }: PortfolioShowcaseProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const panelRefs = useRef<(HTMLDivElement | null)[]>([])
+  const parentRef = useRef<HTMLDivElement>(null)
+  const pinRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const observers: IntersectionObserver[] = []
@@ -37,6 +45,29 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
     })
     return () => observers.forEach((o) => o.disconnect())
   }, [items.length])
+
+  // Pin the left image (CSS `position: sticky` breaks under ScrollSmoother).
+  // Desktop+motion only; mobile keeps the stacked layout (left col is hidden lg:block).
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add(Q_DESKTOP, () => {
+        const parent = parentRef.current
+        const pin = pinRef.current
+        if (!parent || !pin) return
+        const st = ScrollTrigger.create({
+          trigger: parent,
+          start: 'top top',
+          end: 'bottom bottom',
+          pin,
+          pinSpacing: false,
+          anticipatePin: 1,
+        })
+        return () => st.kill()
+      })
+    },
+    { scope: parentRef },
+  )
 
   if (!items.length) return null
 
@@ -115,10 +146,10 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
         }
       `}</style>
 
-      <div className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none', direction: 'ltr' }}>
-        {/* ═══ LEFT — sticky crossfading image ═══ */}
+      <div ref={parentRef} className="lg:grid lg:grid-cols-[48fr_52fr]" style={{ borderTop: 'none', direction: 'ltr' }}>
+        {/* ═══ LEFT — pinned crossfading image (ScrollTrigger pin, not CSS sticky) ═══ */}
         <div className="hidden lg:block">
-          <div className="sticky top-0 h-screen overflow-hidden bg-[#0b0b0b]">
+          <div ref={pinRef} className="h-screen overflow-hidden bg-[#0b0b0b]">
             <div className="absolute inset-0">
               {items.map((item, i) =>
                 item.pImage?.node?.sourceUrl ? (
