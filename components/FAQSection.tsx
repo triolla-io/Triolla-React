@@ -1,8 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import parse from 'html-react-parser'
+import { useGSAP } from '@gsap/react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { GlowOrb, GradientText } from '@/components/ui'
+import { registerGsap, Q_DESKTOP } from '@/lib/gsap'
+
+registerGsap()
 
 interface FAQItem {
   faqQuestion: string
@@ -17,6 +23,31 @@ interface FAQSectionProps {
 
 export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
   const [open, setOpen] = useState<number | null>(null)
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const headingRef = useRef<HTMLDivElement>(null)
+
+  // Pin the heading column beside the scrolling list (CSS sticky breaks under
+  // ScrollSmoother). Desktop+motion only; below lg the heading is in normal flow.
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add(Q_DESKTOP, () => {
+        const section = sectionRef.current
+        const heading = headingRef.current
+        if (!section || !heading) return
+        const st = ScrollTrigger.create({
+          trigger: section,
+          start: 'top top',
+          end: 'bottom bottom',
+          pin: heading,
+          pinSpacing: false,
+          anticipatePin: 1,
+        })
+        return () => st.kill()
+      })
+    },
+    { scope: sectionRef },
+  )
 
   if (!items.length) return null
 
@@ -50,9 +81,9 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
           />
           <div className="fq-grid" />
 
-          <div className="fq-layout">
-            {/* LEFT — sticky heading */}
-            <div className="fq-col-left">
+          <div ref={sectionRef} className="fq-layout">
+            {/* LEFT — heading column (ScrollTrigger pin on desktop, not CSS sticky) */}
+            <div ref={headingRef} className="fq-col-left">
               <div className="fq-left-inner">
                 {heading && <h2 className="fq-heading">{heading}</h2>}
                 {subtext && <p className="fq-subtext">{subtext}</p>}
@@ -170,8 +201,6 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
         @media (min-width: 900px) {
           .fq-col-left {
             width: 290px;
-            position: sticky;
-            top: 120px;
             overflow: visible;
           }
         }

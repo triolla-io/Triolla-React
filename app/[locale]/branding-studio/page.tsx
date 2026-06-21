@@ -6,6 +6,7 @@ import type { TypedDocumentNode } from '@apollo/client'
 import { notFound } from 'next/navigation'
 import parse from 'html-react-parser'
 import { FadeIn } from '@/components/FadeIn'
+import { BrandProcessRail } from '@/components/BrandProcessRail'
 import { WpContent } from '@/lib/wp-content'
 import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import type { GetBrandingStudioData, GetThemeSettingsData, ServiceDetailPage, ThemeOptions } from '@/lib/graphql-types'
@@ -176,8 +177,8 @@ export default async function BrandingStudioPage({ params }: { params: Promise<{
         <section className="brand-process">
           <GlowOrb size={760} fade="65%" blur={90} color="rgba(250,204,21,0.05)" className="top-[6%] left-[-8%] z-0" />
           <div className="brand-process__inner">
-            <FadeIn yOffset={30}>
-              <div className="brand-process__rail">
+            <BrandProcessRail sectionSelector=".brand-process__inner">
+              <FadeIn yOffset={30}>
                 <Eyebrow
                   ornament="line"
                   color="#facc15"
@@ -185,8 +186,8 @@ export default async function BrandingStudioPage({ params }: { params: Promise<{
                 >
                   — Process —
                 </Eyebrow>
-              </div>
-            </FadeIn>
+              </FadeIn>
+            </BrandProcessRail>
             <FadeIn yOffset={40} delay={0.1}>
               {/* WP-sourced HTML — trusted backend only */}
               <div className="brand-prose">
@@ -304,7 +305,7 @@ export default async function BrandingStudioPage({ params }: { params: Promise<{
           max-width: 1000px; margin: 0 auto;
           display: grid; grid-template-columns: 200px 1fr; gap: 48px;
         }
-        .brand-process__rail { position: sticky; top: 120px; align-self: start; }
+        .brand-process__rail { align-self: start; }
 
         .brand-prose { color: rgba(255,255,255,0.66); }
         .brand-prose h2 {
