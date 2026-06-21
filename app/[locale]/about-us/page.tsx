@@ -16,6 +16,7 @@ import type { GetAboutPageData, GetThemeSettingsData, AboutPageFields, ThemeOpti
 import { wpImg } from '@/lib/images'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
+import { stripHtml } from '@/lib/text'
 
 const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
   ${GET_ABOUT_PAGE}
@@ -24,16 +25,6 @@ const ABOUT_PAGE_QUERY: TypedDocumentNode<GetAboutPageData> = gql`
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
 `
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
-}
 
 async function getAboutData(uri: string): Promise<AboutPageFields> {
   try {

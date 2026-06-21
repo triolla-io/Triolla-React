@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, GradientText } from '@/components/ui'
 import { wpImg } from '@/lib/images'
+import { stripHtml } from '@/lib/text'
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -29,17 +30,6 @@ interface TechStackSectionProps {
   accentColor: string
 }
 
-function stripHtmlTags(html: string): string {
-  return (html ?? '')
-    .replace(/<br\s*\/?>/gi, ' ')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
-}
-
 export function TechStackSection({ titleOne, titleTwo, text, midTitle, images, accentColor }: TechStackSectionProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
@@ -61,7 +51,7 @@ export function TechStackSection({ titleOne, titleTwo, text, midTitle, images, a
   }, [])
 
   const validImages = images.filter((img) => img.url)
-  const plainText = text ? stripHtmlTags(text) : null
+  const plainText = text ? stripHtml(text) : null
   const cleanMidTitle = (midTitle ?? '')
     .replace(/<br\s*\/?>/gi, ' ')
     .replace(/&amp;/g, '&')
@@ -170,7 +160,7 @@ export function TechStackSection({ titleOne, titleTwo, text, midTitle, images, a
                           <img src={wpImg(img.url) ?? ''} alt={img.title ?? ''} className="tss-card__img" />
                         </div>
                       </div>
-                      {img.title && <span className="tss-card__label">{stripHtmlTags(img.title)}</span>}
+                      {img.title && <span className="tss-card__label">{stripHtml(img.title)}</span>}
                     </div>
                   </div>
                 ))}

@@ -4,11 +4,7 @@
 import { useRef, useState, useEffect } from 'react'
 import parse from 'html-react-parser'
 import { wpImg } from '@/lib/images'
-import { sanitizeWpHtml } from '@/lib/text'
-
-function stripHtml(html: string): string {
-  return (html ?? '').replace(/<[^>]+>/g, '').trim()
-}
+import { sanitizeWpHtml, stripHtml } from '@/lib/text'
 
 interface PortfolioShowcaseProps {
   items: any[]

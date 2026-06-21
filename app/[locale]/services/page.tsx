@@ -17,6 +17,7 @@ import { wpImg } from '@/lib/images'
 import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbSchema, serviceSchema } from '@/lib/jsonld'
+import { stripHtml } from '@/lib/text'
 
 const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
   ${GET_SERVICES_PAGE}
@@ -25,16 +26,6 @@ const SERVICES_PAGE_QUERY: TypedDocumentNode<GetServicesPageData> = gql`
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
 `
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
-}
 
 async function getServicesData(uri: string): Promise<ServicesPageFields> {
   try {

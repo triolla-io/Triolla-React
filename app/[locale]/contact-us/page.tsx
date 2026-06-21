@@ -11,6 +11,7 @@ import { GlowOrb, Eyebrow } from '@/components/ui'
 import type { GetContactPageData, GetThemeSettingsData, ContactFields, ThemeOptions } from '@/lib/graphql-types'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
+import { stripHtml } from '@/lib/text'
 
 const CONTACT_PAGE_QUERY: TypedDocumentNode<GetContactPageData> = gql`
   ${GET_CONTACT_PAGE}
@@ -20,14 +21,6 @@ const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
 `
 
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&#8217;/g, '’')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
-}
 
 async function getContactData(uri: string): Promise<{ title: string | null; fields: ContactFields | null }> {
   try {

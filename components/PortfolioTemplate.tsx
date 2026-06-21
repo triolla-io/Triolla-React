@@ -6,17 +6,7 @@ import { CountUpNumber } from '@/components/CountUpNumber'
 import { PortfolioShowcase } from '@/components/PortfolioShowcase'
 import { Marquee } from '@/components/ui'
 import parse from 'html-react-parser'
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&#8217;/g, "'")
-    .trim()
-}
+import { stripHtml } from '@/lib/text'
 
 export function PortfolioTemplate({ pf, ts, locale = 'en' }: { pf: any; ts: any; locale?: string }) {
   const isRtl = locale === 'he'

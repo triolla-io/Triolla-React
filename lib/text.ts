@@ -2,11 +2,13 @@
  *  clean plain text. Shared by home + blog. Mirrors the original inline helper. */
 export function stripHtml(html: string | null | undefined): string {
   return (html ?? '')
+    .replace(/<br\s*\/?>/gi, ' ')
     .replace(/<[^>]+>/g, '')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
+    .replace(/&#8217;/g, "'")
     .trim()
 }
 
@@ -27,6 +29,17 @@ export function sanitizeWpHtml(html: string | null | undefined): string {
     .replace(/\sdata-[\w-]+\s*=\s*'[^']*'/gi, '')
     .replace(/<\/?(?:div|span)[^>]*>/gi, '')
     .trim()
+}
+
+/** WordPress returns every article in both languages as separate post nodes
+ *  (distinct IDs, identical date). The GraphQL schema exposes no language field
+ *  or filter, so the only reliable discriminator is the URI: Hebrew posts live
+ *  under `/he/…`, English (the default) under `/blog/…`. Kept as a utility for
+ *  English-only contexts; the locale-aware blog query (the `language` variable)
+ *  is the primary filter. Exclusion (rather than requiring `/blog/`) keeps any
+ *  unprefixed English URI by default. */
+export function filterEnglishPosts<T extends { uri?: string | null }>(nodes: T[]): T[] {
+  return nodes.filter((p) => !/^\/?he(\/|$)/.test(p.uri ?? ''))
 }
 
 /** Format a WP ISO date string as e.g. "14 Jun 2026". Returns null when the

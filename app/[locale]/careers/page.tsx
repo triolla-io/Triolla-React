@@ -11,20 +11,11 @@ import type { GetCareersPageData, CareerFields } from '@/lib/graphql-types'
 import { isLocale, defaultLocale, PAGE_URI, localizeHref } from '@/lib/i18n'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbSchema, webPageSchema, jobPostingSchema } from '@/lib/jsonld'
+import { stripHtml } from '@/lib/text'
 
 const CAREERS_QUERY: TypedDocumentNode<GetCareersPageData> = gql`
   ${GET_CAREERS_PAGE}
 `
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .trim()
-}
 
 async function getCareers(uri: string): Promise<CareerFields | null> {
   try {
@@ -156,11 +147,19 @@ export default async function CareersPage({ params }: { params: Promise<{ locale
               <Button
                 href={localizeHref('/contact-us', loc)}
                 variant="primary"
-                style={{ '--btn-pad': '16px 34px', '--btn-gap': '10px', boxShadow: '0 4px 28px rgba(250,204,21,0.24)' } as React.CSSProperties}
+                style={
+                  { '--btn-pad': '16px 34px', '--btn-gap': '10px', boxShadow: '0 4px 28px rgba(250,204,21,0.24)' } as React.CSSProperties
+                }
               >
                 {cf.buttonText}
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                  <path d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M3.5 9H14.5M10.5 5L14.5 9L10.5 13"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </Button>
             </FadeIn>

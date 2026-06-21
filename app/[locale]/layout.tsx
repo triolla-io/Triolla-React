@@ -4,6 +4,8 @@ import '../globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CookieBanner from '@/components/CookieBanner'
+import ConsentScripts from '@/components/consent/ConsentScripts'
+import { ConsentProvider } from '@/components/consent/ConsentProvider'
 import { BfcacheReloader } from '@/components/BfcacheReloader'
 import { MotionProvider } from '@/components/MotionProvider'
 import { OrganizationJsonLd } from '@/components/OrganizationJsonLd'
@@ -51,12 +53,15 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://triolla.io" />
       </head>
       <body className="min-h-full flex flex-col font-sans bg-[#F5F5F5] text-black selection:bg-yellow-400 selection:text-black pb-[env(safe-area-inset-bottom)]">
-        <MotionProvider>
-          <Header locale={loc} />
-          <main className="grow">{children}</main>
-          <Footer locale={loc} />
-          <CookieBanner />
-        </MotionProvider>
+        <ConsentScripts />
+        <ConsentProvider>
+          <MotionProvider>
+            <Header locale={loc} />
+            <main className="grow">{children}</main>
+            <Footer locale={loc} />
+            <CookieBanner />
+          </MotionProvider>
+        </ConsentProvider>
         <BfcacheReloader />
         <OrganizationJsonLd />
       </body>

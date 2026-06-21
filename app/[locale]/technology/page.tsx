@@ -15,6 +15,7 @@ import { wpImg } from '@/lib/images'
 import { isLocale, defaultLocale, PAGE_URI } from '@/lib/i18n'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbSchema, webPageSchema } from '@/lib/jsonld'
+import { stripHtml } from '@/lib/text'
 
 const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
   ${GET_TECHNOLOGY_PAGE}
@@ -23,17 +24,6 @@ const TECH_PAGE_QUERY: TypedDocumentNode<GetTechnologyPageData> = gql`
 const THEME_SETTINGS_QUERY: TypedDocumentNode<GetThemeSettingsData> = gql`
   ${GET_THEME_SETTINGS}
 `
-
-function stripHtml(html: string): string {
-  return (html ?? '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&#8217;/g, "'")
-    .trim()
-}
 
 async function getTechData(uri: string, locale: string): Promise<TechnologyPageFields> {
   try {
@@ -145,20 +135,14 @@ export default async function TechnologyPage({ params }: { params: Promise<{ loc
   /* ── Bottom portfolio grid image ── */
   const bottomGridImage: string | null = ts?.commonGridOneImage?.node?.sourceUrl ?? null
 
-  const faqItems = (tp.qaList ?? []).flatMap(
-    (q: { question: string; answer: string }) => {
-      return q?.question
-        ? [{ faqQuestion: q.question, faqAnswer: q.answer ?? '' }]
-        : []
-    }
-  )
+  const faqItems = (tp.qaList ?? []).flatMap((q: { question: string; answer: string }) => {
+    return q?.question ? [{ faqQuestion: q.question, faqAnswer: q.answer ?? '' }] : []
+  })
 
-  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap(
-    (item: { cLogo: WPImage | null }) => {
-      const url = item.cLogo?.node?.sourceUrl
-      return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
-    }
-  )
+  const clientLogos: { url: string; alt: string }[] = (ts?.clientsLogos ?? []).flatMap((item: { cLogo: WPImage | null }) => {
+    const url = item.cLogo?.node?.sourceUrl
+    return url ? [{ url, alt: item.cLogo?.node?.altText ?? '' }] : []
+  })
 
   const contactItems = [
     ts?.cEmailLabel && ts?.cEmailAddress

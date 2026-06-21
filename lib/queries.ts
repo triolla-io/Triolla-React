@@ -218,18 +218,26 @@ export const GET_BRANDING_STUDIO = `
   }
 `
 
+// Fetch each footer menu BY SLUG. The bulk `menus { nodes }` connection only
+// returns menus assigned to a registered nav location, so menus that aren't
+// location-assigned (e.g. product-menu, technology-menu) silently disappear.
+// Querying by slug is immune to location assignment. Slugs must stay in sync
+// with MENU_COLUMNS in components/Footer.tsx.
 export const GET_FOOTER_DATA = `
   query GetFooterData {
-    menus {
+    product: menu(id: "product-menu", idType: SLUG) { ...FooterMenuFields }
+    caseStudy: menu(id: "case-study-menu", idType: SLUG) { ...FooterMenuFields }
+    technology: menu(id: "technology-menu", idType: SLUG) { ...FooterMenuFields }
+    company: menu(id: "company-menu", idType: SLUG) { ...FooterMenuFields }
+    blog: menu(id: "blog-menu", idType: SLUG) { ...FooterMenuFields }
+  }
+  fragment FooterMenuFields on Menu {
+    name
+    slug
+    menuItems(first: 20) {
       nodes {
-        name
-        slug
-        menuItems(first: 20) {
-          nodes {
-            label
-            url
-          }
-        }
+        label
+        url
       }
     }
   }
