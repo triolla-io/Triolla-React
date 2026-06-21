@@ -1,6 +1,10 @@
 'use client'
 
 import { useEffect } from 'react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { registerGsap } from '@/lib/gsap'
+
+registerGsap()
 
 /**
  * Forces a full page reload when the browser restores a page from the
@@ -16,7 +20,11 @@ export function BfcacheReloader() {
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         window.location.reload()
+        return
       }
+      // Non-persisted pageshow (normal load/restore): recompute trigger
+      // positions so pins/reveals measure the freshly-laid-out page.
+      ScrollTrigger.refresh()
     }
 
     window.addEventListener('pageshow', handlePageShow)

@@ -7,6 +7,7 @@ import CookieBanner from '@/components/CookieBanner'
 import ConsentScripts from '@/components/consent/ConsentScripts'
 import { ConsentProvider } from '@/components/consent/ConsentProvider'
 import { BfcacheReloader } from '@/components/BfcacheReloader'
+import { RouteRefresh } from '@/components/gsap/RouteRefresh'
 import { MotionProvider } from '@/components/MotionProvider'
 import { SmoothScroll } from '@/components/gsap/SmoothScroll'
 import { OrganizationJsonLd } from '@/components/OrganizationJsonLd'
@@ -73,6 +74,7 @@ export default async function RootLayout({
           </MotionProvider>
         </ConsentProvider>
         <BfcacheReloader />
+        <RouteRefresh />
         <OrganizationJsonLd />
       </body>
     </html>
