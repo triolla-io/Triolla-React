@@ -144,6 +144,8 @@ export function TechStickyFeature({
         }
 
         /* ─── Wave transitions ──────────────────────── */
+        .tsf-wave { line-height: 0; pointer-events: none; display: block; }
+        .tsf-wave svg { display: block; width: 100%; height: auto; }
 
         /* ─── Statement section (cream) ─────────────── */
         .tsf-stmt {
@@ -402,6 +404,13 @@ export function TechStickyFeature({
         ══════════════════════════════════════ */}
         {threbottomText && (
           <>
+            {/* Wave: dark → cream */}
+            <div className="tsf-wave" aria-hidden="true">
+              <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0 L240 45 L480 10 L720 55 L960 8 L1200 48 L1440 12 L1440 80 L0 80 Z" fill="#F5F0E8" />
+              </svg>
+            </div>
+
             <div ref={stmtRef} className="tsf-stmt">
               <div className="tsf-stmt__grid" aria-hidden="true" />
               <GlowOrb
@@ -507,6 +516,13 @@ export function TechStickyFeature({
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Wave: cream → dark */}
+            <div className="tsf-wave" aria-hidden="true">
+              <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 80 L240 35 L480 70 L720 25 L960 72 L1200 32 L1440 68 L1440 0 L0 0 Z" fill="#F5F0E8" />
+              </svg>
             </div>
           </>
         )}

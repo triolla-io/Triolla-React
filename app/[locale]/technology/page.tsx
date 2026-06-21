@@ -270,7 +270,32 @@ export default async function TechnologyPage({ params }: { params: Promise<{ loc
           .tech-scroll-cue { display: none; }
         }
 
-        /* Marquee banner uses the shared .brand-marquee-* classes (globals.css). */
+        /* ─── Marquee banner ────────────────────────────── */
+        .tech-marquee-item {
+          display: inline-flex;
+          align-items: center;
+          gap: clamp(22px, 2.8vw, 56px);
+          padding-right: clamp(22px, 2.8vw, 56px);
+          flex-shrink: 0;
+        }
+        .tech-marquee-name {
+          font-size: clamp(22px, 2.8vw, 44px);
+          font-weight: 900;
+          letter-spacing: -0.015em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.28);
+          transition: color 0.3s ease;
+          line-height: 1;
+        }
+        .tech-marquee-item:hover .tech-marquee-name {
+          color: rgba(255,255,255,0.95);
+        }
+        .tech-marquee-sep {
+          font-size: 16px;
+          display: inline-block;
+          transform: translateY(-0.1em);
+          letter-spacing: 0;
+        }
 
         /* ─── Tech grid ─────────────────────────────────── */
         @keyframes techCardFloat {
@@ -459,9 +484,9 @@ export default async function TechnologyPage({ params }: { params: Promise<{ loc
             fade
             fadeColor="#080808"
             renderItem={(c: { companyName: string }, i: number) => (
-              <span key={i} className="brand-marquee-item">
-                <span className="brand-marquee-name">{c.companyName}</span>
-                <span className="brand-marquee-sep" aria-hidden="true">
+              <span key={i} className="tech-marquee-item">
+                <span className="tech-marquee-name">{c.companyName}</span>
+                <span className="tech-marquee-sep" style={{ color: 'var(--accent)' }} aria-hidden="true">
                   ✦
                 </span>
               </span>

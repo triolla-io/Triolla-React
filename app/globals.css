@@ -367,36 +367,6 @@ html {
     background: linear-gradient(to left, var(--mq-fade-color, #080808) 0%, transparent 100%);
   }
 
-  /* Brand text banner — canonical scrolling company/category strip.
-     Reference: technology page. Shared by every text marquee so the
-     style stays identical site-wide (logo-image marquees are exempt). */
-  .brand-marquee-item {
-    display: inline-flex;
-    align-items: center;
-    gap: clamp(22px, 2.8vw, 56px);
-    padding-right: clamp(22px, 2.8vw, 56px);
-    flex-shrink: 0;
-  }
-  .brand-marquee-name {
-    font-size: clamp(22px, 2.8vw, 44px);
-    font-weight: 900;
-    letter-spacing: -0.015em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.28);
-    transition: color 0.3s ease;
-    line-height: 1;
-  }
-  .brand-marquee-item:hover .brand-marquee-name {
-    color: rgba(255, 255, 255, 0.95);
-  }
-  .brand-marquee-sep {
-    font-size: 16px;
-    display: inline-block;
-    transform: translateY(-0.1em);
-    letter-spacing: 0;
-    color: var(--accent);
-  }
-
   .shine-card {
     position: relative;
     overflow: hidden;
