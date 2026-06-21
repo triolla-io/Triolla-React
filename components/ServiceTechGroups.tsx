@@ -1,6 +1,7 @@
 'use client'
 
 import { SectionReveal } from '@/components/SectionReveal'
+import { Reveal } from '@/components/gsap/Reveal'
 import { useServiceModal, type ServiceDetail } from '@/components/ServiceDetailModal'
 
 export interface TechGroup {
@@ -61,13 +62,13 @@ export function ServiceTechGroups({ groups, ctaText, ctaLink }: ServiceTechGroup
               </h4>
               {copy && <p className="svc-tech-group__sub">{copy}</p>}
               {chips.length > 0 && (
-                <ul className="svc-tech-chips">
+                <Reveal stagger={0.05} className="svc-tech-chips">
                   {chips.map((chip, c) => (
-                    <li key={c} className="svc-tech-chip">
+                    <span key={c} className="svc-tech-chip">
                       {chip}
-                    </li>
+                    </span>
                   ))}
-                </ul>
+                </Reveal>
               )}
             </div>
           )

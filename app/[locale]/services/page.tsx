@@ -488,12 +488,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             <ServiceTechGroups groups={techGroups} ctaText={sp.buttonText ?? null} ctaLink="/contact-us" />
 
             {sp.devleftimage?.node?.sourceUrl && (
-              <FadeIn delay={0.18} yOffset={32} className="svc-dev__img-wrap">
-                <div className="svc-dev__img-inner">
-                  <img src={wpImg(sp.devleftimage.node.sourceUrl) ?? ''} alt="" className="svc-dev__img" />
-                  <div className="svc-dev__img-glow" aria-hidden="true" />
-                </div>
-              </FadeIn>
+              <Reveal yOffset={32} delay={0.1} className="svc-dev__img-wrap">
+                <Parallax speed={0.85}>
+                  <div className="svc-dev__img-inner">
+                    <img src={wpImg(sp.devleftimage.node.sourceUrl) ?? ''} alt="" className="svc-dev__img" />
+                    <div className="svc-dev__img-glow" aria-hidden="true" />
+                  </div>
+                </Parallax>
+              </Reveal>
             )}
           </div>
         </div>
