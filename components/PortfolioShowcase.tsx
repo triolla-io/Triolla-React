@@ -135,14 +135,6 @@ export function PortfolioShowcase({ items, accentColor, isRtl = false }: Portfol
 
             <div className="ps-scan" aria-hidden="true" />
 
-            {/* Right-edge fade into the page */}
-            <div
-              className="absolute inset-y-0 right-0 w-40 pointer-events-none z-10"
-              style={{
-                background: 'linear-gradient(to right, transparent, #080808)',
-              }}
-              aria-hidden="true"
-            />
             {/* Bottom + top vignette */}
             <div
               className="absolute inset-x-0 bottom-0 h-32 pointer-events-none z-10"
