@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useId, useRef, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'motion/react'
 import { useConsent } from '@/components/consent/ConsentProvider'
+import { Portal } from '@/components/gsap/Portal'
 
 interface Category {
   key: 'necessary' | 'analytics' | 'marketing'
@@ -87,13 +88,14 @@ function PreferencesDialog() {
   const state: Record<Category['key'], boolean> = { necessary: true, analytics, marketing }
 
   return (
-    <m.div
-      className="fixed inset-0 z-110 flex items-end justify-center p-4 sm:items-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
-    >
+    <Portal>
+      <m.div
+        className="fixed inset-0 z-110 flex items-end justify-center p-4 sm:items-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+      >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" aria-hidden="true" onClick={closePrefs} />
 
       <m.div
@@ -179,7 +181,8 @@ function PreferencesDialog() {
           </div>
         </div>
       </m.div>
-    </m.div>
+      </m.div>
+    </Portal>
   )
 }
 
