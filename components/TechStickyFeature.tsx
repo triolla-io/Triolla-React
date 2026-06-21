@@ -3,8 +3,14 @@
 import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import parse from 'html-react-parser'
+import { useGSAP } from '@gsap/react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { GlowOrb } from '@/components/ui'
 import { wpImg } from '@/lib/images'
+import { registerGsap, Q_DESKTOP } from '@/lib/gsap'
+
+registerGsap()
 
 function decodeHtml(html: string): string {
   return (html ?? '')
@@ -51,6 +57,8 @@ export function TechStickyFeature({
   const [stmtVisible, setStmtVisible] = useState(false)
   const panelRefs = useRef<(HTMLDivElement | null)[]>([])
   const stmtRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const stickyRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const observers: IntersectionObserver[] = []
@@ -83,6 +91,30 @@ export function TechStickyFeature({
     obs.observe(el)
     return () => obs.disconnect()
   }, [])
+
+  // Replace CSS `position: sticky` (broken under ScrollSmoother's transform)
+  // with a ScrollTrigger pin. Desktop+motion only; mobile keeps the stacked
+  // layout where the left image panel is `hidden lg:block`.
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add(Q_DESKTOP, () => {
+        const grid = gridRef.current
+        const sticky = stickyRef.current
+        if (!grid || !sticky) return
+        const st = ScrollTrigger.create({
+          trigger: grid,
+          start: 'top top',
+          end: 'bottom bottom',
+          pin: sticky,
+          pinSpacing: false,
+          anticipatePin: 1,
+        })
+        return () => st.kill()
+      })
+    },
+    { scope: gridRef },
+  )
 
   if (!panels.length) return null
 
@@ -203,10 +235,10 @@ export function TechStickyFeature({
         {/* ══════════════════════════════════════
             STICKY SPLIT LAYOUT
         ══════════════════════════════════════ */}
-        <div className="lg:grid lg:grid-cols-[45fr_55fr]">
-          {/* LEFT — sticky image */}
+        <div ref={gridRef} className="lg:grid lg:grid-cols-[45fr_55fr]">
+          {/* LEFT — pinned image (ScrollTrigger pin, not CSS sticky) */}
           <div className="hidden lg:block">
-            <div className="sticky top-0 h-screen overflow-hidden">
+            <div ref={stickyRef} className="h-screen overflow-hidden">
               <div className="absolute inset-0">
                 {panels.map((panel, i) =>
                   panel.lftimage?.node?.sourceUrl ? (
