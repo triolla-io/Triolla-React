@@ -6,11 +6,14 @@ import type { TypedDocumentNode } from '@apollo/client'
 import { SectionReveal } from '@/components/SectionReveal'
 import { FadeIn } from '@/components/FadeIn'
 import { FAQSection } from '@/components/FAQSection'
-import { HeroHeadline } from '@/components/HeroHeadline'
+import { Reveal } from '@/components/gsap/Reveal'
+import { SplitReveal } from '@/components/gsap/SplitReveal'
+import { Parallax } from '@/components/gsap/Parallax'
+import { HeroMarquee } from '@/components/services/HeroMarquee'
 import { ClientsSection } from '@/components/ClientsSection'
 import { ServiceModalMenu } from '@/components/ServiceModalMenu'
 import { ServiceTechGroups, type TechGroup } from '@/components/ServiceTechGroups'
-import { GrainOverlay, GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
+import { GrainOverlay, GlowOrb, Eyebrow, Button } from '@/components/ui'
 import parse from 'html-react-parser'
 import type { GetServicesPageData, GetThemeSettingsData, ServicesPageFields, ThemeOptions, WPImage } from '@/lib/graphql-types'
 import { wpImg } from '@/lib/images'
@@ -175,18 +178,25 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
       {/* ══ HERO ══ */}
       <section className="svc-hero">
         {/* animation="none" preserves base CSS transform (-translate-x-1/2) and matches
-            frame-0 opacity of the original svcOrbGold (0.85) / svcOrbAmber (0.6) keyframes */}
-        <GlowOrb
-          size={900}
-          height={480}
-          shape="ellipse"
-          fade="70%"
-          blur={80}
-          color="rgba(250,204,21,0.13)"
-          className="bottom-[-12%] left-1/2 -translate-x-1/2 z-0 opacity-85"
-        />
-        <GlowOrb size={640} fade="65%" blur={80} color="rgba(251,146,60,0.055)" className="top-[-8%] left-[-12%] z-0 opacity-60" />
-        <div className="svc-hero__grid" aria-hidden="true" />
+            frame-0 opacity of the original svcOrbGold (0.85) / svcOrbAmber (0.6) keyframes.
+            Each layer drifts at a different data-speed for multi-plane parallax. */}
+        <Parallax speed={1.15}>
+          <GlowOrb
+            size={900}
+            height={480}
+            shape="ellipse"
+            fade="70%"
+            blur={80}
+            color="rgba(250,204,21,0.13)"
+            className="bottom-[-12%] left-1/2 -translate-x-1/2 z-0 opacity-85"
+          />
+        </Parallax>
+        <Parallax speed={0.9}>
+          <GlowOrb size={640} fade="65%" blur={80} color="rgba(251,146,60,0.055)" className="top-[-8%] left-[-12%] z-0 opacity-60" />
+        </Parallax>
+        <Parallax speed={1.05}>
+          <div className="svc-hero__grid" aria-hidden="true" />
+        </Parallax>
 
         {/* Corner frame brackets */}
         <div className="svc-hero__corner svc-hero__corner--tl" aria-hidden="true" />
@@ -195,9 +205,11 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         <div className="svc-hero__corner svc-hero__corner--br" aria-hidden="true" />
 
         {/* Ghost number */}
-        <div className="svc-hero__ghost" aria-hidden="true">
-          01
-        </div>
+        <Parallax speed={0.8} className="svc-hero__ghost-wrap">
+          <div className="svc-hero__ghost" aria-hidden="true">
+            01
+          </div>
+        </Parallax>
 
         {/* Editorial index top-right */}
         <div className="svc-hero__index" aria-hidden="true">
@@ -212,7 +224,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
 
         <div className="svc-hero__content">
           {sp.headerSubText && (
-            <FadeIn yOffset={20} duration={0.7}>
+            <Reveal yOffset={20} duration={0.7}>
               <Eyebrow
                 ornament="dot"
                 align="center"
@@ -220,41 +232,42 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               >
                 {sp.headerSubText}
               </Eyebrow>
-            </FadeIn>
+            </Reveal>
           )}
 
-          <HeroHeadline
-            headline={heroTitle}
-            headlineClassName="gradient-text gradient-text--animate text-[clamp(3.6rem,11vw,128px)] font-black leading-[0.88] tracking-[-0.055em] mb-12 [word-break:break-word]"
-            headlineStyle={{ '--gt-gradient': 'linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)' } as React.CSSProperties}
+          <SplitReveal
+            text={heroTitle}
+            type="lines"
+            className="gradient-text gradient-text--animate text-[clamp(3.6rem,11vw,128px)] font-black leading-[0.88] tracking-[-0.055em] mb-12 [word-break:break-word]"
+            style={{ '--gt-gradient': 'linear-gradient(135deg,#fff 38%,#facc15 52%,#fff 68%)' } as React.CSSProperties}
           />
 
-          <FadeIn delay={0.22} duration={0.8}>
+          <Reveal delay={0.22} duration={0.8}>
             <div className="svc-hero__rule" aria-hidden="true" />
-          </FadeIn>
+          </Reveal>
 
           <div className="svc-hero__meta">
             <div className="svc-hero__meta-l">
               {sp.boldText && (
-                <FadeIn yOffset={16} delay={0.32}>
+                <Reveal yOffset={16} delay={0.32}>
                   <p className="svc-hero__bold">{sp.boldText}</p>
-                </FadeIn>
+                </Reveal>
               )}
               {sp.shortText && (
-                <FadeIn yOffset={14} delay={0.4}>
+                <Reveal yOffset={14} delay={0.4}>
                   <p className="svc-hero__short">{sp.shortText}</p>
-                </FadeIn>
+                </Reveal>
               )}
             </div>
             <div className="svc-hero__meta-r">
               {sp.moreText && (
-                <FadeIn yOffset={14} delay={0.46}>
+                <Reveal yOffset={14} delay={0.46}>
                   {/* WP-sourced HTML — trusted backend only */}
                   <div className="svc-hero__more">{parse(sp.moreText)}</div>
-                </FadeIn>
+                </Reveal>
               )}
               {sp.buttonText && (
-                <FadeIn yOffset={20} delay={0.56}>
+                <Reveal yOffset={20} delay={0.56}>
                   <Button
                     href={localizeHref('/contact-us', loc)}
                     variant="primary"
@@ -277,7 +290,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
                       />
                     </svg>
                   </Button>
-                </FadeIn>
+                </Reveal>
               )}
             </div>
           </div>
@@ -292,17 +305,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         {/* Scrolling category strip */}
         {svcCategories.length > 0 && (
           <div className="svc-hero__strip" aria-hidden="true">
-            <Marquee
-              items={svcCategories}
-              repeat={4}
-              speed={44}
-              renderItem={(cat, i) => (
-                <span key={i} className="svc-hero__strip-item">
-                  {cat}
-                  <span className="svc-hero__strip-dot">✦</span>
-                </span>
-              )}
-            />
+            <HeroMarquee items={svcCategories} />
           </div>
         )}
       </section>
