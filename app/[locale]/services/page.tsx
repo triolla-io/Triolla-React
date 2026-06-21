@@ -10,6 +10,7 @@ import { Reveal } from '@/components/gsap/Reveal'
 import { SplitReveal } from '@/components/gsap/SplitReveal'
 import { Parallax } from '@/components/gsap/Parallax'
 import { HeroMarquee } from '@/components/services/HeroMarquee'
+import { ProductGalleryScene } from '@/components/services/ProductGalleryScene'
 import { ClientsSection } from '@/components/ClientsSection'
 import { ServiceModalMenu } from '@/components/ServiceModalMenu'
 import { ServiceTechGroups, type TechGroup } from '@/components/ServiceTechGroups'
@@ -327,6 +328,15 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
             {sp.proddtxt && <div className="section-head__sub">{parse(sp.proddtxt)}</div>}
           </FadeIn>
 
+          {/* Desktop + motion: horizontal scrub-gallery (the signature). Self-hides
+              below lg and under reduced motion via CSS; the static gallery/menu
+              below is the fallback for those cases. */}
+          <ProductGalleryScene
+            images={prodImages}
+            dir={loc === 'he' ? 'rtl' : 'ltr'}
+            menu={<ServiceModalMenu services={productServices} ctaText={sp.buttonText ?? null} ctaLink="/contact-us" />}
+          />
+
           <div className="svc-prod__body">
             {/* Mobile-only: 3-card floating collage */}
             {(prodImages[0] || prodImages[1] || prodImages[2]) && (
@@ -599,6 +609,24 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         .svc-prod { position: relative; padding: 112px 0 0; }
         .svc-prod__inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
         .svc-prod__body { display: grid; grid-template-columns: 3fr 1fr; gap: 64px; align-items: start; }
+
+        /* ─── Product scrub-gallery scene (desktop + motion only) ──────────────
+           Hidden by default; the static .svc-prod__body gallery+menu below is the
+           fallback for reduced motion, tablet, and mobile. Fixed aspect-ratio
+           cards make the track width deterministic at layout time, so the scrub
+           distance never depends on image-load timing. */
+        .svc-pgscene { display: none; position: relative; }
+        .svc-pgscene__rail { overflow: hidden; width: 100%; }
+        .svc-pgscene__track { display: flex; gap: 24px; width: max-content; will-change: transform; }
+        .svc-pgscene__card { flex: 0 0 auto; width: clamp(280px, 32vw, 460px); aspect-ratio: 4 / 3; border-radius: 22px; overflow: hidden; background: #111; box-shadow: 0 18px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04); }
+        .svc-pgscene__card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .svc-pgscene__card[data-depth='1'] { margin-top: 36px; }
+        .svc-pgscene__card[data-depth='2'] { margin-top: 18px; }
+        .svc-pgscene__menu { margin-top: 32px; }
+        @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+          .svc-pgscene { display: block; }
+          .svc-prod__body { display: none; } /* scene replaces the static gallery+menu */
+        }
         .svc-prod__gallery { display: flex; flex-direction: column; gap: 16px; }
         .svc-prod__row { display: flex; gap: 16px; align-items: flex-start; }
         .svc-prod__icons { display: flex; gap: 14px; padding-left: 28px; }
