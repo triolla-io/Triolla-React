@@ -3,7 +3,7 @@ import { locales, defaultLocale } from '@/lib/i18n'
 
 const NON_DEFAULT_LOCALES = locales.filter((l) => l !== defaultLocale)
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // A non-default locale (e.g. /he, /he/...) is served as-is.

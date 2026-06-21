@@ -25,7 +25,7 @@ Read `schema.graphql` before writing any query — never guess field names. Rege
 
 ### Internationalization (i18n)
 
-Bilingual via a `[locale]` route segment: English is the default (prefix-free URLs, internal `/en`), Hebrew is served under `/he/` (`dir="rtl"`). Config in `lib/i18n.ts`; `middleware.ts` keeps English URLs clean and redirects `/en/...`. Hebrew content lives in the SAME WordPress install (WPML) and is fetched through the existing WPGraphQL endpoint by the page's Hebrew slug — see `PAGE_URI` in `lib/i18n.ts`. Add a route's Hebrew slug there to localize it. Assets differ per locale and come from whatever WP returns for that page; render `null` when absent — never reuse the English asset.
+Bilingual via a `[locale]` route segment: English is the default (prefix-free URLs, internal `/en`), Hebrew is served under `/he/` (`dir="rtl"`). Config in `lib/i18n.ts`; `proxy.ts` (Next.js 16 renamed `middleware.ts` → `proxy.ts`) keeps English URLs clean and redirects `/en/...`. Hebrew content lives in the SAME WordPress install (WPML) and is fetched through the existing WPGraphQL endpoint by the page's Hebrew slug — see `PAGE_URI` in `lib/i18n.ts`. Add a route's Hebrew slug there to localize it. Assets differ per locale and come from whatever WP returns for that page; render `null` when absent — never reuse the English asset.
 
 **Backend follow-up (not yet done):** Navigation menus and `themeSetting` are not translatable via WPGraphQL without the `wp-graphql-wpml` plugin. Until it is enabled, Header/Footer chrome renders English on `/he/`. Do not hardcode Hebrew chrome text.
 

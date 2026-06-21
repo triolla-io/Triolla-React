@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom'
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, m } from 'motion/react'
-import Image from 'next/image'
 import { wpImg } from '@/lib/images'
 
 export interface ChildItem {
@@ -376,7 +375,7 @@ export function HeaderClient({
           {/* Logo — always visible */}
           <Link href={isHe ? '/he' : '/'} className="shrink-0 flex items-center">
             {logoUrl ? (
-              <Image src={wpImg(logoUrl) ?? logoUrl} alt="Triolla" width={120} height={20} className="h-5 w-auto brightness-0 invert" />
+              <img src={wpImg(logoUrl) ?? logoUrl} alt="Triolla" width={120} height={20} className="h-5 w-auto brightness-0 invert" />
             ) : (
               <span className="text-[18px] font-bold tracking-tight text-white lowercase">triolla</span>
             )}
@@ -571,7 +570,7 @@ export function HeaderClient({
                 }}
               >
                 {logoUrl ? (
-                  <Image src={wpImg(logoUrl) ?? logoUrl} alt="Triolla" width={120} height={20} className="h-5 w-auto brightness-0 invert" />
+                  <img src={wpImg(logoUrl) ?? logoUrl} alt="Triolla" width={120} height={20} className="h-5 w-auto brightness-0 invert" />
                 ) : (
                   <span className="text-[18px] font-bold tracking-tight text-white lowercase">triolla</span>
                 )}

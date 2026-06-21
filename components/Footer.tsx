@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { client } from '@/lib/apollo-client'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
@@ -160,6 +159,10 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
 
   const logoUrl: string = ts?.siteLogo?.node?.sourceUrl ?? ''
   const sqlinkUrl: string = ts?.sqlink ?? ''
+  // The Sqlink badge is a WP theme asset referenced by a root-relative path; it
+  // 404s on the Next host. Prefix it with the WP origin (derived from the
+  // GraphQL endpoint — no new hardcoded host) so it loads from WordPress.
+  const wpOrigin = (process.env.NEXT_PUBLIC_WORDPRESS_GRAPHQL_URL ?? 'https://triolla.io/graphql').replace(/\/graphql\/?$/, '')
   const emailAddress: string = ts?.emailAddress ?? ''
   const tlvLabel: string = ts?.tlvOfficesLabel ?? ''
   const tlvPhone: string = ts?.tlvOfficesPhone ?? ''
@@ -206,7 +209,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
                       style={{ '--mi': i } as React.CSSProperties}
                       aria-label={label}
                     >
-                      <Image src={wpImg(src) ?? src} alt="" width={100} height={36} className="footer-mention__img" />
+                      <img src={wpImg(src) ?? src} alt="" width={100} height={36} className="footer-mention__img" />
                     </a>
                   )
                 })}
@@ -333,7 +336,7 @@ export default async function Footer({ locale = defaultLocale }: { locale?: Loca
               {sqlinkUrl && (
                 <a href={sqlinkUrl} target="_blank" rel="noopener noreferrer" className="footer-sqlink">
                   Part of
-                  <img src="/wp-content/themes/triolla/images/sqlink_icon.png" alt="Sqlink" className="h-5 w-auto" />
+                  <img src={`${wpOrigin}/wp-content/themes/triolla/images/sqlink_icon.png`} alt="Sqlink" className="h-5 w-auto" />
                 </a>
               )}
               <div className="flex items-center gap-3">
