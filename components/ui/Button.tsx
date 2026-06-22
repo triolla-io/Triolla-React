@@ -8,6 +8,9 @@ interface CommonProps {
   variant?: Variant
   className?: string
   style?: React.CSSProperties
+  /** Adds the radial ink-fill hover layer (pair with <Magnetic> for cursor
+   *  origin). Reduced-motion users keep the plain colour-swap hover. */
+  explode?: boolean
 }
 
 type ButtonAsLink = CommonProps & { href: string }
@@ -21,21 +24,29 @@ const VARIANT_CLASS: Record<Variant, string> = {
 }
 
 export function Button(props: ButtonProps) {
-  const { children, variant = 'primary', className = '', style } = props
-  const cls = `btn ${VARIANT_CLASS[variant]} ${className}`.trim()
+  const { children, variant = 'primary', className = '', style, explode = false } = props
+  const cls = `btn ${VARIANT_CLASS[variant]}${explode ? ' btn--explode' : ''} ${className}`.trim()
+  const inner = explode ? (
+    <>
+      <span className="btn__ink" aria-hidden="true" />
+      <span className="btn__label">{children}</span>
+    </>
+  ) : (
+    children
+  )
 
   if (props.href !== undefined) {
     return (
       <Link href={props.href} className={cls} style={style}>
-        {children}
+        {inner}
       </Link>
     )
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { children: _c, variant: _v, className: _cn, style: _s, href: _h, ...rest } = props
+  const { children: _c, variant: _v, className: _cn, style: _s, href: _h, explode: _e, ...rest } = props
   return (
     <button type="button" className={cls} style={style} {...rest}>
-      {children}
+      {inner}
     </button>
   )
 }

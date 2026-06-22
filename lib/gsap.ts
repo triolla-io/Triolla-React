@@ -19,6 +19,10 @@ export function registerGsap(): void {
   CustomEase.create('bounce', 'M0,0 C0.16,1 0.3,1 1,1')
   CustomEase.create('standard', 'M0,0 C0.4,0 0.2,1 1,1')
   CustomEase.create('symmetric', 'M0,0 C0.2,1 0.3,1 1,1')
+  // Springy overshoot for hover/press micro-interactions (mirrors --ease-back in
+  // globals.css). Same bezier Outcrowd uses for its playful button snap. Reserve
+  // for short transform tweens (magnetic pull, chip pop) — never scroll reveals.
+  CustomEase.create('back', 'M0,0 C0.175,0.885 0.32,1.275 1,1')
   registered = true
 }
 
@@ -26,4 +30,4 @@ export function registerGsap(): void {
 export const Q_MOTION = '(prefers-reduced-motion: no-preference)'
 /** Smoothing + heavy scenes are desktop-only. */
 export const Q_DESKTOP = '(min-width: 1024px) and (prefers-reduced-motion: no-preference)'
-export const SMOOTH_AMOUNT = 1.2
+export const SMOOTH_AMOUNT = 1.55

@@ -311,6 +311,9 @@ export const GET_THEME_SETTINGS = `
         commonGridOneImage { node { sourceUrl } }
         commonGridOneMobile { node { sourceUrl } }
         menuBackgroundImage { node { sourceUrl } }
+        jumpingImage1 { node { sourceUrl altText } }
+        jumpingImage2 { node { sourceUrl altText } }
+        jumpingImage3 { node { sourceUrl altText } }
       }
     }
   }

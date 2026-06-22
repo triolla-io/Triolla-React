@@ -1,6 +1,5 @@
 'use client'
 
-import { SectionReveal } from '@/components/SectionReveal'
 import { Reveal } from '@/components/gsap/Reveal'
 import { useServiceModal, type ServiceDetail } from '@/components/ServiceDetailModal'
 
@@ -35,7 +34,7 @@ export function ServiceTechGroups({ groups, ctaText, ctaLink }: ServiceTechGroup
 
   return (
     <>
-      <SectionReveal className="svc-dev__lists">
+      <Reveal stagger={0.12} className="svc-dev__lists">
         {groups.map((g, i) => {
           const { detail, copy, chips } = g
           if (!detail.label) return null
@@ -73,7 +72,7 @@ export function ServiceTechGroups({ groups, ctaText, ctaLink }: ServiceTechGroup
             </div>
           )
         })}
-      </SectionReveal>
+      </Reveal>
 
       {modal}
 

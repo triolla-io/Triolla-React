@@ -6,6 +6,7 @@ import { useGSAP } from '@gsap/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { GlowOrb, GradientText } from '@/components/ui'
+import { Reveal } from '@/components/gsap/Reveal'
 import { registerGsap, Q_DESKTOP } from '@/lib/gsap'
 
 registerGsap()
@@ -98,8 +99,8 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
               </div>
             </div>
 
-            {/* RIGHT — accordion */}
-            <div className="fq-col-right">
+            {/* RIGHT — accordion (rows cascade in on enter) */}
+            <Reveal as="div" stagger={0.06} className="fq-col-right">
               {items.map((item, i) => {
                 const isOpen = open === i
                 return (
@@ -127,7 +128,7 @@ export function FAQSection({ heading, subtext, items }: FAQSectionProps) {
                   </div>
                 )
               })}
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>

@@ -14,16 +14,24 @@ interface RevealProps {
   yOffset?: number
   /** When set, animates direct children with this stagger (seconds). */
   stagger?: number
+  /** Host element to render (default 'div'). Use 'ul'/'ol' to keep list markup
+   *  valid while still staggering the direct `<li>` children. */
+  as?: React.ElementType
   className?: string
   style?: React.CSSProperties
   once?: boolean
+  /** Tie the reveal to scroll progress instead of firing once — the block
+   *  fades/rises in as you scroll through it (Outcrowd-style). `true` ≈ scrub 1.
+   *  Best for long-form text; grids read better as a once-fire cascade. */
+  scrub?: boolean | number
 }
 
 export function Reveal({
   children, delay = 0, duration = 0.7, yOffset = 40, stagger,
-  className, style, once = true,
+  as = 'div', className, style, once = true, scrub,
 }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLElement>(null)
+  const Tag = as as React.ElementType
   const isStagger = stagger != null
 
   useGSAP(
@@ -38,7 +46,9 @@ export function Reveal({
           {
             autoAlpha: 1, y: 0, duration, delay, ease: 'smooth',
             stagger: stagger ?? 0,
-            scrollTrigger: { trigger: root, start: 'top 85%', once },
+            scrollTrigger: scrub != null
+              ? { trigger: root, start: 'top 88%', end: 'top 42%', scrub: scrub === true ? 1 : scrub }
+              : { trigger: root, start: 'top 85%', once },
           },
         )
         return () => tween.scrollTrigger?.kill()
@@ -48,8 +58,8 @@ export function Reveal({
   )
 
   return (
-    <div ref={ref} className={className} style={style} {...(isStagger ? { 'data-reveal-stagger': '' } : { 'data-reveal': '' })}>
+    <Tag ref={ref} className={className} style={style} {...(isStagger ? { 'data-reveal-stagger': '' } : { 'data-reveal': '' })}>
       {children}
-    </div>
+    </Tag>
   )
 }

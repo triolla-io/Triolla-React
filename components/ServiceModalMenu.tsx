@@ -1,6 +1,6 @@
 'use client'
 
-import { FadeIn } from '@/components/FadeIn'
+import { Reveal } from '@/components/gsap/Reveal'
 import { useServiceModal, num, type ServiceDetail } from '@/components/ServiceDetailModal'
 
 export type { ServiceDetail }
@@ -36,32 +36,30 @@ export function ServiceModalMenu({ services, ctaText, ctaLink, variant = 'dark' 
 
   return (
     <>
-      <ul className="svc-menu-list">
+      <Reveal as="ul" stagger={0.08} yOffset={18} className="svc-menu-list">
         {services.map((s, i) => (
-          <FadeIn key={i} delay={i * 0.09} yOffset={18}>
-            <li className={itemCls}>
-              <span className={numCls}>{num(i)}</span>
-              {s.hasDetail ? (
-                <button
-                  type="button"
-                  ref={setTriggerRef(i)}
-                  className={`${titleCls} svc-menu-item__title--btn`}
-                  onClick={() => open(i)}
-                  aria-haspopup="dialog"
-                >
-                  {s.label}
-                </button>
-              ) : s.link ? (
-                <a href={s.link} className={titleCls}>
-                  {s.label}
-                </a>
-              ) : (
-                <span className={titleCls}>{s.label}</span>
-              )}
-            </li>
-          </FadeIn>
+          <li key={i} className={itemCls}>
+            <span className={numCls}>{num(i)}</span>
+            {s.hasDetail ? (
+              <button
+                type="button"
+                ref={setTriggerRef(i)}
+                className={`${titleCls} svc-menu-item__title--btn`}
+                onClick={() => open(i)}
+                aria-haspopup="dialog"
+              >
+                {s.label}
+              </button>
+            ) : s.link ? (
+              <a href={s.link} className={titleCls}>
+                {s.label}
+              </a>
+            ) : (
+              <span className={titleCls}>{s.label}</span>
+            )}
+          </li>
         ))}
-      </ul>
+      </Reveal>
 
       {modal}
 

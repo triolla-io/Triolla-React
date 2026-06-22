@@ -34,6 +34,7 @@
   --ease-bounce: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-symmetric: cubic-bezier(0.2, 1, 0.3, 1);
+  --ease-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -308,6 +309,87 @@ html {
     background: var(--accent);
     color: #000;
     transform: translateY(-2px);
+  }
+
+  /* ── Explode ink-fill (Outcrowd-style) ──────────────────────────────────
+     On hover a radial child grows from the cursor (or center) to flood the
+     button while the label flips colour. Origin is fed by the Magnetic wrapper
+     via --ex/--ey; defaults to centre when used without it. Motion-gated:
+     reduced-motion users keep the plain colour-swap hover. */
+  .btn--explode {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .btn--explode .btn__label {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--btn-gap, 8px);
+  }
+  .btn__ink {
+    display: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .btn--explode .btn__ink {
+      display: block;
+      position: absolute;
+      left: var(--ex, 50%);
+      top: var(--ey, 50%);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.55s var(--ease-back);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .btn--explode .btn__label {
+      transition: color 0.3s var(--ease-standard);
+    }
+    .btn--primary.btn--explode .btn__ink {
+      background: #0a0a0a;
+    }
+    /* Hold the base colour while the dark ink floods (the base .btn--primary:hover
+       flips bg to #fff, which would briefly show white label on white). */
+    .btn--primary.btn--explode:hover {
+      background: var(--accent);
+    }
+    .btn--primary.btn--explode:hover .btn__ink,
+    .btn--primary.btn--explode:focus-visible .btn__ink {
+      transform: translate(-50%, -50%) scale(48);
+    }
+    .btn--primary.btn--explode:hover .btn__label,
+    .btn--primary.btn--explode:focus-visible .btn__label {
+      color: #fff;
+    }
+    .btn--outline.btn--explode .btn__ink {
+      background: var(--accent);
+    }
+    .btn--outline.btn--explode:hover .btn__ink,
+    .btn--outline.btn--explode:focus-visible .btn__ink {
+      transform: translate(-50%, -50%) scale(48);
+    }
+    .btn--outline.btn--explode:hover .btn__label,
+    .btn--outline.btn--explode:focus-visible .btn__label {
+      color: #000;
+    }
+  }
+
+  /* ── Magnetic wrapper ───────────────────────────────────────────────────
+     <Magnetic> drives the child's transform via GSAP (quickTo). Strip transform
+     from the CSS transition so the two don't double-smooth; keep colour/shadow
+     transitions. */
+  .magnetic {
+    display: inline-flex;
+  }
+  .magnetic .btn {
+    transition:
+      background 0.2s,
+      color 0.2s,
+      border-color 0.2s,
+      box-shadow 0.2s;
   }
 
   .section-head {

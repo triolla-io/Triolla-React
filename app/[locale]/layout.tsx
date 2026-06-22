@@ -50,7 +50,7 @@ export default async function RootLayout({
   const loc = isLocale(locale) ? locale : defaultLocale
 
   return (
-    <html lang={htmlLang[loc]} dir={dir[loc]} className={`${inter.variable} h-full antialiased`}>
+    <html lang={htmlLang[loc]} dir={dir[loc]} className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://triolla.io" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://triolla.io" />

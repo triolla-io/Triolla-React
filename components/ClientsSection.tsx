@@ -2,6 +2,8 @@ import React from 'react'
 import Image from 'next/image'
 import parse from 'html-react-parser'
 import { GlowOrb, Eyebrow, Marquee, Button } from '@/components/ui'
+import { Reveal } from '@/components/gsap/Reveal'
+import { Magnetic } from '@/components/gsap/Magnetic'
 import { wpImg } from '@/lib/images'
 import { type Locale, localizeHref } from '@/lib/i18n'
 
@@ -84,7 +86,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
       />
 
       {(heading || bigText) && (
-        <div className="cs-clients__head">
+        <Reveal className="cs-clients__head">
           {heading && (
             <Eyebrow
               ornament="line"
@@ -104,7 +106,7 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
             </Eyebrow>
           )}
           {bigText && <h3 className="cs-clients__title">{parse(decodeHtml(bigText))}</h3>}
-        </div>
+        </Reveal>
       )}
 
       {/* Row 1 — forward */}
@@ -141,18 +143,21 @@ export function ClientsSection({ logos, heading, bigText, ctaText, accentColor =
       />
 
       {ctaText && (
-        <div className="text-center mt-12 relative z-10">
-          <Button
-            variant="primary"
-            href={localizeHref('/contact-us', locale)}
-            style={{ '--btn-pad': '14px 32px', background: 'var(--accent)' } as React.CSSProperties}
-          >
-            {ctaText}
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M2 8H14M10.5 4L14 8L10.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </Button>
-        </div>
+        <Reveal className="text-center mt-12 relative z-10">
+          <Magnetic>
+            <Button
+              variant="primary"
+              href={localizeHref('/contact-us', locale)}
+              explode
+              style={{ '--btn-pad': '14px 32px', background: 'var(--accent)' } as React.CSSProperties}
+            >
+              {ctaText}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2 8H14M10.5 4L14 8L10.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </Button>
+          </Magnetic>
+        </Reveal>
       )}
     </section>
   )

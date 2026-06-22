@@ -68,6 +68,9 @@ export interface ThemeOptions {
   commonGridOneImage: WPImage | null
   commonGridOneMobile: WPImage | null
   menuBackgroundImage: WPImage | null
+  jumpingImage1: WPImage | null
+  jumpingImage2: WPImage | null
+  jumpingImage3: WPImage | null
 }
 
 export interface GetThemeSettingsData {
